@@ -1,0 +1,8 @@
+"engine\game\assets\img\Pozadi_atm.jpg","atmo","192:101","c"
+"engine\game\assets\img\Pozadi_atm.jpg","atmo_notScaled",None,"nc"
+"engine\game\assets\img\space_background.jpg","space_back","810:340","c"
+"engine\game\assets\img\space_button.png","space_button","192:101","ca"
+"engine\game\assets\img\anim0.png","anim0","384:202","c"
+"engine\game\assets\img\anim1.png","anim1","384:202","c"
+"engine\game\assets\img\anim2.png","anim2","384:202","c"
+"engine\game\assets\img\space_background.jpg","anim3","384:202","c"

@@ -1,0 +1,249 @@
+Rendering help:
+
+    animations:
+        Write to 'animations_to_create.py' in format:
+        name, cycle length in sec, layer, frame sizing (x:y), frames...*
+
+        * name of frame in engine internal self.sprites dictionary, which needs to be loaded separately using 'sprites_to_load.py'
+
+        use in current frame: self.animations_to_render.append("example_anim")
+
+    textures/sprites:
+        Write to 'sprites_to_load.py' in format:
+        relative path, name, size (x:y), convert type*
+
+        * convert types are: nc - no convert, c - convert, ca - convert alpha (allows transparency, but is much slower)
+
+        
+        use in current frame:
+            self.to_render.append(RenderItem(
+                "sprite": internal sprite reference in self.sprites,
+                "rect": pygame Rect type or tuple (x, y, sizeX, sizeY)
+                ))
+
+            example:
+                self.to_render.append(RenderItem("sprite", 4, {"sprite":self.sprites["atmo"], "rect":(0, 0, 100, 100)}))
+
+    flatpane:
+        A special container for sprites - can contain position and metadata
+        Currently mostly unused, doesn't have a custom renderer entry, use the same as RenderItem sprite + .sprite (see example below)
+        Don't use unless you have a special use case - for usual sprites and textures use RenderItem sprite
+
+        TL;DR: don't use, it's too complicated to work with excluding niche cases
+
+        usage:
+            flatpane(
+                dtype: currently only "img"
+                sprite_list: list of sprites to choose from using meta["sprite"]
+                meta: all kwargs** metadata; e.g. 'sprite' for sprite reference, 'position' for positioning and any custom for your custom use case
+            )
+
+        example:
+            flatpane("img", self.sprites, sprite="atmo", position=(100, 100))
+
+        use in current frame:
+            self.to_render.append(RenderItem("sprite", 5, {"sprite":flatpane_instance.sprite, "rect":(0, 0, 100, 100)}))
+
+    RenderItem:
+        A class with mostly self-repairing code, used with NGF's integrated render framework
+
+        usage:
+            RenderItem(
+                "item_type": determines what to draw using given metadata; sprite, rect, line, aaline, circle, text, poly
+                "layer": which layer to draw on; uses NGF self.layers variable as a global layer limit
+                "metadata": all item_type dependant data is located here - all supported types are found in greater detail below (sprites are above)
+            )
+
+        text:
+            Requires a font loaded for optimal performance!
+
+            use in current frame:
+                self.to_render.append(RenderItem(
+                    "font": either a sysfont (name, size), or variable containing pg.font.Font type, or custom font file (DON'T PLEASE - file path, size)
+                    "text": text to display
+                    "antialias": whether antialiasing should be used while rendering
+                    "color": can use either RGB or variables included in 'colors.py'
+                    "rect": pygame Rect type
+                    "no_bg": when True, text will render with transparent background, else uses bg_color parameter
+                    "bg_color": use only when no_bg is not enabled; RGB or variables included in 'colors.py'
+                ))
+
+            example:
+                self.to_render.append(RenderItem("text", 5, {"no_bg":True, "font":("Arial", 120), "color":cyan, "text":str("hello")}))
+
+        rectangle:
+            use in current frame:
+                self.to_render.append(RenderItem(
+                    "color": RGB or variables included in 'colors.py'
+                    "rect": pygame Rect type or tuple (x, y, sizeX, sizeY)
+                    "width": border width, gets filled with color when 0
+                    "radius": border radius
+                ))
+                
+            example:
+                self.to_render.append(RenderItem("rect", 3, {"rect":(0, 0, 100, 100), "color":cyan}))
+
+        circle:
+            use in current frame:
+                self.to_render.append(RenderItem(
+                    "color": RGB or variables included in 'colors.py'
+                    "center": center of the circle
+                    "radius": radius from center in pixels
+                    "width": border width, gets filled with color when 0
+                ))
+
+            example:
+                self.to_render.append(RenderItem("circle", 3, {"center":(200, 200), "radius":(200), "color":orange}))
+        
+        line:
+            use in current frame:
+                self.to_render.append(RenderItem(
+                    "color": RGB or variables included in 'colors.py'
+                    "start": starting point
+                    "end": ending point (wau :o)
+                    "width": line width - for single-pixel-wide is mostly best to use aaline
+                ))
+
+            example:
+                self.to_render.append(RenderItem("line", 6, {"color":red, "start":(0, 0), "end":(100, 100), "width":5}))
+
+        aaline:
+            Antialiased version of line
+
+            use in current frame:
+                self.to_render.append(RenderItem(
+                    "color": RGB or variables included in 'colors.py'
+                    "start": starting point
+                    "end": ending point
+                ))
+
+            example:
+                self.to_render.append(RenderItem("aaline", 5, {"color":magenta, "start":(0, 0), "end":(100, 100)}))
+
+        poly:
+            Used to render polygons from multiple points
+
+            use in current frame:
+                self.to_render.append(RenderItem(
+                    "color": RGB or variables included in 'colors.py'
+                    "width": line width - gets filled if 0
+                    "points": list of all points in tuple (x, y) format; automatically connects last to first
+                ))
+            
+            example:
+                self.to_render.append(RenderItem("poly", 2, {"width":0, "points":[(0, 0), (0, 400), (400, 400), (400, 0)], "color":lmagenta}))
+
+    VUI:
+        "VaclavK's User Interface library"
+        Used for UIs and UI-like game elements
+        CURRENTLY Very much incomplete - use wisely
+        Static nor Dynamic VUIs don't contain any colliders nor button references - have to be handled separately, see below
+
+        Dynamic VUI:
+            Upon creation returns name, pygame Surface instance and position in a list
+            Should be used in NGF's RenderItem sprite for rendering
+            Uses basic NGS flatpane instances as elements
+
+            usage:
+                VUILib.create_dynamic_vui(
+                    position: mostly redundant, but useful for some cases; tuple (x, y) format
+                    size: size in pixels; tuple (x, y) format
+                    name: mostly redundant, useful in case of custom sorting
+                    elements: list of NGF flatpane instances to blit onto the dVUI
+                    convert_alpha: used when transparent images are used as a part of the dVUI
+                )
+
+            returns:
+                [name, surface, position]
+
+        Static VUI:
+            The more viable choice between static and dynamic when used for UI
+            Returns a full NGF RenderItem sprite instance - much easier to work with after being created, but can't be modified
+
+            usage:
+                VUILib.create_static_vui(
+                    position: mostly redundant (use center instead), but useful for some cases; tuple (x, y) format
+                    center: center-point (anchor) of the sVUI
+                    size: size in pixels; tuple (x, y) format
+                    elements: list of NGF flatpane instances to blit onto the sVUI
+                    layer: which layer to draw on; uses NGF self.layers variable as a global layer limit
+                    convert_alpha: used when transparent images are used as a part of the sVUI
+                )
+
+            returns:
+                RenderItem sprite
+
+        Interactive VUI:
+            A button container used in combination with dVUI or sVUI
+
+            usage:
+                InteractiveVUI(
+                    buttons: list of button to cycle activation detection
+                )
+
+            update iVUI elements:
+                ivui_instance.hover_detection()
+
+        Button:
+            A basic button with hover, click and hold detection and assigned event execution
+
+            usage:
+                button(
+                    flatpane_sprite: flatpane instance used as the button texture
+                    rect: pygame Rect used as a collider
+                    hold_time: a time required for hold function in seconds
+                    on_hover_function: function that runs every time a mouse collides with the button rect
+                    on_click_function: function that runs on mouse left click
+                    on_hold_function: function that runs when the button is held clicked for more than the specified hold_time
+                )
+
+            independent update:
+                button_instance.activation_detection(mouse info*)
+
+                * for optimal handling use NGF self.mouse_info variable
+
+        Animated button:
+            INCOMPLETE - don't use
+            Same as the basic button, just with a BASIC support for animations
+
+Runtime log help:
+
+    For other reasons than debugging, please use the built-in NGF self.logger object
+
+    usage:
+        self.logger.add_to_log(message)
+
+    Understanding log pipeline:
+        At the start, NGF automatically writes some useful debugging info into the console
+
+        The log starts with 'OpenGL/ModernGL: True/False', which signifies, whether OpenGL is being used for rendering (mostly only useful for shader support)
+
+        Next, the sprite loader prints:
+        - every sprite it will attempt to load in format: 'read' path-to-file : used-name : convert-size : convert-type
+        - how many sprites have been successfully loaded into memory
+        - how many errors have been encountered whilst loading sprites in format: total-errors ('read error': number, 'load error': number, 'scaling error': number, 'conversion error': number)
+        - every loaded sprite's name and pygame Surface dimensions
+
+        Next, the animation loader prints: TBA
+
+        Lastly, NGF startup log completes and the console management is returned to the NGF Runtime Log Handler
+
+Datablock help:
+    Datablock is a class, that is currently being used to access data from multiple files
+    
+    There are currently these data type dictionaries:
+        - strings - used to save strings
+        - ints - used to save integers
+        - floats - used to save floats
+        - lists - used to save lists
+        - dicts - used to save dictionaries
+        - special - used for custom data (currently mostly OpenGL related data)
+        - log_data - used to collect log entries from outside the NGF update cycle
+        - render_data - used to collect RenderItem objects from outside the NGF update cycle
+
+    usage:
+        Datablock.data_type["access name"] = value
+
+        getValue = Datablock.data_type["access name"]
+
+# need to update XD

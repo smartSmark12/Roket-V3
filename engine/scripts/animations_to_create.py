@@ -1,0 +1,1 @@
+"example_anim","1","1","500:100","anim0","anim1","anim2"
