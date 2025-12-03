@@ -86,8 +86,8 @@ class SpriteHandlerJSON:
 
         return rescaled_sprites
 
-    def get_scale(self):
-        self.app.screen_scale = (WIDTH/1920, HEIGHT/1080)
+    def get_scale(self, width=WIDTH, height=HEIGHT):
+        self.app.screen_scale = (width/1920, height/1080)
 
     def to_scalex(self, number: float | int, round_num: bool = True):
         if round_num: return round(number * self.app.screen_scale[0])

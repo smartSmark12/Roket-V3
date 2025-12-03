@@ -43,6 +43,8 @@ from scripts.core.settings import GAME_NAME, DEFAULT_SCENE_NAME
 ## example import
 from scripts.tileScripts.baseBiomeWeights import baseBiomeWeights
 
+from functools import partial
+
 # something like from engine.scripts import * using https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwi46Of9hr-GAxVQhf0HHXmICu4QFnoECCYQAQ&url=https%3A%2F%2Fstackoverflow.com%2Fquestions%2F1057431%2Fhow-to-load-all-modules-in-a-folder&usg=AOvVaw3vlcgC_pzadT7glu9LmH2n&cshid=1717404751563860&opi=89978449
 # need to make a crash handler (official python function??)
 
@@ -69,19 +71,33 @@ class MainEngine:
         print("OpenGL/ModernGL: ", OGL_ENABLED)
 
         # creates pygame window
+
+        ### modified engine code go brrr
+        # set possible resolutions
+        self.RESOLUTIONS = [
+            (1920, 1080),
+            (1280, 720)
+        ]
+
+        self.active_resolution_index = 0
+        self.active_resolution = self.RESOLUTIONS[self.active_resolution_index]
+
+        self.width = self.active_resolution[0] # fawak this is shis
+        self.height = self.active_resolution[1]
+
         ## need to redo this part
         if IN_FULLSCREEN:
             if OGL_ENABLED:
-                self.render_window = pg.display.set_mode(RESOLUTION, pg.FULLSCREEN | pg.OPENGL | pg.DOUBLEBUF)
-                self.window = pg.Surface(RESOLUTION)
+                self.render_window = pg.display.set_mode(self.active_resolution, pg.FULLSCREEN | pg.OPENGL | pg.DOUBLEBUF)
+                self.window = pg.Surface(self.active_resolution)
             else:
-                self.window = pg.display.set_mode(RESOLUTION, pg.FULLSCREEN)
+                self.window = pg.display.set_mode(self.active_resolution, pg.FULLSCREEN)
         else:
             if OGL_ENABLED:
-                self.render_window = pg.display.set_mode(RESOLUTION, pg.OPENGL | pg.DOUBLEBUF)
-                self.window = pg.Surface(RESOLUTION)
+                self.render_window = pg.display.set_mode(self.active_resolution, pg.OPENGL | pg.DOUBLEBUF)
+                self.window = pg.Surface(self.active_resolution)
             else:
-                self.window = pg.display.set_mode(RESOLUTION)
+                self.window = pg.display.set_mode(self.active_resolution)
 
         # opengl setup
         self.ogl_handler = OGLHandler(self)
@@ -100,7 +116,8 @@ class MainEngine:
         self.animations = {}
 
         self.sprite_handler = SpriteHandlerJSON(self) #SpriteHandler(self)
-        self.sprite_handler.get_scale() # gets the real screen scale for different resolutions (use self.sprite_handler.real_scale_sprite())
+        # override default sprite_handler scale setup mode
+        self.sprite_handler.get_scale(self.width, self.height) # gets the real screen scale for different resolutions (use self.sprite_handler.real_scale_sprite())
         self.sprite_handler.initial_load()
 
         self.animation_handler = AnimationHandler(self)
@@ -119,9 +136,11 @@ class MainEngine:
 
         # scene handler setup
         self.scene_handler = SceneHandler(self)
-        self.scene_handler.addScene(Scene(self, "main"))
 
         """ self.create_examples() """
+
+        self.to_scale_x = self.sprite_handler.to_scalex
+        self.to_scale_y = self.sprite_handler.to_scaley
 
         # logger setup
         self.create_runtime_logger()
@@ -131,8 +150,63 @@ class MainEngine:
 
     # write your game on_init here
     def game_on_init(self):
-        # your game code here
-        pass
+        # set render layers
+        self.LAYER_UI_BOTTOM = 7
+
+        # load fonts # can hardcode, cause you'll still need to relaunch the game to take effect
+        self.h1_font = pg.Font("engine/game/assets/fonts/MinecraftRegular-Bmg3.otf", int(160 * (self.active_resolution[1] / HEIGHT)))
+        self.button_font = pg.Font("engine/game/assets/fonts/MinecraftRegular-Bmg3.otf", int(80 * (self.active_resolution[1] / HEIGHT)))
+
+        # add all scenes
+        self.scene_handler.addScene(Scene(self, "main_menu"))
+        self.scene_handler.addScene(Scene(self, "ship_modification"))
+        self.scene_handler.addScene(Scene(self, "game"))
+        self.scene_handler.addScene(Scene(self, "career"))
+        self.scene_handler.addScene(Scene(self, "achievements"))
+        self.scene_handler.addScene(Scene(self, "settings"))
+
+        # set main scene
+        self.scene_handler.setActiveScene("main_menu")
+
+        # override scene updates
+        self.scene_handler.getScene("main_menu").update = self.main_menu_update
+
+        # override scene renders
+        self.scene_handler.getScene("main_menu").render = self.main_menu_render
+
+        # override scene shis
+
+        menu_button_width = 360
+        menu_button_height = 160
+
+        menu_square_button_size = 160
+
+        self.scene_handler.getScene("main_menu").main_text = "Roket V3!"
+        self.scene_handler.getScene("main_menu").play_text = "PLAY"
+        self.scene_handler.getScene("main_menu").exit_text = "EXIT"
+        self.scene_handler.getScene("main_menu").buttons = {}
+        ## create all menu buttons
+        self.scene_handler.getScene("main_menu").buttons["play"] = button(flatpane("sprite", {"main":self.sprites["button_template"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - menu_button_width) / 2), self.to_scale_y((HEIGHT - menu_button_height) / 2), self.to_scale_x(menu_button_width), self.to_scale_y(menu_button_height)), 0, None, partial(print, "play pressed"), None, self)
+        self.scene_handler.getScene("main_menu").buttons["exit"] = button(flatpane("sprite", {"main":self.sprites["button_template"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - menu_button_width) / 2), self.to_scale_y((HEIGHT - menu_button_height) / 2 + 200), self.to_scale_x(menu_button_width), self.to_scale_y(menu_button_height)), 0, None, partial(print, "exit pressed"), None, self)
+        
+        self.scene_handler.getScene("main_menu").buttons["settings"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_settings_button"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - menu_square_button_size) / 2 - 300), self.to_scale_y((HEIGHT - menu_square_button_size) / 2 + 200), self.to_scale_x(menu_square_button_size), self.to_scale_y(menu_square_button_size)), 0, None, partial(print, "options pressed"), None, self)
+        self.scene_handler.getScene("main_menu").buttons["achievements"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_leaderboard_button"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - menu_square_button_size) / 2 + 300), self.to_scale_y((HEIGHT - menu_square_button_size) / 2 + 200), self.to_scale_x(menu_square_button_size), self.to_scale_y(menu_square_button_size)), 0, None, partial(print, "achievements pressed"), None, self)
+
+    def main_menu_update(self):
+        main_menu = self.scene_handler.getScene("main_menu")
+        # update all buttons
+        for button_index in main_menu.buttons:
+            button = main_menu.buttons[button_index]
+            button.activation_detection(self.mouse_info)
+            button.update_hold_time(self.mouse_info)
+            button.render()
+
+    def main_menu_render(self):
+        main_menu = self.scene_handler.getScene("main_menu")
+        self.draw("text", self.LAYER_UI_TOP, {"text":main_menu.main_text, "no_bg":True, "font":self.h1_font, "center":(self.width/2, self.height/5)})
+        self.draw("text", self.LAYER_UI_TOP, {"text":main_menu.play_text, "no_bg":True, "font":self.button_font, "center":main_menu.buttons["play"].rect.center, "color":black})
+        self.draw("text", self.LAYER_UI_TOP, {"text":main_menu.exit_text, "no_bg":True, "font":self.button_font, "center":main_menu.buttons["exit"].rect.center, "color":black})
+
 
     def create_runtime_logger(self):
         self.logger = LogHandler()
@@ -169,7 +243,7 @@ class MainEngine:
         example_anim = AnimatedTexture(convert_to_flatpane({"anim0":self.sprites["anim0"], "anim1":self.sprites["anim1"], "anim2":self.sprites["anim2"]}), 1) """
 
     	# vtilemap examples
-        self.color_examples = [lime, green, gray, yellow, blue]
+        """ self.color_examples = [lime, green, gray, yellow, blue] """
 
             # vtile diamond map
         """ self.vtilemap_example = VTileGenerator.generateMap((38*4, 22*4), [0, 1, 2, 3, 4], "square", 20) """ # 38, 22; vk, square
@@ -181,7 +255,7 @@ class MainEngine:
         self.vtile_timer = 0 """
 
             # vtile terrain map full
-        self.vtilemap_example = VTileTerrainGenerator.generateTerrainMap((38*5, 22*5), None, 4.5, 1) # stability = 2
+        """ self.vtilemap_example = VTileTerrainGenerator.generateTerrainMap((38*5, 22*5), None, 4.5, 1) # stability = 2 """
 
             # vtile terrain map generable
         """ self.mapSize = (38*6, 22*6)
@@ -189,11 +263,11 @@ class MainEngine:
         self.vtilemap_example = VTileTerrainGenerator.placeStartingPoint(self.vtilemap_example, VTileTerrainGenerator.loadBaseBiomes()[0])
         self.vtile_timer = 0 """
 
-        self.tile_width = WIDTH/len(self.vtilemap_example[0])
+        """ self.tile_width = WIDTH/len(self.vtilemap_example[0])
         self.tile_height = HEIGHT/len(self.vtilemap_example)
 
         self.draw_screen = pg.Surface((WIDTH, HEIGHT))
-        self.drawn = False
+        self.drawn = False """
 
     def render_examples(self):
         """ fp = flatpane("img", self.sprites, sprite="atmo", position=(100, 100))
@@ -306,7 +380,7 @@ class MainEngine:
         # refresh mouse information
         mouse_pressed = pg.mouse.get_pressed()
 
-        mouse_changed = mouse_pressed[0] != self.mouse_last
+        mouse_changed = (mouse_pressed[0] != self.mouse_last)
         """ if mouse_pressed[0] == self.mouse_last: # could do it for every mouse button and put in in a list as any
             mouse_changed = False
         else:
@@ -329,12 +403,13 @@ class MainEngine:
         self.print_log() # print and clear log of current cycle
 
     def do_logic(self): # all non-engine related logic should go here
-        # only renders integrated examples
+        pass
+        """ # only renders integrated examples
         self.render_examples()
 
         self.animations["example_anim"].anim_pos = (self.mouse_info[0][0], self.mouse_info[0][1])
 
-        self.animations_to_render.append("example_anim")
+        self.animations_to_render.append("example_anim") """
  
     def run(self):
         while self.is_running:

@@ -2,6 +2,8 @@ import pygame as pg
 from scripts.colors import *
 """ from scripts.datablock import Datablock """
 
+# help???? what the actual fuck is this shit :cry: how ami supposed to work with this inside buttons
+
 class flatpane: # just for displaying images or colors; for backgrounds/graphics/buttons of vui
     def __init__(self, dtype: str, sprite_list: dict, **kwargs): # display type (color, image), dictionary, from where sprites should be referenced, keyword args for sprite name/color
         self.dtype = dtype

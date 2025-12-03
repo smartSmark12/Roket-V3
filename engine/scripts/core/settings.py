@@ -1,5 +1,5 @@
 NGF_VERSION = "0.0.4s"
-GAME_NAME = "Placeholder_name"
+GAME_NAME = "Roket V3!"
 
 WIDTH = 1920
 HEIGHT = 1080
@@ -22,7 +22,7 @@ DEFAULT_SPRITE_JSON_PATH:str = "./engine/scripts/json/sprites_to_load.json"
 DEFAULT_ANIMATION_PATH:str = "./engine/scripts/animations_to_create.py"
 
 # scene settings
-DEFAULT_SCENE_NAME = "main"         # the default rendered scene
+DEFAULT_SCENE_NAME = "main_menu"         # the default rendered scene
 
 # server settings
 SERVER_CONNECTIONS:int = 4          # max connections the server will expect at start

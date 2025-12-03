@@ -61,6 +61,10 @@ class ThreadedGameRenderer:
                             case "circle":
                                 pg.draw.circle(self.window_drawing, item.metadata["color"], item.metadata["center"], item.metadata["radius"], item.metadata["width"])
                             case "text":
+                                if "center" in item.metadata:
+                                    item.center_rect = item.metadata["font"].render(item.metadata["text"], False, (0, 0, 0)).get_rect()
+                                    item.metadata["rect"] = item.center_rect
+                                    item.metadata["rect"].center = item.metadata["center"]
                                 if "no_bg" in item.metadata: self.window_drawing.blit(item.metadata["font"].render(item.metadata["text"], item.metadata["antialias"], item.metadata["color"]), item.metadata["rect"])
                                 else: self.window_drawing.blit(item.metadata["font"].render(item.metadata["text"], item.metadata["antialias"], item.metadata["color"], item.metadata["bgcolor"]), item.metadata["rect"])
                             case "poly":

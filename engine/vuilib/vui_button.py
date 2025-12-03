@@ -44,11 +44,17 @@ class button:
         else:
             self.held_for = 0
 
+    def render(self):
+        self.app.draw("sprite", self.app.LAYER_UI_BOTTOM, {"sprite":self.sprite.sprite, "rect":self.rect})
+
     def on_hover(self):
-        self.on_hover_function()
+        if self.on_hover_function != None:
+            self.on_hover_function()
 
     def on_click(self):
-        self.on_click_function()
+        if self.on_click_function != None:
+            self.on_click_function()
 
     def on_hold(self):
-        self.on_hold_function()
+        if self.on_hold_function != None:
+            self.on_hold_function()
