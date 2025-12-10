@@ -153,6 +153,7 @@ class MainEngine:
         self.button_font = pg.Font("engine/game/assets/fonts/MinecraftRegular-Bmg3.otf", int(80 * (self.height / HEIGHT)))
 
         # add all scenes
+        self.scene_handler.addScene(Scene(self, "title"))
         self.scene_handler.addScene(Scene(self, "main_menu"))
         self.scene_handler.addScene(Scene(self, "ship_modification"))
         self.scene_handler.addScene(Scene(self, "game"))
@@ -161,8 +162,9 @@ class MainEngine:
         self.scene_handler.addScene(Scene(self, "settings"))
 
         # set main scene
-        self.scene_handler.setActiveScene("main_menu")
+        self.scene_handler.setActiveScene("title")
 
+        title_scene = self.scene_handler.getScene("title")
         main_menu_scene = self.scene_handler.getScene("main_menu")
         ship_mod_scene = self.scene_handler.getScene("ship_modification")
         game_scene = self.scene_handler.getScene("game")
@@ -171,28 +173,28 @@ class MainEngine:
         settings_scene = self.scene_handler.getScene("settings")
 
         # override scene updates
-        main_menu_scene.update = self.main_menu_update
+        title_scene.update = self.title_update
 
         # override scene renders
-        main_menu_scene.render = self.main_menu_render
+        title_scene.render = self.title_render
 
         # override scene shis
 
-        menu_button_width = 360
-        menu_button_height = 160
+        title_button_width = 360
+        title_button_height = 160
 
-        menu_square_button_size = 160
+        title_square_button_size = 160
 
-        main_menu_scene.main_text = "Roket V3!"
-        main_menu_scene.play_text = "PLAY"
-        main_menu_scene.exit_text = "EXIT"
-        main_menu_scene.buttons = {}
+        title_scene.main_text = "Roket V3!"
+        title_scene.play_text = "PLAY"
+        title_scene.exit_text = "EXIT"
+        title_scene.buttons = {}
         ## create all menu buttons
-        main_menu_scene.buttons["play"] = button(flatpane("sprite", {"main":self.sprites["button_template"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - menu_button_width) / 2), self.to_scale_y((HEIGHT - menu_button_height) / 2), self.to_scale_x(menu_button_width), self.to_scale_y(menu_button_height)), 0, None, partial(print, "play pressed"), None, self)
-        main_menu_scene.buttons["exit"] = button(flatpane("sprite", {"main":self.sprites["button_template"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - menu_button_width) / 2), self.to_scale_y((HEIGHT - menu_button_height) / 2 + 200), self.to_scale_x(menu_button_width), self.to_scale_y(menu_button_height)), 0, None, partial(print, "exit pressed"), None, self)
+        title_scene.buttons["play"] = button(flatpane("sprite", {"main":self.sprites["button_template"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_button_width) / 2), self.to_scale_y((HEIGHT - title_button_height) / 2), self.to_scale_x(title_button_width), self.to_scale_y(title_button_height)), 0, None, partial(self.scene_handler.setActiveScene, "main_menu"), None, self)
+        title_scene.buttons["exit"] = button(flatpane("sprite", {"main":self.sprites["button_template"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_button_width) / 2), self.to_scale_y((HEIGHT - title_button_height) / 2 + 200), self.to_scale_x(title_button_width), self.to_scale_y(title_button_height)), 0, None, partial(print, "exit pressed"), None, self)
         
-        main_menu_scene.buttons["settings"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_settings_button"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - menu_square_button_size) / 2 - 300), self.to_scale_y((HEIGHT - menu_square_button_size) / 2 + 200), self.to_scale_x(menu_square_button_size), self.to_scale_y(menu_square_button_size)), 0, None, partial(print, "options pressed"), None, self)
-        main_menu_scene.buttons["achievements"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_leaderboard_button"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - menu_square_button_size) / 2 + 300), self.to_scale_y((HEIGHT - menu_square_button_size) / 2 + 200), self.to_scale_x(menu_square_button_size), self.to_scale_y(menu_square_button_size)), 0, None, partial(print, "achievements pressed"), None, self)
+        title_scene.buttons["settings"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_settings_button"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_square_button_size) / 2 - 300), self.to_scale_y((HEIGHT - title_square_button_size) / 2 + 200), self.to_scale_x(title_square_button_size), self.to_scale_y(title_square_button_size)), 0, None, partial(print, "options pressed"), None, self)
+        title_scene.buttons["achievements"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_leaderboard_button"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_square_button_size) / 2 + 300), self.to_scale_y((HEIGHT - title_square_button_size) / 2 + 200), self.to_scale_x(title_square_button_size), self.to_scale_y(title_square_button_size)), 0, None, partial(print, "achievements pressed"), None, self)
 
     def create_resolutions(self):
         # set possible resolutions
@@ -237,22 +239,22 @@ class MainEngine:
         self.blackbar_x_size_aka_renderer_blit_x_offset = int((self.window_width - self.width) / 2)
         self.blackbar_y_size_aka_renderer_blit_y_offset = int((self.window_height - self.height) / 2)
 
-    def main_menu_update(self):
-        main_menu = self.scene_handler.getScene("main_menu")
+    def title_update(self):
+        title = self.scene_handler.getScene("title")
         # update all buttons
-        for button_index in main_menu.buttons:
-            button = main_menu.buttons[button_index]
+        for button_index in title.buttons:
+            button = title.buttons[button_index]
             button.activation_detection(self.corrected_mouse_info)
             button.update_hold_time(self.corrected_mouse_info)
 
-    def main_menu_render(self):
-        main_menu = self.scene_handler.getScene("main_menu")
-        self.draw("text", self.LAYER_UI_TOP, {"text":main_menu.main_text, "no_bg":True, "font":self.h1_font, "center":(self.width/2, self.height/5)})
-        self.draw("text", self.LAYER_UI_TOP, {"text":main_menu.play_text, "no_bg":True, "font":self.button_font, "center":main_menu.buttons["play"].rect.center, "color":black})
-        self.draw("text", self.LAYER_UI_TOP, {"text":main_menu.exit_text, "no_bg":True, "font":self.button_font, "center":main_menu.buttons["exit"].rect.center, "color":black})
+    def title_render(self):
+        title = self.scene_handler.getScene("title")
+        self.draw("text", self.LAYER_UI_TOP, {"text":title.main_text, "no_bg":True, "font":self.h1_font, "center":(self.width/2, self.height/5)})
+        self.draw("text", self.LAYER_UI_TOP, {"text":title.play_text, "no_bg":True, "font":self.button_font, "center":title.buttons["play"].rect.center, "color":black})
+        self.draw("text", self.LAYER_UI_TOP, {"text":title.exit_text, "no_bg":True, "font":self.button_font, "center":title.buttons["exit"].rect.center, "color":black})
 
-        for button in main_menu.buttons:
-            main_menu.buttons[button].render()
+        for button in title.buttons:
+            title.buttons[button].render()
 
     def screen_to_game_coords(self, pos) -> tuple:
         return (pos[0] - self.blackbar_x_size_aka_renderer_blit_x_offset, pos[1] - self.blackbar_y_size_aka_renderer_blit_y_offset)
