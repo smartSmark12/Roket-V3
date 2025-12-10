@@ -205,7 +205,7 @@ class MainEngine:
         ]
 
     def set_resolution(self):
-        self.active_resolution_index = 7
+        self.active_resolution_index = 4
         self.active_resolution = self.RESOLUTIONS[self.active_resolution_index]
 
         self.window_width = self.active_resolution[0] # fawak this is shis
@@ -422,15 +422,17 @@ class MainEngine:
         # refresh mouse information
         mouse_pressed = pg.mouse.get_pressed()
 
-        mouse_changed = (mouse_pressed[0] != self.mouse_last)
+        left_pressed = mouse_pressed[0]
+
+        mouse_changed = (left_pressed != self.mouse_last)
         """ if mouse_pressed[0] == self.mouse_last: # could do it for every mouse button and put in in a list as any
             mouse_changed = False
         else:
             mouse_changed = True """
 
-        self.mouse_last = mouse_pressed[0]
+        self.mouse_last = left_pressed
 
-        self.mouse_info = (pg.mouse.get_pos(), mouse_pressed, mouse_changed)
+        self.mouse_info = (pg.mouse.get_pos(), left_pressed, mouse_changed)
 
         # do main game logic
         self.do_logic()
