@@ -160,11 +160,18 @@ class MainEngine:
         # set main scene
         self.scene_handler.setActiveScene("main_menu")
 
+        main_menu_scene = self.scene_handler.getScene("main_menu")
+        ship_mod_scene = self.scene_handler.getScene("ship_modification")
+        game_scene = self.scene_handler.getScene("game")
+        career_scene = self.scene_handler.getScene("career")
+        achievements_scene = self.scene_handler.getScene("achievements")
+        settings_scene = self.scene_handler.getScene("settings")
+
         # override scene updates
-        self.scene_handler.getScene("main_menu").update = self.main_menu_update
+        main_menu_scene.update = self.main_menu_update
 
         # override scene renders
-        self.scene_handler.getScene("main_menu").render = self.main_menu_render
+        main_menu_scene.render = self.main_menu_render
 
         # override scene shis
 
@@ -173,16 +180,16 @@ class MainEngine:
 
         menu_square_button_size = 160
 
-        self.scene_handler.getScene("main_menu").main_text = "Roket V3!"
-        self.scene_handler.getScene("main_menu").play_text = "PLAY"
-        self.scene_handler.getScene("main_menu").exit_text = "EXIT"
-        self.scene_handler.getScene("main_menu").buttons = {}
+        main_menu_scene.main_text = "Roket V3!"
+        main_menu_scene.play_text = "PLAY"
+        main_menu_scene.exit_text = "EXIT"
+        main_menu_scene.buttons = {}
         ## create all menu buttons
-        self.scene_handler.getScene("main_menu").buttons["play"] = button(flatpane("sprite", {"main":self.sprites["button_template"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - menu_button_width) / 2), self.to_scale_y((HEIGHT - menu_button_height) / 2), self.to_scale_x(menu_button_width), self.to_scale_y(menu_button_height)), 0, None, partial(print, "play pressed"), None, self)
-        self.scene_handler.getScene("main_menu").buttons["exit"] = button(flatpane("sprite", {"main":self.sprites["button_template"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - menu_button_width) / 2), self.to_scale_y((HEIGHT - menu_button_height) / 2 + 200), self.to_scale_x(menu_button_width), self.to_scale_y(menu_button_height)), 0, None, partial(print, "exit pressed"), None, self)
+        main_menu_scene.buttons["play"] = button(flatpane("sprite", {"main":self.sprites["button_template"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - menu_button_width) / 2), self.to_scale_y((HEIGHT - menu_button_height) / 2), self.to_scale_x(menu_button_width), self.to_scale_y(menu_button_height)), 0, None, partial(print, "play pressed"), None, self)
+        main_menu_scene.buttons["exit"] = button(flatpane("sprite", {"main":self.sprites["button_template"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - menu_button_width) / 2), self.to_scale_y((HEIGHT - menu_button_height) / 2 + 200), self.to_scale_x(menu_button_width), self.to_scale_y(menu_button_height)), 0, None, partial(print, "exit pressed"), None, self)
         
-        self.scene_handler.getScene("main_menu").buttons["settings"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_settings_button"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - menu_square_button_size) / 2 - 300), self.to_scale_y((HEIGHT - menu_square_button_size) / 2 + 200), self.to_scale_x(menu_square_button_size), self.to_scale_y(menu_square_button_size)), 0, None, partial(print, "options pressed"), None, self)
-        self.scene_handler.getScene("main_menu").buttons["achievements"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_leaderboard_button"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - menu_square_button_size) / 2 + 300), self.to_scale_y((HEIGHT - menu_square_button_size) / 2 + 200), self.to_scale_x(menu_square_button_size), self.to_scale_y(menu_square_button_size)), 0, None, partial(print, "achievements pressed"), None, self)
+        main_menu_scene.buttons["settings"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_settings_button"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - menu_square_button_size) / 2 - 300), self.to_scale_y((HEIGHT - menu_square_button_size) / 2 + 200), self.to_scale_x(menu_square_button_size), self.to_scale_y(menu_square_button_size)), 0, None, partial(print, "options pressed"), None, self)
+        main_menu_scene.buttons["achievements"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_leaderboard_button"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - menu_square_button_size) / 2 + 300), self.to_scale_y((HEIGHT - menu_square_button_size) / 2 + 200), self.to_scale_x(menu_square_button_size), self.to_scale_y(menu_square_button_size)), 0, None, partial(print, "achievements pressed"), None, self)
 
     def create_resolutions(self):
         # set possible resolutions
