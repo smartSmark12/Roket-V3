@@ -145,6 +145,9 @@ class MainEngine:
         # set render layers
         self.LAYER_UI_BOTTOM = 7
 
+        # assign empty corrected mouse info
+        self.corrected_mouse_info = None
+
         # load fonts # can hardcode, cause you'll still need to relaunch the game to take effect
         self.h1_font = pg.Font("engine/game/assets/fonts/MinecraftRegular-Bmg3.otf", int(160 * (self.height / HEIGHT)))
         self.button_font = pg.Font("engine/game/assets/fonts/MinecraftRegular-Bmg3.otf", int(80 * (self.height / HEIGHT)))
@@ -201,11 +204,11 @@ class MainEngine:
             (1280, 960),
             (1440, 1080),
             (80,45),
-            (200, 400)
+            (1200, 400)
         ]
 
     def set_resolution(self):
-        self.active_resolution_index = 4
+        self.active_resolution_index =  7#4
         self.active_resolution = self.RESOLUTIONS[self.active_resolution_index]
 
         self.window_width = self.active_resolution[0] # fawak this is shis
@@ -239,9 +242,8 @@ class MainEngine:
         # update all buttons
         for button_index in main_menu.buttons:
             button = main_menu.buttons[button_index]
-            button.activation_detection(self.mouse_info)
-            button.update_hold_time(self.mouse_info)
-            button.render()
+            button.activation_detection(self.corrected_mouse_info)
+            button.update_hold_time(self.corrected_mouse_info)
 
     def main_menu_render(self):
         main_menu = self.scene_handler.getScene("main_menu")
@@ -249,6 +251,11 @@ class MainEngine:
         self.draw("text", self.LAYER_UI_TOP, {"text":main_menu.play_text, "no_bg":True, "font":self.button_font, "center":main_menu.buttons["play"].rect.center, "color":black})
         self.draw("text", self.LAYER_UI_TOP, {"text":main_menu.exit_text, "no_bg":True, "font":self.button_font, "center":main_menu.buttons["exit"].rect.center, "color":black})
 
+        for button in main_menu.buttons:
+            main_menu.buttons[button].render()
+
+    def screen_to_game_coords(self, pos) -> tuple:
+        return (pos[0] - self.blackbar_x_size_aka_renderer_blit_x_offset, pos[1] - self.blackbar_y_size_aka_renderer_blit_y_offset)
 
     def create_runtime_logger(self):
         self.logger = LogHandler()
@@ -425,14 +432,13 @@ class MainEngine:
         left_pressed = mouse_pressed[0]
 
         mouse_changed = (left_pressed != self.mouse_last)
-        """ if mouse_pressed[0] == self.mouse_last: # could do it for every mouse button and put in in a list as any
-            mouse_changed = False
-        else:
-            mouse_changed = True """
 
         self.mouse_last = left_pressed
 
         self.mouse_info = (pg.mouse.get_pos(), left_pressed, mouse_changed)
+        self.corrected_mouse_info = (self.screen_to_game_coords(pg.mouse.get_pos()), left_pressed, mouse_changed)
+
+        #self.draw("circle", 9, {"center":self.corrected_mouse_info[0]})
 
         # do main game logic
         self.do_logic()
@@ -448,10 +454,7 @@ class MainEngine:
 
     def do_logic(self): # all non-engine related logic should go here
         pass
-        """ # only renders integrated examples
-        self.render_examples()
-
-        self.animations["example_anim"].anim_pos = (self.mouse_info[0][0], self.mouse_info[0][1])
+        """ self.animations["example_anim"].anim_pos = (self.mouse_info[0][0], self.mouse_info[0][1])
 
         self.animations_to_render.append("example_anim") """
  
