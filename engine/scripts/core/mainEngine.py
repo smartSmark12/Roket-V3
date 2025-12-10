@@ -73,17 +73,9 @@ class MainEngine:
         # creates pygame window
 
         ### modified engine code go brrr
-        # set possible resolutions
-        self.RESOLUTIONS = [
-            (1920, 1080),
-            (1280, 720)
-        ]
-
-        self.active_resolution_index = 0
-        self.active_resolution = self.RESOLUTIONS[self.active_resolution_index]
-
-        self.width = self.active_resolution[0] # fawak this is shis
-        self.height = self.active_resolution[1]
+        self.create_resolutions()
+        self.set_resolution()
+        self.create_draw_window()
 
         ## need to redo this part
         if IN_FULLSCREEN:
@@ -154,8 +146,8 @@ class MainEngine:
         self.LAYER_UI_BOTTOM = 7
 
         # load fonts # can hardcode, cause you'll still need to relaunch the game to take effect
-        self.h1_font = pg.Font("engine/game/assets/fonts/MinecraftRegular-Bmg3.otf", int(160 * (self.active_resolution[1] / HEIGHT)))
-        self.button_font = pg.Font("engine/game/assets/fonts/MinecraftRegular-Bmg3.otf", int(80 * (self.active_resolution[1] / HEIGHT)))
+        self.h1_font = pg.Font("engine/game/assets/fonts/MinecraftRegular-Bmg3.otf", int(160 * (self.height / HEIGHT)))
+        self.button_font = pg.Font("engine/game/assets/fonts/MinecraftRegular-Bmg3.otf", int(80 * (self.height / HEIGHT)))
 
         # add all scenes
         self.scene_handler.addScene(Scene(self, "main_menu"))
@@ -191,6 +183,49 @@ class MainEngine:
         
         self.scene_handler.getScene("main_menu").buttons["settings"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_settings_button"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - menu_square_button_size) / 2 - 300), self.to_scale_y((HEIGHT - menu_square_button_size) / 2 + 200), self.to_scale_x(menu_square_button_size), self.to_scale_y(menu_square_button_size)), 0, None, partial(print, "options pressed"), None, self)
         self.scene_handler.getScene("main_menu").buttons["achievements"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_leaderboard_button"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - menu_square_button_size) / 2 + 300), self.to_scale_y((HEIGHT - menu_square_button_size) / 2 + 200), self.to_scale_x(menu_square_button_size), self.to_scale_y(menu_square_button_size)), 0, None, partial(print, "achievements pressed"), None, self)
+
+    def create_resolutions(self):
+        # set possible resolutions
+        self.RESOLUTIONS = [
+            (1920, 1080),
+            (1280, 720),
+            (640, 360),
+            (2560, 1440),
+            (1280, 960),
+            (1440, 1080),
+            (80,45),
+            (200, 400)
+        ]
+
+    def set_resolution(self):
+        self.active_resolution_index = 7
+        self.active_resolution = self.RESOLUTIONS[self.active_resolution_index]
+
+        self.window_width = self.active_resolution[0] # fawak this is shis
+        self.window_height = self.active_resolution[1]
+
+    def create_draw_window(self):
+        # extend the screen if ratio not 16:9
+        target_ratio = 16/9
+        current_ratio = self.window_width/self.window_height
+        
+        if current_ratio < target_ratio: # higher - wider, lower - taller
+            self.width = self.window_width
+            self.height = int(self.window_width / target_ratio)
+
+        elif current_ratio > target_ratio:
+            self.height = self.window_height
+            self.width = int(self.window_height * target_ratio)
+
+        else:
+            self.width, self.height = self.window_width, self.window_height
+
+        # create the actual draw window
+        self.draw_window = pg.Surface((self.width, self.height))
+
+        # assign blackbar sizes
+        self.blackbar_x_size_aka_renderer_blit_x_offset = int((self.window_width - self.width) / 2)
+        self.blackbar_y_size_aka_renderer_blit_y_offset = int((self.window_height - self.height) / 2)
 
     def main_menu_update(self):
         main_menu = self.scene_handler.getScene("main_menu")

@@ -13,7 +13,7 @@ class ThreadedGameRenderer:
         self.lock = thread_lock
         self.window = app.window
         self.layers = self.app.render_layers
-        self.window_drawing = pg.Surface(RESOLUTION)
+        self.window_drawing = self.app.draw_window #pg.Surface(RESOLUTION)
 
         self.to_render = []
 
@@ -74,10 +74,10 @@ class ThreadedGameRenderer:
 
         if OGL_ENABLED:
             with self.lock:
-                self.app.window = self.window_drawing.copy()
+                self.app.window = self.window_drawing.copy() # i probably broke this with the ratio thingie XD
 
         else:
-            self.app.window.blit(self.window_drawing, pg.Rect(0, 0, WIDTH, HEIGHT))
+            self.app.window.blit(self.window_drawing, pg.Rect(self.app.blackbar_x_size_aka_renderer_blit_x_offset, self.app.blackbar_y_size_aka_renderer_blit_y_offset, self.app.width, self.app.height))
             pg.display.flip()
 
     def render_get_log(self):
