@@ -8,6 +8,7 @@ class flatpane: # just for displaying images or colors; for backgrounds/graphics
     def __init__(self, dtype: str, sprite_list: dict, **kwargs): # display type (color, image), dictionary, from where sprites should be referenced, keyword args for sprite name/color
         self.dtype = dtype
         self.sprite = None # gets created later in code
+        self.sprite_list = sprite_list # WHY WASNT THIS HERE EVER BEFORE??
         self.meta = {}
         
         # assign color or image reference
@@ -50,3 +51,13 @@ class flatpane: # just for displaying images or colors; for backgrounds/graphics
                 print(f"{__name__}: display-type set to 'sprite', but none was assigned")
                 self.sprite = pg.Surface((100, 100))
                 self.sprite.fill(white)
+
+    def set_active_sprite(self, spriteName:str) -> bool:
+        if spriteName in self.sprite_list:
+            self.sprite = self.sprite_list[spriteName]
+
+            return True
+        else:
+            print(f"{__name__}: Couldn't find sprite {spriteName} in the sprite list (did you forget to assign it during creation?)")
+
+            return False

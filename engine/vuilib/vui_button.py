@@ -33,9 +33,12 @@ class button:
                 if self.held_for > self.hold_time:
                     self.on_hold()
 
+            self.set_active_sprite("hover")
+
             return True
         else:
-            self.hover = False 
+            self.hover = False
+            self.set_active_sprite("main")
             return False
     
     def update_hold_time(self, mouse_info):
@@ -43,6 +46,9 @@ class button:
             self.held_for += self.app.dt
         else:
             self.held_for = 0
+
+    def set_active_sprite(self, spriteName:str):
+        self.sprite.set_active_sprite(spriteName)
 
     def render(self):
         self.app.draw("sprite", self.app.LAYER_UI_BOTTOM, {"sprite":self.sprite.sprite, "rect":self.rect})
