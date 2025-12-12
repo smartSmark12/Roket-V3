@@ -341,11 +341,14 @@ class MainEngine:
             button.activation_detection(self.corrected_mouse_info)
             button.update_hold_time(self.corrected_mouse_info)
 
+        # check for keybind activation
         if self.get_keybind_just_pressed("ui_forward"):
-            print("ui_forward pressed! (not held, fucko)")
+            title.buttons["play"].on_click()
 
-            self.save_keybinds()
+        if self.get_keybind_just_pressed("ui_back"):
+            title.buttons["exit"].on_click()
 
+        ## unrelated temp debug until UI works
         if self.get_keybind_just_pressed("debug_reset_keybinds"):
             self.reset_keybinds()
 
@@ -372,6 +375,13 @@ class MainEngine:
             button = main_menu.buttons[button_index]
             button.activation_detection(self.corrected_mouse_info)
             button.update_hold_time(self.corrected_mouse_info)
+
+        # check for keybind activation
+        if self.get_keybind_just_pressed("ui_forward"):
+            main_menu.buttons["launch"].on_click()
+
+        if self.get_keybind_just_pressed("ui_back"):
+            main_menu.buttons["return"].on_click()
 
     def main_menu_render(self):
         main_menu = self.scene_handler.getScene("main_menu")
