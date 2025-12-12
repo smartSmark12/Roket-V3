@@ -297,6 +297,15 @@ class MainEngine:
     def load_keybinds(self):
         pass
 
+    def register_keybind(self):
+        pass # add keybind to the keyhandler
+
+    def unregister_keybind(self):
+        pass # remove keybind from the kh
+
+    def save_keybinds(self):
+        pass # save kbs to the json file
+
     def title_update(self):
         title = self.scene_handler.getScene("title")
         # update all buttons
