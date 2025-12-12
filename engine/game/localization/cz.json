@@ -1,0 +1,12 @@
+{
+    "version":"0.1",
+    "code":"cz",
+    "name":"Cesky",
+    "texts": {
+        "title_title":"Roket V3!",
+        "title_play":"HRAT",
+        "title_exit":"KONEC",
+        "main_menu_launch":"START",
+        "main_menu_return":"MENU"
+    }
+}

@@ -27,8 +27,8 @@ DEFAULT_ANIMATION_PATH:str = "./engine/scripts/animations_to_create.py"
 DEFAULT_SCENE_NAME = "main_menu"         # the default rendered scene
 
 ## game settings cause me be lazy :33
-DEFAULT_LOCALIZATION_CODE = "en"
-LOCALIZATION_PATH = "./engine/game/assets/localization/"
+DEFAULT_LOCALIZATION_CODE = "cz"
+LOCALIZATION_PATH = "./engine/game/localization/"
 LOCALIZATION_POSTFIX = ".json"
 
 DEFAULT_KEYBIND_PATH = "./engine/game/settings/roket_keybinds_template.json" # used if no other config is present as a copy source

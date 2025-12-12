@@ -1,8 +1,9 @@
 {
-    "ui_forward":[119, 100],
-    "ui_back":[0],
-    "control_w":[0],
-    "control_a":[0],
-    "control_s":[0],
-    "control_d":[0]
+    "ui_forward":[119, 13],
+    "ui_back":[101, 27],
+    "control_w":[119, 1073741906],
+    "control_a":[97, 1073741904],
+    "control_s":[115, 1073741905],
+    "control_d":[100, 1073741903],
+    "debug_reset_keybinds":[59]
 }

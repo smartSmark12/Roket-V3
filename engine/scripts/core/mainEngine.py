@@ -218,7 +218,7 @@ class MainEngine:
 
         title_scene.main_text = self.texts["title_title"]
         title_scene.version_text = "v" + GAME_VERSION + " - " + GAME_VERSION_HINT
-        title_scene.play_text = self.texts["title_play"] + " [W]"
+        title_scene.play_text = self.texts["title_play"] + " " + self.get_keybind_keycode_name_in_square_brackets("ui_forward")
         title_scene.exit_text = self.texts["title_exit"] + " [E]"
         title_scene.buttons = {}
 
@@ -323,6 +323,16 @@ class MainEngine:
         print(f"{__name__}: saved keybinds to {ACTIVE_KEYBIND_PATH}")
         pass # save kbs to the json file
 
+    def reset_keybinds(self):
+        loaded_keybinds = JsonLoader.load_from_file(DEFAULT_KEYBIND_PATH)
+
+        self.keyhandler.keybinds = loaded_keybinds
+
+        self.keyhandler.update_keybind_buffers()
+
+        self.save_keybinds()
+        
+
     def title_update(self):
         title = self.scene_handler.getScene("title")
         # update all buttons
@@ -331,10 +341,13 @@ class MainEngine:
             button.activation_detection(self.corrected_mouse_info)
             button.update_hold_time(self.corrected_mouse_info)
 
-        if self.get_keybind_pressed("ui_forward") and self.get_keybind_changed("ui_forward"):
+        if self.get_keybind_just_pressed("ui_forward"):
             print("ui_forward pressed! (not held, fucko)")
 
             self.save_keybinds()
+
+        if self.get_keybind_just_pressed("debug_reset_keybinds"):
+            self.reset_keybinds()
 
     def title_render(self):
         title = self.scene_handler.getScene("title")
@@ -381,6 +394,17 @@ class MainEngine:
     
     def get_keybind_changed(self, keybind:str):
         return self.keybinds_changed[keybind]
+    
+    def get_keybind_just_pressed(self, keybind:str):
+        return self.get_keybind_pressed(keybind) and self.get_keybind_changed(keybind)
+
+    def get_keybind_keycode_name(self, keybind:str):
+        return self.keyhandler.keybind_keycode_names[keybind]
+    
+    def get_keybind_keycode_name_in_square_brackets(self, keybind): # returns a shortened and capitalized version
+        start = 0
+        length = 3
+        return "[" + self.get_keybind_keycode_name(keybind)[start : start + length].upper() + "]"
 
     def exit_game(self):
         print(f"{__name__}: exiting game")

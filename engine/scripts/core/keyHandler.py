@@ -8,7 +8,7 @@ class KeyHandler:
 
     def initial_setup(self):
 
-        self.keybinds = {
+        self.keybinds = {}; """ {
             "space":pg.K_SPACE,
             "up":pg.K_UP,
             "right":pg.K_RIGHT,
@@ -18,7 +18,7 @@ class KeyHandler:
             "a":pg.K_a,
             "d":pg.K_d,
             "s":pg.K_s
-        }
+        } """
 
         self.create_key_buffers()
 
@@ -30,14 +30,15 @@ class KeyHandler:
         self.app.keybinds_pressed = {}
         self.app.keybinds_changed = {}
 
+        # creates dicts for keybind-keycode names
+        self.keybind_keycode_names = {}
+
         # this is some broken shit
         for keycode_index in range(len(self.app.keys_pressed)):
             self.keycodes_changed.append(keycode_index)
             #self.app.keys_changed.append(self.app.keys_pressed[keycode_index])
 
-        # this fills out the base data for the keybind dict
-        for keyname in self.keybinds:
-            self.app.keybinds_pressed[keyname] = False
+        self.update_keybind_buffers()
 
     def register_keybind(self, keybind_name:str, keycode:int):
         if keybind_name in self.keybinds:
@@ -67,8 +68,12 @@ class KeyHandler:
             print(f"{__name__}: keybind {keybind_name} not registered - cannot unregister")
 
     def update_keybind_buffers(self):
+        # this fills out the base data for the keybind dict
         for keyname in self.keybinds:
             self.app.keybinds_pressed[keyname] = False
+
+            self.keybind_keycode_names[keyname] = pg.key.name(self.keybinds[keyname][0], use_compat=False)
+        print(self.keybind_keycode_names)
 
     def update_keys(self):
         pressed = pg.key.get_pressed()
