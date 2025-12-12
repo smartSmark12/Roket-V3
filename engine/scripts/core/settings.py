@@ -31,6 +31,9 @@ DEFAULT_LOCALIZATION_CODE = "en"
 LOCALIZATION_PATH = "./engine/game/assets/localization/"
 LOCALIZATION_POSTFIX = ".json"
 
+DEFAULT_KEYBIND_PATH = "./engine/game/settings/roket_keybinds_template.json" # used if no other config is present as a copy source
+ACTIVE_KEYBIND_PATH = "./engine/game/settings/roket_keybinds.json"
+
 DEFAULT_FONT_PATH = "engine/game/assets/fonts/MinecraftRegular-Bmg3.otf"
 
 BUTTON_FONT_SIZE = 60

@@ -161,6 +161,10 @@ class MainEngine:
         self.localization_code = DEFAULT_LOCALIZATION_CODE ## temp
         self.load_localization()
 
+        # load keybinds
+        self.keybind_path = DEFAULT_KEYBIND_PATH ## also temp
+        self.load_keybinds()
+
         # create darker button variants
         BUTTON_COLOR_SUBTRACT_COLOR = (30, 30, 30)
         for sprite in ["button_template", "mainmenu_settings_button", "mainmenu_leaderboard_button"]:
@@ -295,15 +299,28 @@ class MainEngine:
             self.texts[text] = loaded_localization["texts"][text]
 
     def load_keybinds(self):
-        pass
+        loaded_keybinds = JsonLoader.load_from_file(DEFAULT_KEYBIND_PATH)
 
-    def register_keybind(self):
+        self.keyhandler.keybinds = loaded_keybinds
+
+        self.keyhandler.update_keybind_buffers()
+
+        print(loaded_keybinds)
+
+    def register_keybind(self, keybind_name:str, keycode:int):
+        self.keyhandler.register_keybind(keybind_name, keycode)
         pass # add keybind to the keyhandler
 
-    def unregister_keybind(self):
+    def unregister_keybind(self, keybind_name:str, keycode:int):
+        self.keyhandler.unregister_keybind(keybind_name, keycode)
         pass # remove keybind from the kh
 
     def save_keybinds(self):
+
+        keybind_data = self.keyhandler.keybinds
+
+        JsonLoader.write_to_file(ACTIVE_KEYBIND_PATH, keybind_data)
+        print(f"{__name__}: saved keybinds to {ACTIVE_KEYBIND_PATH}")
         pass # save kbs to the json file
 
     def title_update(self):
@@ -313,6 +330,11 @@ class MainEngine:
             button = title.buttons[button_index]
             button.activation_detection(self.corrected_mouse_info)
             button.update_hold_time(self.corrected_mouse_info)
+
+        if self.get_keybind_pressed("ui_forward") and self.get_keybind_changed("ui_forward"):
+            print("ui_forward pressed! (not held, fucko)")
+
+            self.save_keybinds()
 
     def title_render(self):
         title = self.scene_handler.getScene("title")
@@ -353,6 +375,12 @@ class MainEngine:
 
     def screen_to_game_coords(self, pos) -> tuple:
         return (pos[0] - self.blackbar_x_size_aka_renderer_blit_x_offset, pos[1] - self.blackbar_y_size_aka_renderer_blit_y_offset)
+    
+    def get_keybind_pressed(self, keybind:str):
+        return self.keybinds_pressed[keybind]
+    
+    def get_keybind_changed(self, keybind:str):
+        return self.keybinds_changed[keybind]
 
     def exit_game(self):
         print(f"{__name__}: exiting game")
