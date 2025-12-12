@@ -202,12 +202,12 @@ class MainEngine:
 
         # override scene shis
 
-        title_button_width = 360
-        title_button_height = 160
+        title_button_width = 280
+        title_button_height = 128
 
-        title_square_button_size = 160
-        title_side_button_x_distance = 300
-        title_button_y_offset = 200
+        title_square_button_size = 128
+        title_side_button_x_distance = 250
+        title_button_y_offset = 160 # not sure why this cant be the same as button x dist ::
 
         main_menu_button_start_y = 650 # all values autoconverted by to_scale_x/y
         main_menu_button_width = title_button_width
@@ -219,12 +219,12 @@ class MainEngine:
         title_scene.main_text = self.texts["title_title"]
         title_scene.version_text = "v" + GAME_VERSION + " - " + GAME_VERSION_HINT
         title_scene.play_text = self.texts["title_play"] + " " + self.get_keybind_keycode_name_in_square_brackets("ui_forward")
-        title_scene.exit_text = self.texts["title_exit"] + " [E]"
+        title_scene.exit_text = self.texts["title_exit"] + " " + self.get_keybind_keycode_name_in_square_brackets("ui_back")
         title_scene.buttons = {}
 
         ## main_menu
-        main_menu_scene.launch_text = self.texts["main_menu_launch"] + " [W]"
-        main_menu_scene.return_text = self.texts["main_menu_return"] + " [E]"
+        main_menu_scene.launch_text = self.texts["main_menu_launch"] + " " + self.get_keybind_keycode_name_in_square_brackets("ui_forward")
+        main_menu_scene.return_text = self.texts["main_menu_return"] + " " + self.get_keybind_keycode_name_in_square_brackets("ui_back")
         main_menu_scene.buttons = {}
 
 

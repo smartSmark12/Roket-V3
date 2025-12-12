@@ -27,7 +27,7 @@ DEFAULT_ANIMATION_PATH:str = "./engine/scripts/animations_to_create.py"
 DEFAULT_SCENE_NAME = "main_menu"         # the default rendered scene
 
 ## game settings cause me be lazy :33
-DEFAULT_LOCALIZATION_CODE = "cz"
+DEFAULT_LOCALIZATION_CODE = "en"
 LOCALIZATION_PATH = "./engine/game/localization/"
 LOCALIZATION_POSTFIX = ".json"
 
@@ -36,7 +36,7 @@ ACTIVE_KEYBIND_PATH = "./engine/game/settings/roket_keybinds.json"
 
 DEFAULT_FONT_PATH = "engine/game/assets/fonts/MinecraftRegular-Bmg3.otf"
 
-BUTTON_FONT_SIZE = 60
+BUTTON_FONT_SIZE = 36
 H1_FONT_SIZE = 160
 VERSION_FONT_SIZE = 20
 

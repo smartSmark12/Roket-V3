@@ -91,7 +91,7 @@
     ],
     "button_template":[
         "engine/game/assets/img/menu/button_template.png",
-        [360,160],
+        [280,128],
         "ca"
     ],
     "ingame_menu_background":[
@@ -106,12 +106,12 @@
     ],
     "mainmenu_leaderboard_button":[
         "engine/game/assets/img/menu/mainmenu_leaderboard_button.png",
-        [160,160],
+        [128,128],
         "ca"
     ],
     "mainmenu_settings_button":[
         "engine/game/assets/img/menu/mainmenu_settings_button.png",
-        [160,160],
+        [128,128],
         "ca"   
     ],
     "selector_background":[
