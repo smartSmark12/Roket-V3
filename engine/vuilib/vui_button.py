@@ -38,7 +38,8 @@ class button:
             return True
         else:
             self.hover = False
-            self.set_active_sprite("main")
+            self.passive_update()
+            
             return False
     
     def update_hold_time(self, mouse_info):
@@ -46,6 +47,9 @@ class button:
             self.held_for += self.app.dt
         else:
             self.held_for = 0
+
+    def passive_update(self):
+        self.set_active_sprite("main")
 
     def set_active_sprite(self, spriteName:str):
         self.sprite.set_active_sprite(spriteName)
