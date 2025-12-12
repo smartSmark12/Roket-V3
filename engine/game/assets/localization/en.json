@@ -1,0 +1,11 @@
+{
+    "code":"en",
+    "name":"English",
+    "texts": {
+        "title_title":"Roket V3!",
+        "title_play":"PLAY",
+        "title_exit":"EXIT",
+        "main_menu_launch":"LAUNCH",
+        "main_menu_return":"TITLE"
+    }
+}

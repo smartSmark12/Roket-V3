@@ -25,6 +25,10 @@ DEFAULT_ANIMATION_PATH:str = "./engine/scripts/animations_to_create.py"
 DEFAULT_SCENE_NAME = "main_menu"         # the default rendered scene
 
 ## game settings cause me be lazy :33
+DEFAULT_LOCALIZATION_CODE = "en"
+LOCALIZATION_PATH = "./engine/game/assets/localization/"
+LOCALIZATION_POSTFIX = ".json"
+
 BUTTON_FONT_SIZE = 60
 
 # server settings

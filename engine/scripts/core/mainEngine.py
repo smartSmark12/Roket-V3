@@ -37,6 +37,7 @@ from scripts.core.keyHandler import KeyHandler # local library used to handle ke
 from scripts.core.openglHandler import OGLHandler # local library for shader support (experimental!)
 from scripts.core.scenes.scene_handler import SceneHandler
 from scripts.core.scenes.scene import Scene
+from scripts.json_loader import JsonLoader
 from scripts.core.settings import GAME_NAME, DEFAULT_SCENE_NAME
 """ from game.game import MainGame """
 
@@ -155,6 +156,10 @@ class MainEngine:
         self.h1_font = pg.Font("engine/game/assets/fonts/MinecraftRegular-Bmg3.otf", int(160 * (self.height / HEIGHT)))
         self.button_font = pg.Font("engine/game/assets/fonts/MinecraftRegular-Bmg3.otf", int(BUTTON_FONT_SIZE * (self.height / HEIGHT)))
 
+        # load localization
+        self.localization_code = DEFAULT_LOCALIZATION_CODE ## temp
+        self.load_localization()
+
         # create darker button variants
         BUTTON_COLOR_SUBTRACT_COLOR = (30, 30, 30)
         for sprite in ["button_template", "mainmenu_settings_button", "mainmenu_leaderboard_button"]:
@@ -206,14 +211,14 @@ class MainEngine:
 
         ## title
 
-        title_scene.main_text = "Roket V3!"
-        title_scene.play_text = "PLAY [W]"
-        title_scene.exit_text = "EXIT [E]"
+        title_scene.main_text = self.texts["title_title"]
+        title_scene.play_text = self.texts["title_play"] + " [W]"
+        title_scene.exit_text = self.texts["title_exit"] + " [E]"
         title_scene.buttons = {}
 
         ## main_menu
-        main_menu_scene.launch_text = "LAUNCH [W]"
-        main_menu_scene.return_text = "TITLE [E]"
+        main_menu_scene.launch_text = self.texts["main_menu_launch"] + " [W]"
+        main_menu_scene.return_text = self.texts["main_menu_return"] + " [E]"
         main_menu_scene.buttons = {}
 
 
@@ -271,6 +276,24 @@ class MainEngine:
         # assign blackbar sizes
         self.blackbar_x_size_aka_renderer_blit_x_offset = int((self.window_width - self.width) / 2)
         self.blackbar_y_size_aka_renderer_blit_y_offset = int((self.window_height - self.height) / 2)
+
+    def load_localization(self):
+        self.texts = {}
+
+        # load default localization
+        loaded_localization = JsonLoader.load_from_file(LOCALIZATION_PATH + DEFAULT_LOCALIZATION_CODE + LOCALIZATION_POSTFIX)
+
+        self.texts = loaded_localization["texts"]
+
+        # load new localization
+        loaded_localization = JsonLoader.load_from_file(LOCALIZATION_PATH + self.localization_code + LOCALIZATION_POSTFIX)
+
+        # replace default localization
+        for text in loaded_localization["texts"]:
+            self.texts[text] = loaded_localization["texts"][text]
+
+    def load_keybinds(self):
+        pass
 
     def title_update(self):
         title = self.scene_handler.getScene("title")
