@@ -153,8 +153,9 @@ class MainEngine:
         self.corrected_mouse_info = None
 
         # load fonts # can hardcode, cause you'll still need to relaunch the game to take effect
-        self.h1_font = pg.Font("engine/game/assets/fonts/MinecraftRegular-Bmg3.otf", int(160 * (self.height / HEIGHT)))
-        self.button_font = pg.Font("engine/game/assets/fonts/MinecraftRegular-Bmg3.otf", int(BUTTON_FONT_SIZE * (self.height / HEIGHT)))
+        self.h1_font = pg.Font(DEFAULT_FONT_PATH, int(H1_FONT_SIZE * (self.height / HEIGHT)))
+        self.button_font = pg.Font(DEFAULT_FONT_PATH, int(BUTTON_FONT_SIZE * (self.height / HEIGHT)))
+        self.version_font = pg.Font(DEFAULT_FONT_PATH, int(VERSION_FONT_SIZE * (self.height / HEIGHT)))
 
         # load localization
         self.localization_code = DEFAULT_LOCALIZATION_CODE ## temp
@@ -212,6 +213,7 @@ class MainEngine:
         ## title
 
         title_scene.main_text = self.texts["title_title"]
+        title_scene.version_text = "v" + GAME_VERSION + " - " + GAME_VERSION_HINT
         title_scene.play_text = self.texts["title_play"] + " [W]"
         title_scene.exit_text = self.texts["title_exit"] + " [E]"
         title_scene.buttons = {}
@@ -305,7 +307,14 @@ class MainEngine:
 
     def title_render(self):
         title = self.scene_handler.getScene("title")
+
+        # draw title
         self.draw("text", self.LAYER_UI_TOP, {"text":title.main_text, "no_bg":True, "font":self.h1_font, "center":(self.width/2, self.height/5)})
+
+        # draw version info
+        self.draw("text", self.LAYER_UI_TOP, {"text":title.version_text, "no_bg":True, "font":self.version_font, "rect":pg.Rect(self.to_scale_x(30), self.to_scale_y(HEIGHT - 50), 0, 0), "color":gray})
+
+        # draw button texts
         self.draw_button_text(title.play_text, title.buttons["play"])
         self.draw_button_text(title.exit_text, title.buttons["exit"])
 
@@ -323,6 +332,7 @@ class MainEngine:
     def main_menu_render(self):
         main_menu = self.scene_handler.getScene("main_menu")
         
+        # draw button texts
         self.draw_button_text(main_menu.launch_text, main_menu.buttons["launch"])
         self.draw_button_text(main_menu.return_text, main_menu.buttons["return"])
 

@@ -1,5 +1,7 @@
 NGF_VERSION = "0.0.4s"
 GAME_NAME = "Roket V3!"
+GAME_VERSION = "0.1"
+GAME_VERSION_HINT = "Hydrogen"
 
 WIDTH = 1920
 HEIGHT = 1080
@@ -29,7 +31,11 @@ DEFAULT_LOCALIZATION_CODE = "en"
 LOCALIZATION_PATH = "./engine/game/assets/localization/"
 LOCALIZATION_POSTFIX = ".json"
 
+DEFAULT_FONT_PATH = "engine/game/assets/fonts/MinecraftRegular-Bmg3.otf"
+
 BUTTON_FONT_SIZE = 60
+H1_FONT_SIZE = 160
+VERSION_FONT_SIZE = 20
 
 # server settings
 SERVER_CONNECTIONS:int = 4          # max connections the server will expect at start
