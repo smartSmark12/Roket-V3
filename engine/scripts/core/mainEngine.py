@@ -454,8 +454,24 @@ class MainEngine:
             while planet_name_prefix + str(animation_number) in self.animations:
                 animation_number += 1
             
-            self.animation_handler.add_animation(planet_name_prefix + str(animation_number), ["title_planet_0_0","title_planet_0_1","title_planet_0_2"], 2, self.LAYER_TITLE_PLANETS, (self.to_scale_x(WIDTH), self.to_scale_y(HEIGHT)))
+            x_pos = 100
+            y_pos = 100
+
+            while self.in_bounds((x_pos, y_pos)):
+                x_pos = random.randint(int(WIDTH/2), WIDTH)
+                y_pos = random.randint(int(HEIGHT/2), HEIGHT)
+
+            self.animation_handler.add_animation(planet_name_prefix + str(animation_number), ["title_planet_0_0","title_planet_0_1","title_planet_0_2"], 2, self.LAYER_TITLE_PLANETS, (self.to_scale_x(x_pos), self.to_scale_y(y_pos)))
             self.scene_handler.getScene("title").planets.append(planet_name_prefix + str(animation_number))
+
+    def in_bounds(self, pos):
+        x = pos[0]
+        y = pos[1]
+
+        if x > 0 and y > 0 and x < WIDTH and y < HEIGHT:
+            return True
+        else:
+            return False
 
     def update_alarms(self):
         for alarm in self.alarms:
