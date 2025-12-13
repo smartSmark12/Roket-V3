@@ -118,6 +118,21 @@
         "engine/game/assets/img/menu/selector_background.png",
         [840,360],
         "ca"
+    ],
+    "title_planet_0_0":[
+        "engine/game/assets/img/planets/TitlePlanet0_0.png",
+        [200,200],
+        "ca"
+    ],
+    "title_planet_0_1":[
+        "engine/game/assets/img/planets/TitlePlanet0_1.png",
+        [200,200],
+        "ca"
+    ],
+    "title_planet_0_2":[
+        "engine/game/assets/img/planets/TitlePlanet0_2.png",
+        [200,200],
+        "ca"
     ]
 
 }

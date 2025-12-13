@@ -59,6 +59,27 @@ class AnimationHandler:
 
         self.app.return_to_runtime_logger(f"{__name__}:animation_loader")
 
+    def add_animation(self, animationName:str, frames:list[str], animationLengthInSec:int|float, animationLayer:int, animationPosition:tuple):
+        if animationName not in self.app.animations:
+            # get frames from names
+            temp_frames = {}
+
+            for frame in range(len(frames)):
+                temp_frames[frame] = self.app.sprites[frames[frame]]
+
+            # create the animation
+            self.app.animations[animationName] = AnimatedTexture(convert_to_flatpane(temp_frames), animationLengthInSec, animationLayer, animationPosition, self.app)
+
+        else:
+            print(f"{__name__}: an animation is already assigned to name {animationName}")
+
+    def remove_animation(self, animationName:str):
+        if animationName in self.app.animations:
+            del self.app.animations[animationName]
+
+        else:
+            print(f"{__name__}: couldn't find animation {animationName} to remove")
+
     def render_animations(self):
         for anim in self.app.animations:
             if anim in self.app.animations_to_render:

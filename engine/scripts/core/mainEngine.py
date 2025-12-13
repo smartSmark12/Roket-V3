@@ -38,6 +38,7 @@ from scripts.core.openglHandler import OGLHandler # local library for shader sup
 from scripts.core.scenes.scene_handler import SceneHandler
 from scripts.core.scenes.scene import Scene
 from scripts.json_loader import JsonLoader
+from game.scripts.alarm import Alarm
 from scripts.core.settings import GAME_NAME, DEFAULT_SCENE_NAME
 """ from game.game import MainGame """
 
@@ -148,6 +149,12 @@ class MainEngine:
     def game_on_init(self):
         # set render layers
         self.LAYER_UI_BOTTOM = 7
+        self.LAYER_TITLE_PLANETS = 4 # actually just a reference - animations take only numbers from animations_to_create.py
+
+        # alarms setup
+        self.alarms = {}
+
+        self.title_planet_alarm = self.add_alarm("planet_spawn", TITLE_PLANET_SPAWNING_PERIOD, self.spawn_title_planets, True)
 
         # assign empty corrected mouse info
         self.corrected_mouse_info = None
@@ -171,6 +178,9 @@ class MainEngine:
             dark_name = sprite+"_dark"
             self.sprites[dark_name] = self.sprites[sprite].copy()
             pg.Surface.fill(self.sprites[dark_name], BUTTON_COLOR_SUBTRACT_COLOR, special_flags=pg.BLEND_SUB)
+
+        # planet movement speed
+        self.planet_movement_speed = [16,9] # px/s
 
         # add all scenes
         self.scene_handler.addScene(Scene(self, "title"))
@@ -221,6 +231,7 @@ class MainEngine:
         title_scene.play_text = self.texts["title_play"] + " " + self.get_keybind_keycode_name_in_square_brackets("ui_forward")
         title_scene.exit_text = self.texts["title_exit"] + " " + self.get_keybind_keycode_name_in_square_brackets("ui_back")
         title_scene.buttons = {}
+        title_scene.planets = []
 
         ## main_menu
         main_menu_scene.launch_text = self.texts["main_menu_launch"] + " " + self.get_keybind_keycode_name_in_square_brackets("ui_forward")
@@ -352,6 +363,19 @@ class MainEngine:
         if self.get_keybind_just_pressed("debug_reset_keybinds"):
             self.reset_keybinds()
 
+        # planet movement
+        for planet in title.planets:
+            self.animations[planet].anim_pos = (
+                                                self.animations[planet].anim_pos[0] - self.to_scale_x(self.planet_movement_speed[0])*self.dt,
+                                                self.animations[planet].anim_pos[1] - self.to_scale_y(self.planet_movement_speed[1])*self.dt
+                                                )
+            
+            if self.animations[planet].anim_pos[0] < -200:
+                self.animation_handler.remove_animation(planet)
+                title.planets[title.planets.index(planet)] = None
+
+        title.planets = [i for i in title.planets if i is not None]
+
     def title_render(self):
         title = self.scene_handler.getScene("title")
 
@@ -367,6 +391,10 @@ class MainEngine:
 
         for button in title.buttons:
             title.buttons[button].render()
+
+        # planet render
+        for planet in title.planets:
+            self.animations_to_render.append(planet)
 
     def main_menu_update(self):
         main_menu = self.scene_handler.getScene("main_menu")
@@ -415,6 +443,37 @@ class MainEngine:
         start = 0
         length = 3
         return "[" + self.get_keybind_keycode_name(keybind)[start : start + length].upper() + "]"
+    
+    def spawn_title_planets(self):
+
+        if random.randint(0, TITLE_PLANET_SPAWNING_ANICHANCE) == 0:
+
+            planet_name_prefix = "title_planet_"
+            animation_number = 0
+
+            while planet_name_prefix + str(animation_number) in self.animations:
+                animation_number += 1
+            
+            self.animation_handler.add_animation(planet_name_prefix + str(animation_number), ["title_planet_0_0","title_planet_0_1","title_planet_0_2"], 2, self.LAYER_TITLE_PLANETS, (self.to_scale_x(WIDTH), self.to_scale_y(HEIGHT)))
+            self.scene_handler.getScene("title").planets.append(planet_name_prefix + str(animation_number))
+
+    def update_alarms(self):
+        for alarm in self.alarms:
+
+            if self.alarms[alarm].getRemoveSchedule():
+                del self.alarms[alarm] # idk
+
+            self.alarms[alarm].checkTimeout(self.dt)
+
+    def add_alarm(self, alarmName:str, alarmTime:int|float, timeoutFunction, repeatAlarm:bool) -> int:
+        alarm = Alarm(alarmName, alarmTime, timeoutFunction, repeatAlarm)
+        print(id(alarm))
+        self.alarms[id(alarm)] = alarm
+
+        return id(alarm)
+
+    def remove_alarm(self, alarmId:str|int):
+        self.alarms[alarmId].removeAlarm()
 
     def exit_game(self):
         print(f"{__name__}: exiting game")
@@ -602,6 +661,9 @@ class MainEngine:
         self.corrected_mouse_info = (self.screen_to_game_coords(pg.mouse.get_pos()), left_pressed, mouse_changed)
 
         #self.draw("circle", 9, {"center":self.corrected_mouse_info[0]})
+
+        # update alarms
+        self.update_alarms()
 
         # do main game logic
         self.do_logic()
