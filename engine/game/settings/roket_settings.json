@@ -1,3 +1,10 @@
 {
-    "version":"3.0.1"
+    "version":"3.0.1",
+    "language":"cz",
+    "resolution":[1280,900],
+    "resolution_index":0,
+    "fps_limit":120,
+    "fps_limit_index":0,
+    "graphics_level":0,
+    "fullscreen":false
 }
