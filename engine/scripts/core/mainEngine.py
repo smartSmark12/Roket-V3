@@ -464,7 +464,7 @@ class MainEngine:
             self.animation_handler.add_animation(planet_name_prefix + str(animation_number), ["title_planet_0_0","title_planet_0_1","title_planet_0_2"], 2, self.LAYER_TITLE_PLANETS, (self.to_scale_x(x_pos), self.to_scale_y(y_pos)))
             self.scene_handler.getScene("title").planets.append(planet_name_prefix + str(animation_number))
 
-    def in_bounds(self, pos): # this thing is lowkey crazy :((
+    def in_bounds(self, pos): # this thing is lowkey crazy :(( ## its worldspace, NOT SCREENSPACE
         x = pos[0]
         y = pos[1]
 
