@@ -40,8 +40,8 @@ BUTTON_FONT_SIZE = 36
 H1_FONT_SIZE = 160
 VERSION_FONT_SIZE = 20
 
-TITLE_PLANET_SPAWNING_PERIOD = 10
-TITLE_PLANET_SPAWNING_ANICHANCE = 20 # its more like 1/antichance is the chance, so
+TITLE_PLANET_SPAWNING_PERIOD = 8
+TITLE_PLANET_SPAWNING_ANICHANCE = 5 # its more like 1/antichance is the chance, so
 
 # server settings
 SERVER_CONNECTIONS:int = 4          # max connections the server will expect at start
