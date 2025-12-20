@@ -643,6 +643,7 @@ class MainEngine:
         # apply settings
         self.user_resolution = settings_read["resolution"]
         self.user_fullscreen = settings_read["fullscreen"]
+        self.user_fps_limit = settings_read["fps_limit"]
 
         self.active_resolution_index = 5 # uhhh changeme
 
@@ -693,7 +694,7 @@ class MainEngine:
 
     def update(self):
         self.to_render.clear()
-        self.dt = self.clock.tick(FPS_LOGIC_LIMIT) / 1000
+        self.dt = self.clock.tick(self.user_fps_limit) / 1000
 
         # refresh mouse information
         mouse_pressed = pg.mouse.get_pressed()
@@ -724,7 +725,7 @@ class MainEngine:
         self.collect_logs()
         self.print_log() # print and clear log of current cycle
 
-    def do_logic(self): # all non-engine related logic should go here
+    def do_logic(self): # all non-engine related logic should go here (unless you use scenes ofc)
         pass
         """ self.animations["example_anim"].anim_pos = (self.mouse_info[0][0], self.mouse_info[0][1])
 
