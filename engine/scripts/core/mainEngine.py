@@ -86,7 +86,8 @@ class MainEngine:
         self.create_draw_window()
 
         ## need to redo this part
-        if IN_FULLSCREEN:
+        #if IN_FULLSCREEN:
+        if self.user_fullscreen:
             if OGL_ENABLED:
                 self.render_window = pg.display.set_mode(self.active_resolution, pg.FULLSCREEN | pg.OPENGL | pg.DOUBLEBUF)
                 self.window = pg.Surface(self.active_resolution)
@@ -641,10 +642,13 @@ class MainEngine:
 
         # apply settings
         self.user_resolution = settings_read["resolution"]
+        self.user_fullscreen = settings_read["fullscreen"]
 
         self.active_resolution_index = 5 # uhhh changeme
 
         self.localization_code = settings_read["localization"]
+
+
 
     def render(self):
         if MULTITHREADED_RENDERING:
