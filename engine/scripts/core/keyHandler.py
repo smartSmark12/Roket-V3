@@ -73,7 +73,7 @@ class KeyHandler:
             self.app.keybinds_pressed[keyname] = False
 
             self.keybind_keycode_names[keyname] = pg.key.name(self.keybinds[keyname][0], use_compat=False)
-        print(self.keybind_keycode_names)
+        #print(self.keybind_keycode_names)
 
     def update_keys(self):
         pressed = pg.key.get_pressed()

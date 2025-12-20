@@ -24,7 +24,7 @@ DEFAULT_SPRITE_JSON_PATH:str = "./engine/scripts/json/sprites_to_load.json"
 DEFAULT_ANIMATION_PATH:str = "./engine/scripts/animations_to_create.py"
 
 # scene settings
-DEFAULT_SCENE_NAME = "main_menu"         # the default rendered scene
+DEFAULT_SCENE_NAME = "main_menu"         # the default rendered/active scene
 
 ## game settings cause me be lazy :33
 DEFAULT_LOCALIZATION_CODE = "en"
@@ -34,9 +34,14 @@ LOCALIZATION_POSTFIX = ".json"
 DEFAULT_KEYBIND_PATH = "./engine/game/settings/roket_keybinds_template.json" # used if no other config is present as a copy source
 ACTIVE_KEYBIND_PATH = "./engine/game/settings/roket_keybinds.json"
 
+DEFAULT_SETTINGS_PATH = "engine/game/settings/roket_settings_template.json" # same as the keybind config failsafe
+ACTIVE_SETTINGS_PATH = "engine/game/settings/roket_settings.json"
+
+PERSISTENT_DATA_PATH = "engine/game/settings/persistent.json"
+
 DEFAULT_FONT_PATH = "engine/game/assets/fonts/Minecraft.otf"
 
-BUTTON_FONT_SIZE = 36
+BUTTON_FONT_SIZE = 36                 # all font sizes are gamespace; rescaled to fit the active res
 H1_FONT_SIZE = 160
 VERSION_FONT_SIZE = 20
 

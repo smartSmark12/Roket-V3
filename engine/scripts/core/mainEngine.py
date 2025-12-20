@@ -78,6 +78,9 @@ class MainEngine:
         # debug shis
         self.DEBUG_RESOLUTION_INDEX = 1
 
+        # load user settings
+        self.load_settings()
+
         self.create_resolutions()
         self.set_resolution()
         self.create_draw_window()
@@ -165,7 +168,7 @@ class MainEngine:
         self.version_font = pg.Font(DEFAULT_FONT_PATH, int(VERSION_FONT_SIZE * (self.height / HEIGHT)))
 
         # load localization
-        self.localization_code = DEFAULT_LOCALIZATION_CODE ## temp
+        #self.localization_code = DEFAULT_LOCALIZATION_CODE ## temp
         self.load_localization()
 
         # load keybinds
@@ -254,18 +257,23 @@ class MainEngine:
     def create_resolutions(self):
         # set possible resolutions
         self.RESOLUTIONS = [
-            (1920, 1080),
-            (1280, 720),
             (640, 360),
+            (1280, 720),
+            (1920, 1080),
             (2560, 1440),
-            (1280, 960),
+            (3840, 2160),
+            tuple(self.user_resolution) # loaded resolution here; converted to tuple for compatibility
+        ] 
+
+        """ (1280, 960),
             (1440, 1080),
             (80,45),
-            (1200, 400)
-        ]
+            (1200, 400) """
+        
+        print(self.RESOLUTIONS)
 
     def set_resolution(self):
-        self.active_resolution_index =  self.DEBUG_RESOLUTION_INDEX#4
+        #self.active_resolution_index =  self.DEBUG_RESOLUTION_INDEX#4
         self.active_resolution = self.RESOLUTIONS[self.active_resolution_index]
 
         self.window_width = self.active_resolution[0] # fawak this is shis
@@ -316,7 +324,7 @@ class MainEngine:
 
         self.keyhandler.update_keybind_buffers()
 
-        print(loaded_keybinds)
+        #print(loaded_keybinds)
 
     def register_keybind(self, keybind_name:str, keycode:int):
         self.keyhandler.register_keybind(keybind_name, keycode)
@@ -342,7 +350,6 @@ class MainEngine:
         self.keyhandler.update_keybind_buffers()
 
         self.save_keybinds()
-        
 
     def title_update(self):
         title = self.scene_handler.getScene("title")
@@ -618,6 +625,26 @@ class MainEngine:
                         
     def load_sounds(self):
         pass
+
+    def load_settings(self):
+        settings_read = None
+
+        # try loading user settings        
+        settings_read = JsonLoader.load_from_file(ACTIVE_SETTINGS_PATH)
+
+        # load defaults if no settings file exists
+        if not settings_read:
+            settings_read = JsonLoader.load_from_file(DEFAULT_SETTINGS_PATH)
+            print("loaded default settings! Something's probably gone wrong :>")
+
+        #print(settings_read)
+
+        # apply settings
+        self.user_resolution = settings_read["resolution"]
+
+        self.active_resolution_index = 5 # uhhh changeme
+
+        self.localization_code = settings_read["localization"]
 
     def render(self):
         if MULTITHREADED_RENDERING:

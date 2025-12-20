@@ -19,6 +19,7 @@ class JsonLoader:
                 return json.load(file)
         except:
             print(f"JsonLoader:readError: couldn't read data from file {filepath}")
+            return None
         
     @staticmethod
     def write_to_file(filepath:str, data:dict) -> None:
