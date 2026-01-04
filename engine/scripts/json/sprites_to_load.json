@@ -133,6 +133,51 @@
         "engine/game/assets/img/planets/TitlePlanet0_2.png",
         [200,200],
         "ca"
+    ],
+    "ui_builder_left":[
+        "engine/game/assets/img/ui_builder/left.png",
+        [15,210],
+        "ca"
+    ],
+    "ui_builder_top":[
+        "engine/game/assets/img/ui_builder/top.png",
+        [130,15],
+        "ca"
+    ],
+    "ui_builder_right":[
+        "engine/game/assets/img/ui_builder/right.png",
+        [15,210],
+        "ca"
+    ],
+    "ui_builder_bottom":[
+        "engine/game/assets/img/ui_builder/bottom.png",
+        [130,15],
+        "ca"
+    ],
+    "ui_builder_corner_top_left":[
+        "engine/game/assets/img/ui_builder/corner_top_left.png",
+        [15,15],
+        "ca"
+    ],
+    "ui_builder_corner_top_right":[
+        "engine/game/assets/img/ui_builder/corner_top_right.png",
+        [15,15],
+        "ca"
+    ],
+    "ui_builder_corner_bottom_right":[
+        "engine/game/assets/img/ui_builder/corner_bottom_right.png",
+        [15,15],
+        "ca"
+    ],
+    "ui_builder_corner_bottom_left":[
+        "engine/game/assets/img/ui_builder/corner_bottom_left.png",
+        [15,15],
+        "ca"
+    ],
+    "ui_builder_background":[
+        "engine/game/assets/img/ui_builder/background.png",
+        [1,1],
+        "c"
     ]
 
 }

@@ -39,6 +39,7 @@ from scripts.core.scenes.scene_handler import SceneHandler
 from scripts.core.scenes.scene import Scene
 from scripts.json_loader import JsonLoader
 from game.scripts.alarm import Alarm
+from game.scripts.ui_frame_builder import UIFrameBuilder
 from scripts.core.settings import GAME_NAME, DEFAULT_SCENE_NAME
 """ from game.game import MainGame """
 
@@ -403,6 +404,10 @@ class MainEngine:
         # planet render
         for planet in title.planets:
             self.animations_to_render.append(planet)
+
+
+        # debug
+        #self.draw("sprite", 7, {"sprite":UIFrameBuilder.get_ui_frame(400, 300, self.sprites), "rect":(100, 100, 0, 0)})
 
     def main_menu_update(self):
         main_menu = self.scene_handler.getScene("main_menu")
