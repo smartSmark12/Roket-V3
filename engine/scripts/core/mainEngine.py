@@ -224,10 +224,15 @@ class MainEngine:
         title_side_button_x_distance = 250
         title_button_y_offset = 160 # not sure why this cant be the same as button x dist ::
 
-        main_menu_button_start_y = 650 # all values autoconverted by to_scale_x/y
+        main_menu_button_start_y = 750 # all values autoconverted by to_scale_x/y
         main_menu_button_width = title_button_width
         main_menu_button_height = title_button_height
         main_menu_button_y_offset = title_button_y_offset
+
+        main_menu_background_frame_width = 1600
+        main_menu_background_frame_height = 600
+        main_menu_background_frame_x = (WIDTH - main_menu_background_frame_width) / 2
+        main_menu_background_frame_y = 100
 
         ## title
 
@@ -241,6 +246,8 @@ class MainEngine:
         ## main_menu
         main_menu_scene.launch_text = self.texts["main_menu_launch"] + " " + self.get_keybind_keycode_name_in_square_brackets("ui_forward")
         main_menu_scene.return_text = self.texts["main_menu_return"] + " " + self.get_keybind_keycode_name_in_square_brackets("ui_back")
+        main_menu_scene.background_frame = UIFrameBuilder.get_ui_frame(self.to_scale_x(main_menu_background_frame_width), self.to_scale_y(main_menu_background_frame_height), self.sprites)
+        main_menu_scene.background_frame_pos = (main_menu_background_frame_x, main_menu_background_frame_y)
         main_menu_scene.buttons = {}
 
 
@@ -353,6 +360,9 @@ class MainEngine:
 
         self.save_keybinds()
 
+    def render_version_info(self):
+        self.draw("text", self.LAYER_UI_TOP, {"text":self.scene_handler.getScene("title").version_text, "no_bg":True, "font":self.version_font, "rect":pg.Rect(self.to_scale_x(30), self.to_scale_y(HEIGHT - 50), 0, 0), "color":gray})
+
     def title_update(self):
         title = self.scene_handler.getScene("title")
         # update all buttons
@@ -392,7 +402,7 @@ class MainEngine:
         self.draw("text", self.LAYER_UI_TOP, {"text":title.main_text, "no_bg":True, "font":self.h1_font, "center":(self.width/2, self.height/5)})
 
         # draw version info
-        self.draw("text", self.LAYER_UI_TOP, {"text":title.version_text, "no_bg":True, "font":self.version_font, "rect":pg.Rect(self.to_scale_x(30), self.to_scale_y(HEIGHT - 50), 0, 0), "color":gray})
+        self.render_version_info()
 
         # draw button texts
         self.draw_button_text(title.play_text, title.buttons["play"])
@@ -433,6 +443,12 @@ class MainEngine:
 
         for button in main_menu.buttons:
             main_menu.buttons[button].render()
+
+        # draw background frame
+        self.draw("sprite", self.LAYER_UI_BOTTOM, {"sprite":main_menu.background_frame, "rect":(self.to_scale_x(main_menu.background_frame_pos[0]), self.to_scale_y(main_menu.background_frame_pos[1]), 0, 0)})
+
+        # draw version info
+        self.render_version_info()
 
     def draw_button_text(self, buttonText:str, button):
         self.draw("text", self.LAYER_UI_TOP, {"text":buttonText, "no_bg":True, "font":self.button_font, "center":button.rect.center, "color":black})
