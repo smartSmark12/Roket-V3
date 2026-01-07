@@ -234,6 +234,17 @@ class MainEngine:
         main_menu_background_frame_x = (WIDTH - main_menu_background_frame_width) / 2
         main_menu_background_frame_y = 100
 
+        main_menu_background_frame_width_part = main_menu_background_frame_width / 10
+        main_menu_background_frame_margin = 20
+
+        main_menu_ship_frame_width = main_menu_background_frame_width_part * 5 - 2 * main_menu_background_frame_margin
+        main_menu_mode_frame_width = main_menu_background_frame_width_part * 3 - 2 * main_menu_background_frame_margin
+        main_menu_news_frame_width = main_menu_background_frame_width_part * 2 - 2 * main_menu_background_frame_margin
+
+        main_menu_ship_frame_x = main_menu_background_frame_x + main_menu_background_frame_margin
+        main_menu_mode_frame_x = main_menu_ship_frame_x + main_menu_ship_frame_width + 2 * main_menu_background_frame_margin
+        main_menu_news_frame_x = main_menu_mode_frame_x + main_menu_mode_frame_width + 2 * main_menu_background_frame_margin
+
         ## title
 
         title_scene.main_text = self.texts["title_title"]
@@ -248,6 +259,12 @@ class MainEngine:
         main_menu_scene.return_text = self.texts["main_menu_return"] + " " + self.get_keybind_keycode_name_in_square_brackets("ui_back")
         main_menu_scene.background_frame = UIFrameBuilder.get_ui_frame(self.to_scale_x(main_menu_background_frame_width), self.to_scale_y(main_menu_background_frame_height), self.sprites)
         main_menu_scene.background_frame_pos = (main_menu_background_frame_x, main_menu_background_frame_y)
+        main_menu_scene.ship_frame = UIFrameBuilder.get_ui_frame(self.to_scale_x(main_menu_ship_frame_width), self.to_scale_y(main_menu_background_frame_height), self.sprites)
+        main_menu_scene.ship_frame_pos = (main_menu_ship_frame_x, main_menu_background_frame_y)
+        main_menu_scene.mode_frame = UIFrameBuilder.get_ui_frame(self.to_scale_x(main_menu_mode_frame_width), self.to_scale_y(main_menu_background_frame_height), self.sprites)
+        main_menu_scene.mode_frame_pos = (main_menu_mode_frame_x, main_menu_background_frame_y)
+        main_menu_scene.news_frame = UIFrameBuilder.get_ui_frame(self.to_scale_x(main_menu_news_frame_width), self.to_scale_y(main_menu_background_frame_height), self.sprites)
+        main_menu_scene.news_frame_pos = (main_menu_news_frame_x, main_menu_background_frame_y)
         main_menu_scene.buttons = {}
 
 
@@ -445,7 +462,10 @@ class MainEngine:
             main_menu.buttons[button].render()
 
         # draw background frame
-        self.draw("sprite", self.LAYER_UI_BOTTOM, {"sprite":main_menu.background_frame, "rect":(self.to_scale_x(main_menu.background_frame_pos[0]), self.to_scale_y(main_menu.background_frame_pos[1]), 0, 0)})
+        #self.draw("sprite", self.LAYER_UI_BOTTOM, {"sprite":main_menu.background_frame, "rect":(self.to_scale_x(main_menu.background_frame_pos[0]), self.to_scale_y(main_menu.background_frame_pos[1]), 0, 0)})
+        self.draw("sprite", self.LAYER_UI_BOTTOM, {"sprite":main_menu.ship_frame, "rect":(self.to_scale_x(main_menu.ship_frame_pos[0]), self.to_scale_y(main_menu.ship_frame_pos[1]), 0, 0)})
+        self.draw("sprite", self.LAYER_UI_BOTTOM, {"sprite":main_menu.mode_frame, "rect":(self.to_scale_x(main_menu.mode_frame_pos[0]), self.to_scale_y(main_menu.mode_frame_pos[1]), 0, 0)})
+        self.draw("sprite", self.LAYER_UI_BOTTOM, {"sprite":main_menu.news_frame, "rect":(self.to_scale_x(main_menu.news_frame_pos[0]), self.to_scale_y(main_menu.news_frame_pos[1]), 0, 0)})
 
         # draw version info
         self.render_version_info()
@@ -510,9 +530,14 @@ class MainEngine:
 
             self.alarms[alarm].checkTimeout(self.dt)
 
+    def pause_alarm(self, alarmId:str):
+        self.alarms[alarmId].pauseAlarm()
+
+    def unpause_alarm(self, alarmId:str):
+        self.alarms[alarmId].unpauseAlarm()
+
     def add_alarm(self, alarmName:str, alarmTime:int|float, timeoutFunction, repeatAlarm:bool) -> int:
         alarm = Alarm(alarmName, alarmTime, timeoutFunction, repeatAlarm)
-        print(id(alarm))
         self.alarms[id(alarm)] = alarm
 
         return id(alarm)
@@ -747,7 +772,12 @@ class MainEngine:
         self.print_log() # print and clear log of current cycle
 
     def do_logic(self): # all non-engine related logic should go here (unless you use scenes ofc)
-        pass
+        # pause planet spawning alarm if title not active
+        if self.scene_handler.getActiveSceneName() != "title":
+            self.pause_alarm(self.title_planet_alarm)
+        else:
+            self.unpause_alarm(self.title_planet_alarm)
+
         """ self.animations["example_anim"].anim_pos = (self.mouse_info[0][0], self.mouse_info[0][1])
 
         self.animations_to_render.append("example_anim") """

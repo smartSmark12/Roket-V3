@@ -89,3 +89,5 @@ class AnimationHandler:
                 position = self.app.animations[anim].get_animation_position()
                 self.app.to_render.append(RenderItem("sprite", anim_reference.get_render_layer(), {"rect":(position[0], position[1], WIDTH, HEIGHT),"sprite":anim_reference.get_current_frame().sprite}))
 
+        self.app.animations_to_render.clear() # now this was a memory leak and a half ::
+
