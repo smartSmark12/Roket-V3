@@ -1,7 +1,7 @@
 {
     "version":"3.0.1",
     "localization":"cz",
-    "resolution":[1280,720],
+    "resolution":[1600,500],
     "resolution_index":0,
     "fps_limit":400,
     "fps_limit_index":0,

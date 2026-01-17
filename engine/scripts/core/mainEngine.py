@@ -269,11 +269,11 @@ class MainEngine:
 
 
         ## create all title buttons
-        title_scene.buttons["play"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_button_width) / 2), self.to_scale_y((HEIGHT - title_button_height) / 2), self.to_scale_x(title_button_width), self.to_scale_y(title_button_height)), 0, None, partial(self.scene_handler.setActiveScene, "main_menu"), None, self)
-        title_scene.buttons["exit"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_button_width) / 2), self.to_scale_y((HEIGHT - title_button_height) / 2 + title_button_y_offset), self.to_scale_x(title_button_width), self.to_scale_y(title_button_height)), 0, None, partial(self.exit_game), None, self)
+        title_scene.buttons["play"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_button_width) / 2), self.to_scale_y((HEIGHT - title_button_height) / 2 + title_button_y_offset), self.to_scale_x(title_button_width), self.to_scale_y(title_button_height)), 0, None, partial(self.scene_handler.setActiveScene, "main_menu"), None, self)
+        title_scene.buttons["exit"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_button_width) / 2), self.to_scale_y((HEIGHT - title_button_height) / 2 + 2 * title_button_y_offset), self.to_scale_x(title_button_width), self.to_scale_y(title_button_height)), 0, None, partial(self.exit_game), None, self)
         
-        title_scene.buttons["settings"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_settings_button"], "hover":self.sprites["mainmenu_settings_button_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_square_button_size) / 2 - title_side_button_x_distance), self.to_scale_y((HEIGHT - title_square_button_size) / 2), self.to_scale_x(title_square_button_size), self.to_scale_y(title_square_button_size)), 0, None, partial(print, "options pressed"), None, self)
-        title_scene.buttons["achievements"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_leaderboard_button"], "hover":self.sprites["mainmenu_leaderboard_button_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_square_button_size) / 2 + title_side_button_x_distance), self.to_scale_y((HEIGHT - title_square_button_size) / 2), self.to_scale_x(title_square_button_size), self.to_scale_y(title_square_button_size)), 0, None, partial(print, "achievements pressed"), None, self)
+        title_scene.buttons["settings"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_settings_button"], "hover":self.sprites["mainmenu_settings_button_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_square_button_size) / 2 - title_side_button_x_distance), self.to_scale_y((HEIGHT - title_square_button_size) / 2 + title_button_y_offset), self.to_scale_x(title_square_button_size), self.to_scale_y(title_square_button_size)), 0, None, partial(print, "options pressed"), None, self)
+        title_scene.buttons["achievements"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_leaderboard_button"], "hover":self.sprites["mainmenu_leaderboard_button_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_square_button_size) / 2 + title_side_button_x_distance), self.to_scale_y((HEIGHT - title_square_button_size) / 2 + title_button_y_offset), self.to_scale_x(title_square_button_size), self.to_scale_y(title_square_button_size)), 0, None, partial(print, "achievements pressed"), None, self)
 
         ## create all main_menu buttons
         main_menu_scene.buttons["launch"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - main_menu_button_width) / 2), self.to_scale_y(main_menu_button_start_y), self.to_scale_x(main_menu_button_width), self.to_scale_y(main_menu_button_height)), 0, None, partial(print, "launch pressed"), None, self)
@@ -416,7 +416,7 @@ class MainEngine:
         title = self.scene_handler.getScene("title")
 
         # draw title
-        self.draw("text", self.LAYER_UI_TOP, {"text":title.main_text, "no_bg":True, "font":self.h1_font, "center":(self.width/2, self.height/5)})
+        self.draw("text", self.LAYER_UI_TOP, {"text":title.main_text, "no_bg":True, "font":self.h1_font, "center":(self.width/2, self.height/5 * 1.5)})
 
         # draw version info
         self.render_version_info()
