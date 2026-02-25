@@ -176,7 +176,7 @@
     ],
     "ui_builder_background":[
         "engine/game/assets/img/ui_builder/background.png",
-        [1,1],
+        [100,100],
         "c"
     ]
 

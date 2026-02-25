@@ -29,7 +29,7 @@ class UIFrameBuilder:
             main_engine_sprite_dict["ui_builder_bottom"],
         ]
 
-        background = main_engine_sprite_dict["ui_builder_background"]
+        background:pg.Surface = main_engine_sprite_dict["ui_builder_background"]
 
         # rescale
         edges[0] = pg.transform.scale(edges[0], (edges[0].width, height-corners[0].height-corners[3].height))
@@ -37,8 +37,11 @@ class UIFrameBuilder:
         edges[2] = pg.transform.scale(edges[2], (edges[2].width, height-corners[1].height-corners[2].height))
         edges[3] = pg.transform.scale(edges[3], (width-corners[2].width-corners[3].width, edges[3].height))
 
-        background = pg.transform.scale(background, (width-corners[0].width-corners[1].width, height-corners[0].height-corners[3].height))
+        # fallback color ## unused
+        fcolor = (142, 202, 230)
 
+        background = pg.transform.scale(background, (width-corners[0].width-corners[1].width, height-corners[0].height-corners[3].height))
+        
         # draw
         surf = surf.convert_alpha() #idk if this is right
 
