@@ -94,6 +94,11 @@
         [280,128],
         "ca"
     ],
+    "button_template_vertical":[
+        "engine/game/assets/img/menu/button_template_vertical.png",
+        [128,280],
+        "ca"
+    ],
     "ingame_menu_background":[
         "engine/game/assets/img/menu/ingame_menu_background.png",
         [320,480],

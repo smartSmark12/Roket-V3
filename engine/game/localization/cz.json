@@ -7,6 +7,9 @@
         "title_play":"HRAT",
         "title_exit":"KONEC",
         "main_menu_launch":"START",
-        "main_menu_return":"MENU"
+        "main_menu_return":"MENU",
+        "main_menu_switch_left":"<",
+        "main_menu_switch_right":">",
+        "main_menu_ship_modification":"HANGAR"
     }
 }

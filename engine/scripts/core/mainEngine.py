@@ -40,6 +40,7 @@ from scripts.core.scenes.scene import Scene
 from scripts.json_loader import JsonLoader
 from game.scripts.alarm import Alarm
 from game.scripts.ui_frame_builder import UIFrameBuilder
+from game.scripts.sprite_window import SpriteWindow
 from scripts.core.settings import GAME_NAME, DEFAULT_SCENE_NAME
 """ from game.game import MainGame """
 
@@ -143,6 +144,7 @@ class MainEngine:
 
         self.to_scale_x = self.sprite_handler.to_scalex
         self.to_scale_y = self.sprite_handler.to_scaley
+        self.to_scale = self.sprite_handler.to_scale
 
         # logger setup
         self.create_runtime_logger()
@@ -179,7 +181,7 @@ class MainEngine:
 
         # create darker button variants
         BUTTON_COLOR_SUBTRACT_COLOR = (30, 30, 30)
-        for sprite in ["button_template", "mainmenu_settings_button", "mainmenu_leaderboard_button"]:
+        for sprite in ["button_template", "button_template_vertical", "mainmenu_settings_button", "mainmenu_leaderboard_button"]:
             dark_name = sprite+"_dark"
             self.sprites[dark_name] = self.sprites[sprite].copy()
             pg.Surface.fill(self.sprites[dark_name], BUTTON_COLOR_SUBTRACT_COLOR, special_flags=pg.BLEND_SUB)
@@ -267,6 +269,26 @@ class MainEngine:
         main_menu_scene.news_frame_pos = (main_menu_news_frame_x, main_menu_background_frame_y)
         main_menu_scene.buttons = {}
 
+        ### ship frame
+        ship_window_size_mult = 0.4
+        ship_window_size = (main_menu_ship_frame_width * ship_window_size_mult, main_menu_ship_frame_width * ship_window_size_mult)
+        ship_window_pos = (main_menu_ship_frame_x + (main_menu_ship_frame_width - ship_window_size[0]) / 2, main_menu_background_frame_y + (main_menu_background_frame_height - ship_window_size[1]) / 2 - 50) # ja uz asi nedavam matiku pls proc 4 a ne 2
+        main_menu_scene.ship_window = SpriteWindow(self, self.sprites["lajf"], ship_window_pos, ship_window_size, self.LAYER_UI_TOP)
+
+        ship_switch_size = (128, 280)
+        ship_switch_left_button_pos = (main_menu_ship_frame_x + 30, main_menu_background_frame_y + (main_menu_background_frame_height - ship_switch_size[1]) / 2)
+        ship_switch_right_button_pos = (main_menu_ship_frame_x - 30 + main_menu_ship_frame_width - ship_switch_size[0], main_menu_background_frame_y + (main_menu_background_frame_height - ship_switch_size[1]) / 2)
+
+        ship_mod_button_size = (main_menu_button_width, main_menu_button_height)
+        ship_mod_button_pos = (main_menu_ship_frame_x + (main_menu_ship_frame_width - ship_mod_button_size[0]) / 2, main_menu_background_frame_y + 420)
+
+        main_menu_scene.buttons["ship_switch_left"] = button(flatpane("sprite", {"main":self.sprites["button_template_vertical"], "hover":self.sprites["button_template_vertical_dark"]}, sprite="main"), pg.Rect(self.to_scale(ship_switch_left_button_pos), self.to_scale(ship_switch_size)), 0, None, partial(print, "left switch"), None, self)
+        main_menu_scene.buttons["ship_switch_right"] = button(flatpane("sprite", {"main":self.sprites["button_template_vertical"], "hover":self.sprites["button_template_vertical_dark"]}, sprite="main"), pg.Rect(self.to_scale(ship_switch_right_button_pos), self.to_scale(ship_switch_size)), 0, None, partial(print, "right switch"), None, self)
+        main_menu_scene.buttons["ship_modification"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale(ship_mod_button_pos), self.to_scale(ship_mod_button_size)), 0, None, partial(print, "mod scene button"), None, self)
+
+        main_menu_scene.left_switch_text = self.texts["main_menu_switch_left"]
+        main_menu_scene.right_switch_text = self.texts["main_menu_switch_right"]
+        main_menu_scene.mod_button_text = self.texts["main_menu_ship_modification"]
 
         ## create all title buttons
         title_scene.buttons["play"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_button_width) / 2), self.to_scale_y((HEIGHT - title_button_height) / 2 + title_button_y_offset), self.to_scale_x(title_button_width), self.to_scale_y(title_button_height)), 0, None, partial(self.scene_handler.setActiveScene, "main_menu"), None, self)
@@ -342,6 +364,9 @@ class MainEngine:
         # replace default localization
         for text in loaded_localization["texts"]:
             self.texts[text] = loaded_localization["texts"][text]
+
+        # debug
+        print(f"{__name__}: loaded localization: {self.localization_code}")
 
     def load_keybinds(self):
         loaded_keybinds = JsonLoader.load_from_file(DEFAULT_KEYBIND_PATH)
@@ -457,15 +482,24 @@ class MainEngine:
         # draw button texts
         self.draw_button_text(main_menu.launch_text, main_menu.buttons["launch"])
         self.draw_button_text(main_menu.return_text, main_menu.buttons["return"])
-
-        for button in main_menu.buttons:
-            main_menu.buttons[button].render()
+        self.draw_button_text(main_menu.left_switch_text, main_menu.buttons["ship_switch_left"])
+        self.draw_button_text(main_menu.right_switch_text, main_menu.buttons["ship_switch_right"])
+        self.draw_button_text(main_menu.mod_button_text, main_menu.buttons["ship_modification"])
 
         # draw background frame
         #self.draw("sprite", self.LAYER_UI_BOTTOM, {"sprite":main_menu.background_frame, "rect":(self.to_scale_x(main_menu.background_frame_pos[0]), self.to_scale_y(main_menu.background_frame_pos[1]), 0, 0)})
         self.draw("sprite", self.LAYER_UI_BOTTOM, {"sprite":main_menu.ship_frame, "rect":(self.to_scale_x(main_menu.ship_frame_pos[0]), self.to_scale_y(main_menu.ship_frame_pos[1]), 0, 0)})
         self.draw("sprite", self.LAYER_UI_BOTTOM, {"sprite":main_menu.mode_frame, "rect":(self.to_scale_x(main_menu.mode_frame_pos[0]), self.to_scale_y(main_menu.mode_frame_pos[1]), 0, 0)})
         self.draw("sprite", self.LAYER_UI_BOTTOM, {"sprite":main_menu.news_frame, "rect":(self.to_scale_x(main_menu.news_frame_pos[0]), self.to_scale_y(main_menu.news_frame_pos[1]), 0, 0)})
+
+        # draw ship frame
+        main_menu.ship_window.render()
+
+        """ main_menu.ship_button_left.render() """
+
+        # draw buttons
+        for button in main_menu.buttons:
+            main_menu.buttons[button].render()
 
         # draw version info
         self.render_version_info()
@@ -752,6 +786,8 @@ class MainEngine:
         self.mouse_last = left_pressed
 
         self.mouse_info = (pg.mouse.get_pos(), left_pressed, mouse_changed)
+
+        ## correct mouse information for different resolutions
         self.corrected_mouse_info = (self.screen_to_game_coords(pg.mouse.get_pos()), left_pressed, mouse_changed)
 
         #self.draw("circle", 9, {"center":self.corrected_mouse_info[0]})

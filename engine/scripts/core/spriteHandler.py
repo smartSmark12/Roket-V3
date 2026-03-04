@@ -97,6 +97,12 @@ class SpriteHandlerJSON:
         if round_num: return round(number * self.app.screen_scale[1])
         else: return number * self.app.screen_scale[1]
 
+    def to_scale(self, point:tuple[float|int], round_num:bool=True):
+        if round_num:
+            return (self.to_scalex(point[0], True), self.to_scaley(point[1], True))
+        else:
+            return (self.to_scalex(point[0], False), self.to_scaley(point[1], False))
+
 # the old version
 class SpriteHandler:
     def __init__(self, appInstance):
