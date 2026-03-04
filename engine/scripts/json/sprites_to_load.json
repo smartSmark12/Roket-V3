@@ -99,6 +99,21 @@
         [128,280],
         "ca"
     ],
+    "button_mode_career":[
+        "engine/game/assets/img/menu/mode_button_career.png",
+        [360,146],
+        "ca"
+    ],
+    "button_mode_infinite":[
+        "engine/game/assets/img/menu/mode_button_infinite.png",
+        [360,146],
+        "ca"
+    ],
+    "button_mode_dummy":[
+        "engine/game/assets/img/menu/mode_button_dummy.png",
+        [360,146],
+        "ca"
+    ],
     "ingame_menu_background":[
         "engine/game/assets/img/menu/ingame_menu_background.png",
         [320,480],

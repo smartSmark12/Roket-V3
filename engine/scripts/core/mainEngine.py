@@ -290,6 +290,14 @@ class MainEngine:
         main_menu_scene.right_switch_text = self.texts["main_menu_switch_right"]
         main_menu_scene.mod_button_text = self.texts["main_menu_ship_modification"]
 
+        ### gamemode frame
+        mode_button_size = (360, 146)
+        mode_button_margin = 40
+        mode_button_start_pos = (main_menu_mode_frame_x + mode_button_margin, main_menu_background_frame_y + mode_button_margin)
+        main_menu_scene.buttons["mode_career"] = button(flatpane("sprite", {"main":self.sprites["button_mode_career"], "hover":self.sprites["button_template_vertical_dark"]}, sprite="main"), pg.Rect(self.to_scale(mode_button_start_pos), self.to_scale(mode_button_size)), 0, None, partial(print, "career mode"), None, self)
+        main_menu_scene.buttons["mode_infinite"] = button(flatpane("sprite", {"main":self.sprites["button_mode_infinite"], "hover":self.sprites["button_template_vertical_dark"]}, sprite="main"), pg.Rect(self.to_scale((mode_button_start_pos[0], mode_button_start_pos[1] + mode_button_size[1] + mode_button_margin)), self.to_scale(mode_button_size)), 0, None, partial(print, "infinite mode"), None, self)
+        main_menu_scene.buttons["mode_dummy"] = button(flatpane("sprite", {"main":self.sprites["button_mode_dummy"], "hover":self.sprites["button_template_vertical_dark"]}, sprite="main"), pg.Rect(self.to_scale((mode_button_start_pos[0], mode_button_start_pos[1] + 2 * mode_button_size[1] + 2 * mode_button_margin)), self.to_scale(mode_button_size)), 0, None, partial(print, "survival mode"), None, self)
+
         ## create all title buttons
         title_scene.buttons["play"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_button_width) / 2), self.to_scale_y((HEIGHT - title_button_height) / 2 + title_button_y_offset), self.to_scale_x(title_button_width), self.to_scale_y(title_button_height)), 0, None, partial(self.scene_handler.setActiveScene, "main_menu"), None, self)
         title_scene.buttons["exit"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_button_width) / 2), self.to_scale_y((HEIGHT - title_button_height) / 2 + 2 * title_button_y_offset), self.to_scale_x(title_button_width), self.to_scale_y(title_button_height)), 0, None, partial(self.exit_game), None, self)
