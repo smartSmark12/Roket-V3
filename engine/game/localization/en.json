@@ -6,10 +6,13 @@
         "title_title":"Roket V3!",
         "title_play":"PLAY",
         "title_exit":"EXIT",
-        "main_menu_launch":"LAUNCH",
+        "main_menu_launch":"NEXT",
         "main_menu_return":"TITLE",
         "main_menu_switch_left":"<",
         "main_menu_switch_right":">",
-        "main_menu_ship_modification":"HANGAR"
+        "main_menu_ship_modification":"HANGAR",
+        "main_menu_mode_career":"CAREER",
+        "main_menu_mode_infinite":"ENDLESS",
+        "main_menu_mode_dummy":"DUMMY"
     }
 }

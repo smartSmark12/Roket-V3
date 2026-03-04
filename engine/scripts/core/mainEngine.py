@@ -170,6 +170,7 @@ class MainEngine:
         self.h1_font = pg.Font(DEFAULT_FONT_PATH, int(H1_FONT_SIZE * (self.height / HEIGHT)))
         self.button_font = pg.Font(DEFAULT_FONT_PATH, int(BUTTON_FONT_SIZE * (self.height / HEIGHT)))
         self.version_font = pg.Font(DEFAULT_FONT_PATH, int(VERSION_FONT_SIZE * (self.height / HEIGHT)))
+        self.mode_font = pg.Font(DEFAULT_FONT_PATH, int(GAMEMODE_FONT_SIZE * (self.height / HEIGHT)))
 
         # load localization
         #self.localization_code = DEFAULT_LOCALIZATION_CODE ## temp
@@ -186,17 +187,39 @@ class MainEngine:
             self.sprites[dark_name] = self.sprites[sprite].copy()
             pg.Surface.fill(self.sprites[dark_name], BUTTON_COLOR_SUBTRACT_COLOR, special_flags=pg.BLEND_SUB)
 
+        # black&white mode variants ## omg this fuckass method is gonna be the end of me
+        TINT_COLOR = (33/4, 158/4, 188/4)
+        for sprite in ["button_mode_career", "button_mode_infinite", "button_mode_dummy"]:
+            baw_name = sprite+"_baw"
+
+            sprite_out:pg.Surface = self.sprites[sprite].copy()
+
+            for y in range(sprite_out.get_height()):
+                for x in range(sprite_out.get_width()):
+                    pix_col = sprite_out.get_at((x,y))
+                    baw_val = pix_col.r + pix_col.g + pix_col.b# / 3)
+                    baw_col = pg.Color(baw_val)
+                    sprite_out.set_at((x,y), baw_col)
+
+            #sprite_out.fill(TINT_COLOR, None, pg.BLEND_RGBA_ADD)
+
+            self.sprites[baw_name] = sprite_out
+
         # planet movement speed
         self.planet_movement_speed = [16,9] # px/s
 
+        # gamemode select preset
+        self.selected_mode = "mode_career"
+
         # add all scenes
-        self.scene_handler.addScene(Scene(self, "title"))
-        self.scene_handler.addScene(Scene(self, "main_menu"))
-        self.scene_handler.addScene(Scene(self, "ship_modification"))
-        self.scene_handler.addScene(Scene(self, "game"))
-        self.scene_handler.addScene(Scene(self, "career"))
-        self.scene_handler.addScene(Scene(self, "achievements"))
-        self.scene_handler.addScene(Scene(self, "settings"))
+        self.scene_handler.addScene(Scene(self, "title"))               # the main game title
+        self.scene_handler.addScene(Scene(self, "main_menu"))           # main menu - root point
+        self.scene_handler.addScene(Scene(self, "ship_modification"))   # upgrades, types, modification
+        self.scene_handler.addScene(Scene(self, "game"))                # actual game scene
+        self.scene_handler.addScene(Scene(self, "career"))              # career overview and level select
+        self.scene_handler.addScene(Scene(self, "infinite_setup"))      # select music and level for endless mode
+        self.scene_handler.addScene(Scene(self, "achievements"))        # achievement and game stats overview
+        self.scene_handler.addScene(Scene(self, "settings"))            # resolution, language, etc. settings
 
         # set main scene
         self.scene_handler.setActiveScene("title")
@@ -206,6 +229,7 @@ class MainEngine:
         ship_mod_scene = self.scene_handler.getScene("ship_modification")
         game_scene = self.scene_handler.getScene("game")
         career_scene = self.scene_handler.getScene("career")
+        infinite_setup_scene = self.scene_handler.getScene("infinite_setup")
         achievements_scene = self.scene_handler.getScene("achievements")
         settings_scene = self.scene_handler.getScene("settings")
 
@@ -294,9 +318,16 @@ class MainEngine:
         mode_button_size = (360, 146)
         mode_button_margin = 40
         mode_button_start_pos = (main_menu_mode_frame_x + mode_button_margin, main_menu_background_frame_y + mode_button_margin)
-        main_menu_scene.buttons["mode_career"] = button(flatpane("sprite", {"main":self.sprites["button_mode_career"], "hover":self.sprites["button_template_vertical_dark"]}, sprite="main"), pg.Rect(self.to_scale(mode_button_start_pos), self.to_scale(mode_button_size)), 0, None, partial(print, "career mode"), None, self)
-        main_menu_scene.buttons["mode_infinite"] = button(flatpane("sprite", {"main":self.sprites["button_mode_infinite"], "hover":self.sprites["button_template_vertical_dark"]}, sprite="main"), pg.Rect(self.to_scale((mode_button_start_pos[0], mode_button_start_pos[1] + mode_button_size[1] + mode_button_margin)), self.to_scale(mode_button_size)), 0, None, partial(print, "infinite mode"), None, self)
-        main_menu_scene.buttons["mode_dummy"] = button(flatpane("sprite", {"main":self.sprites["button_mode_dummy"], "hover":self.sprites["button_template_vertical_dark"]}, sprite="main"), pg.Rect(self.to_scale((mode_button_start_pos[0], mode_button_start_pos[1] + 2 * mode_button_size[1] + 2 * mode_button_margin)), self.to_scale(mode_button_size)), 0, None, partial(print, "survival mode"), None, self)
+        main_menu_scene.buttons["mode_career"] = button(flatpane("sprite", {"main":self.sprites["button_mode_career_baw"], "hover":self.sprites["button_mode_career"]}, sprite="main"), pg.Rect(self.to_scale(mode_button_start_pos), self.to_scale(mode_button_size)), 0, None, partial(self.change_gamemode, "mode_career"), None, self)
+        main_menu_scene.buttons["mode_infinite"] = button(flatpane("sprite", {"main":self.sprites["button_mode_infinite_baw"], "hover":self.sprites["button_mode_infinite"]}, sprite="main"), pg.Rect(self.to_scale((mode_button_start_pos[0], mode_button_start_pos[1] + mode_button_size[1] + mode_button_margin)), self.to_scale(mode_button_size)), 0, None, partial(self.change_gamemode, "mode_infinite"), None, self)
+        main_menu_scene.buttons["mode_dummy"] = button(flatpane("sprite", {"main":self.sprites["button_mode_dummy_baw"], "hover":self.sprites["button_mode_dummy"]}, sprite="main"), pg.Rect(self.to_scale((mode_button_start_pos[0], mode_button_start_pos[1] + 2 * mode_button_size[1] + 2 * mode_button_margin)), self.to_scale(mode_button_size)), 0, None, partial(self.change_gamemode, "mode_dummy"), None, self)
+
+        main_menu_scene.mode_button_names = ["mode_career", "mode_infinite", "mode_dummy"]
+
+        main_menu_scene.mode_texts = {}
+        main_menu_scene.mode_texts["mode_career"] = self.texts["main_menu_mode_career"]
+        main_menu_scene.mode_texts["mode_infinite"] = self.texts["main_menu_mode_infinite"]
+        main_menu_scene.mode_texts["mode_dummy"] = self.texts["main_menu_mode_dummy"]
 
         ## create all title buttons
         title_scene.buttons["play"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_button_width) / 2), self.to_scale_y((HEIGHT - title_button_height) / 2 + title_button_y_offset), self.to_scale_x(title_button_width), self.to_scale_y(title_button_height)), 0, None, partial(self.scene_handler.setActiveScene, "main_menu"), None, self)
@@ -306,7 +337,7 @@ class MainEngine:
         title_scene.buttons["achievements"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_leaderboard_button"], "hover":self.sprites["mainmenu_leaderboard_button_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_square_button_size) / 2 + title_side_button_x_distance), self.to_scale_y((HEIGHT - title_square_button_size) / 2 + title_button_y_offset), self.to_scale_x(title_square_button_size), self.to_scale_y(title_square_button_size)), 0, None, partial(print, "achievements pressed"), None, self)
 
         ## create all main_menu buttons
-        main_menu_scene.buttons["launch"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - main_menu_button_width) / 2), self.to_scale_y(main_menu_button_start_y), self.to_scale_x(main_menu_button_width), self.to_scale_y(main_menu_button_height)), 0, None, partial(print, "launch pressed"), None, self)
+        main_menu_scene.buttons["launch"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - main_menu_button_width) / 2), self.to_scale_y(main_menu_button_start_y), self.to_scale_x(main_menu_button_width), self.to_scale_y(main_menu_button_height)), 0, None, partial(self.launch_from_main_menu), None, self)
         main_menu_scene.buttons["return"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - main_menu_button_width) / 2), self.to_scale_y(main_menu_button_start_y + main_menu_button_y_offset), self.to_scale_x(main_menu_button_width), self.to_scale_y(main_menu_button_height)), 0, None, partial(self.scene_handler.setActiveScene, "title"), None, self)
 
 
@@ -413,6 +444,20 @@ class MainEngine:
     def render_version_info(self):
         self.draw("text", self.LAYER_UI_TOP, {"text":self.scene_handler.getScene("title").version_text, "no_bg":True, "font":self.version_font, "rect":pg.Rect(self.to_scale_x(30), self.to_scale_y(HEIGHT - 50), 0, 0), "color":gray})
 
+    def change_gamemode(self, gameModeName:str):
+        self.selected_mode = gameModeName
+
+    def launch_from_main_menu(self):
+        match self.selected_mode:
+            case "mode_career":
+                self.scene_handler.setActiveScene("career")
+
+            case "mode_infinite":
+                self.scene_handler.setActiveScene("infinite_setup")
+
+            case "mode_dummy":
+                print("dummy launch!")
+
     def title_update(self):
         title = self.scene_handler.getScene("title")
         # update all buttons
@@ -477,6 +522,13 @@ class MainEngine:
             button.activation_detection(self.corrected_mouse_info)
             button.update_hold_time(self.corrected_mouse_info)
 
+        # change button sprite to colored when active ## has to be after updating button interactions
+        for button_name in main_menu.mode_button_names:
+            button = main_menu.buttons[button_name]
+
+            if self.selected_mode == button_name:
+                button.set_active_sprite("hover")
+
         # check for keybind activation
         if self.get_keybind_just_pressed("ui_forward"):
             main_menu.buttons["launch"].on_click()
@@ -508,6 +560,13 @@ class MainEngine:
         # draw buttons
         for button in main_menu.buttons:
             main_menu.buttons[button].render()
+
+        # draw mode button texts
+        for button_name in main_menu.mode_button_names:
+            button = main_menu.buttons[button_name]
+
+            if not (button.is_hovered(self.mouse_info[0]) or self.selected_mode == button_name):
+                self.draw("text", self.LAYER_UI_TOP, {"text":main_menu.mode_texts[button_name], "font":self.mode_font, "center":button.rect.center, "color":white, "no_bg":True})
 
         # draw version info
         self.render_version_info()
@@ -736,8 +795,6 @@ class MainEngine:
         self.active_resolution_index = 5 # uhhh changeme
 
         self.localization_code = settings_read["localization"]
-
-
 
     def render(self):
         if MULTITHREADED_RENDERING:

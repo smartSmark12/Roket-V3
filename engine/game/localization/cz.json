@@ -6,10 +6,13 @@
         "title_title":"Roket V3!",
         "title_play":"HRAT",
         "title_exit":"KONEC",
-        "main_menu_launch":"START",
+        "main_menu_launch":"DALSI",
         "main_menu_return":"MENU",
         "main_menu_switch_left":"<",
         "main_menu_switch_right":">",
-        "main_menu_ship_modification":"HANGAR"
+        "main_menu_ship_modification":"HANGAR",
+        "main_menu_mode_career":"CAREER",
+        "main_menu_mode_infinite":"ENDLESS",
+        "main_menu_mode_dummy":"DUMMY"
     }
 }

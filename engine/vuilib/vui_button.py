@@ -24,13 +24,13 @@ class button:
                 self.rect = pg.Rect(100, 100, 100, 100)
 
     def activation_detection(self, mouse_info: tuple):
-        if self.rect.collidepoint(mouse_info[0]):
+        if self.is_hovered(mouse_info[0]):
             self.on_hover()
             self.hover = True
             self.update_hold_time(mouse_info)
-            if mouse_info[1] and mouse_info[2]:
+            if self.is_clicked(mouse_info[0], mouse_info[1], mouse_info[2]):
                 self.on_click()
-                if self.held_for > self.hold_time:
+                if self.is_held():
                     self.on_hold()
 
             self.set_active_sprite("hover")
@@ -41,6 +41,15 @@ class button:
             self.passive_update()
             
             return False
+
+    def is_hovered(self, mousePos:tuple):
+        return self.rect.collidepoint(mousePos)
+    
+    def is_clicked(self, mousePos:tuple, mouseDown:bool, mouseChanged:bool):
+        return self.is_hovered(mousePos) and mouseDown and mouseChanged
+    
+    def is_held(self):
+        return self.held_for > self.hold_time
     
     def update_hold_time(self, mouse_info):
         if mouse_info[1]:
