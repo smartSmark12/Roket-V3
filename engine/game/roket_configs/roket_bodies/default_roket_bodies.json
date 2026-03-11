@@ -38,6 +38,44 @@
                     "allowed_module_types":["WeaponModuleType", "EngineModuleType", "HullModuleType", "AbilityModuleType"]
                 }
             }
+        },
+        "runner":
+        {
+            "display_name":"Runner",
+            "base_lives":1,
+            "size":[100,100],
+            "collider_size":[100,100],
+            "collider_offset":[0,50],
+            "sprite_source":"internal",
+            "animation_sprites":
+            [
+                "img/ships/Runner/Runner_anim1.png",
+                "img/ships/Runner/Runner_anim2.png",
+                "img/ships/Runner/Runner_anim3.png"
+            ],
+            "module_slots":
+            {
+                "1":{
+                    "name":"Front weapon",
+                    "position":[10,10],
+                    "allowed_module_types":["WeaponModuleType"]
+                },
+                "2":{
+                    "name":"Core hull",
+                    "position":[10,20],
+                    "allowed_module_types":["HullModuleType"]
+                },
+                "3":{
+                    "name":"Main engine",
+                    "position":[10,30],
+                    "allowed_module_types":["EngineModuleType"]
+                },
+                "4":{
+                    "name":"Extra special fucker",
+                    "position":[20,10],
+                    "allowed_module_types":["WeaponModuleType", "EngineModuleType", "HullModuleType", "AbilityModuleType"]
+                }
+            }
         }
     }
 }

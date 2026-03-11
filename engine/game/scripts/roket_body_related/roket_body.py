@@ -30,7 +30,7 @@ class RoketBody:
         # actionId-int: slot-RoketModuleSlot
         # }
 
-        self.superProperties = copy.deepcopy(self.properties)
+        self.superProperties = copy.deepcopy(self.properties) # deepcopy cause reasons
 
     def get_property(self, propertyName:str):
         if propertyName in self.superProperties:
@@ -39,9 +39,10 @@ class RoketBody:
             pass # debug here todo
 
     def trigger_module_action(self, triggerId:int, actionName:str):
-        actions = self.get_property("module_actions")
+        actions:dict = self.get_property("module_actions")
         if triggerId in actions:
-            action = actions.get(triggerId).trigger_module(actionName) # returns RoketModuleAction if it exists, else False
+            module:RoketModuleSlot = actions.get(triggerId)
+            action:RoketModuleAction = module.trigger_module(actionName) # returns RoketModuleAction if it exists, else False
             if action:
                 self.do_action(action)
 
@@ -49,7 +50,6 @@ class RoketBody:
         match action.command: # have to change in RoketModuleAction._parse_parameters also!!!
             case "damage":
                 pass
-
             case "heal":
                 pass
             case "spawn":

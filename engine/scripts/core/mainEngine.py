@@ -222,6 +222,9 @@ class MainEngine:
         # gamemode select preset
         self.selected_mode = "mode_career"
 
+        # active ship
+        self.active_ship_name = "legacy" # will be replaced by loading a save perhaps?
+
         # rocket config select
         #self.selected_roket_body = self.roket_bodies["legacy"]
 
@@ -250,10 +253,12 @@ class MainEngine:
         # override scene updates
         title_scene.update = self.title_update
         main_menu_scene.update = self.main_menu_update
+        ship_mod_scene.update = self.ship_modification_update
 
         # override scene renders
         title_scene.render = self.title_render
         main_menu_scene.render = self.main_menu_render
+        ship_mod_scene.render = self.ship_modification_render
 
         # override scene shis
 
@@ -320,9 +325,12 @@ class MainEngine:
         ship_mod_button_size = (main_menu_button_width, main_menu_button_height)
         ship_mod_button_pos = (main_menu_ship_frame_x + (main_menu_ship_frame_width - ship_mod_button_size[0]) / 2, main_menu_background_frame_y + 420)
 
-        main_menu_scene.buttons["ship_switch_left"] = button(flatpane("sprite", {"main":self.sprites["button_template_vertical"], "hover":self.sprites["button_template_vertical_dark"]}, sprite="main"), pg.Rect(self.to_scale(ship_switch_left_button_pos), self.to_scale(ship_switch_size)), 0, None, partial(print, "left switch"), None, self)
-        main_menu_scene.buttons["ship_switch_right"] = button(flatpane("sprite", {"main":self.sprites["button_template_vertical"], "hover":self.sprites["button_template_vertical_dark"]}, sprite="main"), pg.Rect(self.to_scale(ship_switch_right_button_pos), self.to_scale(ship_switch_size)), 0, None, partial(print, "right switch"), None, self)
-        main_menu_scene.buttons["ship_modification"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale(ship_mod_button_pos), self.to_scale(ship_mod_button_size)), 0, None, partial(print, "mod scene button"), None, self)
+        main_menu_scene.buttons["ship_switch_left"] = button(flatpane("sprite", {"main":self.sprites["button_template_vertical"], "hover":self.sprites["button_template_vertical_dark"]}, sprite="main"), pg.Rect(self.to_scale(ship_switch_left_button_pos), self.to_scale(ship_switch_size)), 0, None, partial(self.cycle_main_menu_ship, direction=0), None, self)
+        main_menu_scene.buttons["ship_switch_right"] = button(flatpane("sprite", {"main":self.sprites["button_template_vertical"], "hover":self.sprites["button_template_vertical_dark"]}, sprite="main"), pg.Rect(self.to_scale(ship_switch_right_button_pos), self.to_scale(ship_switch_size)), 0, None, partial(self.cycle_main_menu_ship, direction=1), None, self)
+        main_menu_scene.buttons["ship_modification"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale(ship_mod_button_pos), self.to_scale(ship_mod_button_size)), 0, None, partial(self.scene_handler.setActiveScene, "ship_modification"), None, self)
+
+        main_menu_scene.ship_name_text = self.get_active_ship().get_property("displayName")
+        main_menu_scene.ship_name_text_center = (main_menu_ship_frame_x + main_menu_ship_frame_width / 2, main_menu_background_frame_y + self.to_scale_y(50))
 
         main_menu_scene.left_switch_text = self.texts["main_menu_switch_left"]
         main_menu_scene.right_switch_text = self.texts["main_menu_switch_right"]
@@ -353,6 +361,9 @@ class MainEngine:
         ## create all main_menu buttons
         main_menu_scene.buttons["launch"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - main_menu_button_width) / 2), self.to_scale_y(main_menu_button_start_y), self.to_scale_x(main_menu_button_width), self.to_scale_y(main_menu_button_height)), 0, None, partial(self.launch_from_main_menu), None, self)
         main_menu_scene.buttons["return"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - main_menu_button_width) / 2), self.to_scale_y(main_menu_button_start_y + main_menu_button_y_offset), self.to_scale_x(main_menu_button_width), self.to_scale_y(main_menu_button_height)), 0, None, partial(self.scene_handler.setActiveScene, "title"), None, self)
+
+        ## ship modification
+
 
 
     def create_resolutions(self):
@@ -696,6 +707,42 @@ class MainEngine:
             case "mode_dummy":
                 print("dummy launch!")
 
+    def cycle_main_menu_ship(self, direction:bool):
+        active_ship_name = self.active_ship_name
+        ship_names = list(self.roket_bodies.keys())
+
+        active_ship_name_index = ship_names.index(active_ship_name)
+
+        if direction:
+            active_ship_name_index += 1
+        else:
+            active_ship_name_index -= 1
+
+        if active_ship_name_index < 0:
+            active_ship_name_index = len(ship_names) - 1
+        elif active_ship_name_index > len(ship_names) - 1:
+            active_ship_name_index = 0
+
+        self.set_active_ship(ship_names[active_ship_name_index])
+
+        
+    def set_active_ship(self, shipName:str):
+        ship_names = list(self.roket_bodies.keys())
+
+        if shipName not in ship_names:
+            print("ship not found ig?")
+        
+        else:
+            self.active_ship_name = shipName
+            print(f"{shipName} set as active ship")
+
+            # udpate ship window
+            self.scene_handler.getScene("main_menu").ship_window.set_sprite(self.sprites.get(f"{shipName}_anim_0"))
+            self.scene_handler.getScene("main_menu").ship_name_text = self.get_active_ship().get_property("displayName")
+
+    def get_active_ship(self) -> RoketBody:
+        return self.roket_bodies.get(self.active_ship_name)
+
     def title_update(self):
         title = self.scene_handler.getScene("title")
         # update all buttons
@@ -754,6 +801,7 @@ class MainEngine:
 
     def main_menu_update(self):
         main_menu = self.scene_handler.getScene("main_menu")
+
         # update all buttons
         for button_index in main_menu.buttons:
             button = main_menu.buttons[button_index]
@@ -793,6 +841,9 @@ class MainEngine:
         # draw ship frame
         main_menu.ship_window.render()
 
+        # draw ship name text
+        self.draw("text", self.LAYER_UI_TOP, {"text":main_menu.ship_name_text, "font":self.button_font, "center":main_menu.ship_name_text_center, "no_bg":True, "rect":pg.Rect(0,0,0,0), "color":black}) # idk maybe white
+
         """ main_menu.ship_button_left.render() """
 
         # draw buttons
@@ -808,6 +859,12 @@ class MainEngine:
 
         # draw version info
         self.render_version_info()
+
+    def ship_modification_update(self):
+        pass
+
+    def ship_modification_render(self):
+        pass
 
     def draw_button_text(self, buttonText:str, button):
         self.draw("text", self.LAYER_UI_TOP, {"text":buttonText, "no_bg":True, "font":self.button_font, "center":button.rect.center, "color":black})

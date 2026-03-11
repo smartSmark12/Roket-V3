@@ -15,8 +15,11 @@ class SpriteWindow:
     def _rescale_sprite(self):
         self.sprite = pg.transform.scale(self.sourceSprite, (self.app.to_scale_x(self.width), self.app.to_scale_y(self.height)))
 
-    def set_sprite(self, sprite:pg.Surface):
-        self.sprite = sprite
+    def set_sprite(self, sprite:pg.Surface, rescaleSprite:bool=True):
+        self.sourceSprite = sprite
+
+        if rescaleSprite: self._rescale_sprite()
+        else: self.sprite = self.sourceSprite
 
     def set_pos(self, pos:tuple[int|float]):
         self.pos = pos
