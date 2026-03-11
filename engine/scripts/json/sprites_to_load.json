@@ -99,6 +99,11 @@
         [128,280],
         "ca"
     ],
+    "button_template_square":[
+        "engine/game/assets/img/menu/square_button_template.png",
+        [128,128],
+        "ca"
+    ],
     "button_mode_career":[
         "engine/game/assets/img/menu/mode_button_career.png",
         [360,146],

@@ -193,7 +193,7 @@ class MainEngine:
 
         # create darker button variants
         BUTTON_COLOR_SUBTRACT_COLOR = (30, 30, 30)
-        for sprite in ["button_template", "button_template_vertical", "mainmenu_settings_button", "mainmenu_leaderboard_button"]:
+        for sprite in ["button_template", "button_template_vertical", "button_template_square", "mainmenu_settings_button", "mainmenu_leaderboard_button"]:
             dark_name = sprite+"_dark"
             self.sprites[dark_name] = self.sprites[sprite].copy()
             pg.Surface.fill(self.sprites[dark_name], BUTTON_COLOR_SUBTRACT_COLOR, special_flags=pg.BLEND_SUB)
@@ -363,7 +363,28 @@ class MainEngine:
         main_menu_scene.buttons["return"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - main_menu_button_width) / 2), self.to_scale_y(main_menu_button_start_y + main_menu_button_y_offset), self.to_scale_x(main_menu_button_width), self.to_scale_y(main_menu_button_height)), 0, None, partial(self.scene_handler.setActiveScene, "title"), None, self)
 
         ## ship modification
+        ship_mod_background_frame_size = (1600, 900)
+        ship_mod_background_frame_pos = (
+            (WIDTH - ship_mod_background_frame_size[0]) / 2,
+            (HEIGHT - ship_mod_background_frame_size[1]) / 2
+        )
 
+        ship_mod_return_button_margin = 25
+        ship_mod_return_button_size = 128
+
+        ship_mod_scene.background_frame = UIFrameBuilder.get_ui_frame(
+            ship_mod_background_frame_size[0],
+            ship_mod_background_frame_size[1],
+            self.sprites
+        )
+        ship_mod_scene.background_frame_rect = pg.Rect(self.to_scale(ship_mod_background_frame_pos), self.to_scale(ship_mod_background_frame_size))
+
+        ### ship mod buttons
+        ship_mod_scene.buttons = {}
+
+        ship_mod_scene.return_button_text = "<" # yes, this is hardcoded. judge me.
+
+        ship_mod_scene.buttons["return"] = button(flatpane("sprite", {"main":self.sprites["button_template_square"], "hover":self.sprites["button_template_square_dark"]}, sprite="main"), pg.Rect(self.to_scale((ship_mod_background_frame_pos[0] + 25, ship_mod_background_frame_pos[1] + 25)), self.to_scale((ship_mod_return_button_size, ship_mod_return_button_size))), 0, None, partial(self.scene_handler.setActiveScene, "main_menu"), None, self)
 
 
     def create_resolutions(self):
@@ -860,10 +881,26 @@ class MainEngine:
         self.render_version_info()
 
     def ship_modification_update(self):
-        pass
+        ship_mod = self.scene_handler.getScene("ship_modification")
+
+        # update all buttons
+        for button_index in ship_mod.buttons:
+            button = ship_mod.buttons[button_index]
+            button.activation_detection(self.corrected_mouse_info)
+            button.update_hold_time(self.corrected_mouse_info)
 
     def ship_modification_render(self):
-        pass
+        ship_mod = self.scene_handler.getScene("ship_modification")
+        
+        # draw background frame
+        self.draw("sprite", self.LAYER_UI_BOTTOM, {"sprite":ship_mod.background_frame, "rect":ship_mod.background_frame_rect})
+
+        # draw buttons
+        for button in ship_mod.buttons:
+            ship_mod.buttons[button].render()
+
+        # draw button texts
+        self.draw_button_text(ship_mod.return_button_text, ship_mod.buttons["return"])
 
     def draw_button_text(self, buttonText:str, button):
         self.draw("text", self.LAYER_UI_TOP, {"text":buttonText, "no_bg":True, "font":self.button_font, "center":button.rect.center, "color":black})

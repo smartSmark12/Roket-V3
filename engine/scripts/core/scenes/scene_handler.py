@@ -30,6 +30,7 @@ class SceneHandler:
     def setActiveScene(self, sceneName:str|None):
         if sceneName in self.scenes or sceneName == None:
             self.activeScene = sceneName
+            print(f"{__name__}: set active scene to {sceneName}")
         else:
             print(f"{__name__}: Scene {sceneName} not found in scenes - no new active scene set")
 
