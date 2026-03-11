@@ -1,0 +1,33 @@
+{
+    "ship_modules":
+    {
+        "basic_engine":
+        {
+            "display_name":"Basic engine",
+            "module_type":"EngineModuleType",
+            "sprite_source":"internal",
+            "sprite":"img/else/lajf_buff.png",
+            "modifiers":
+            {
+                "move_speed_mod":2
+            },
+            "actions":
+            {}
+        },
+        "healer_debug":
+        {
+            "display_name":"Debug healing device",
+            "module_type":"AbilityModuleType",
+            "sprite_source":"internal",
+            "sprite":"img/else/inv_buff.png",
+            "modifiers":
+            {
+                "hull_strength_mod":1
+            },
+            "actions":
+            {
+                "on_activation":["heal", [1]]
+            }
+        }
+    }
+}

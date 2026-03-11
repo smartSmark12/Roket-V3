@@ -42,6 +42,11 @@ from game.scripts.alarm import Alarm
 from game.scripts.ui_frame_builder import UIFrameBuilder
 from game.scripts.sprite_window import SpriteWindow
 from scripts.core.settings import GAME_NAME, DEFAULT_SCENE_NAME
+from game.scripts.roket_body_related.roket_body import RoketBody
+from game.scripts.roket_body_related.roket_module import RoketModule # load modules from json file configs
+from game.scripts.roket_body_related.roket_module_slot import RoketModuleSlot
+from game.scripts.spawnnable_object import SpawnableObject
+from game.scripts.spawnable_navigator import Navigator
 """ from game.game import MainGame """
 
 ## example import
@@ -180,6 +185,12 @@ class MainEngine:
         self.keybind_path = DEFAULT_KEYBIND_PATH ## also temp
         self.load_keybinds()
 
+        # load roket bodies and modules
+        self.load_spawnables()
+        self.load_roket_module_types()
+        self.load_roket_modules()
+        self.load_roket_bodies()
+
         # create darker button variants
         BUTTON_COLOR_SUBTRACT_COLOR = (30, 30, 30)
         for sprite in ["button_template", "button_template_vertical", "mainmenu_settings_button", "mainmenu_leaderboard_button"]:
@@ -188,7 +199,7 @@ class MainEngine:
             pg.Surface.fill(self.sprites[dark_name], BUTTON_COLOR_SUBTRACT_COLOR, special_flags=pg.BLEND_SUB)
 
         # black&white mode variants ## omg this fuckass method is gonna be the end of me
-        TINT_COLOR = (33/4, 158/4, 188/4)
+        #TINT_COLOR = (33/4, 158/4, 188/4)
         for sprite in ["button_mode_career", "button_mode_infinite", "button_mode_dummy"]:
             baw_name = sprite+"_baw"
 
@@ -203,13 +214,16 @@ class MainEngine:
 
             #sprite_out.fill(TINT_COLOR, None, pg.BLEND_RGBA_ADD)
 
-            self.sprites[baw_name] = sprite_out
+            self.sprites[baw_name] = sprite_out # its not baw and likely alpha blending, but fk it we ball it looks okay enough
 
         # planet movement speed
         self.planet_movement_speed = [16,9] # px/s
 
         # gamemode select preset
         self.selected_mode = "mode_career"
+
+        # rocket config select
+        #self.selected_roket_body = self.roket_bodies["legacy"]
 
         # add all scenes
         self.scene_handler.addScene(Scene(self, "title"))               # the main game title
@@ -406,6 +420,230 @@ class MainEngine:
 
         # debug
         print(f"{__name__}: loaded localization: {self.localization_code}")
+
+    def load_spawnables(self):
+        self.roket_spawnables = {}
+
+        loaded_spawnables = JsonLoader.load_from_file(DEFAULT_ROKET_SPAWNABLE_PATH)
+
+        for spawnable_name, spawnable in loaded_spawnables["spawnables"].items():
+
+            # prepare sprites
+            loaded_sprite_paths = spawnable["animation_sprites"]
+
+            # prepare prefix
+            sprite_path_prefix = None
+
+            if spawnable["sprite_source"] == "internal":
+                sprite_path_prefix = INTERNAL_SPRITE_PATH
+            elif spawnable["sprite_source"] == "external":
+                sprite_path_prefix = EXTERNAL_SPRITE_PATH
+            else:
+                sprite_path_prefix = "" # when using fully custom paths
+
+            # output sprite dict
+            sprite_dict = {}
+
+            # load sprites
+            for sprite_index in range(len(loaded_sprite_paths)):
+                sprite_path = sprite_path_prefix + loaded_sprite_paths[sprite_index]
+
+                # generate sprite name
+                sprite_name = f"{spawnable_name}_anim_{sprite_index}"
+
+                sprite_dict[sprite_index] = self.sprite_handler.load_sprite(sprite_name, sprite_path, (100,100), "ca")
+
+
+            # create final flatpane
+            spawnable_sprite = flatpane("sprite", sprite_dict, sprite=0)
+
+            # collider
+            collision_rect = pg.Rect(
+                0,
+                0,
+                spawnable["collider_size"][0],
+                spawnable["collider_size"][1]
+            )
+
+            navigator = Navigator(spawnable["navigator"])
+
+            # spawnable
+            self.roket_spawnables[spawnable_name] = SpawnableObject(
+                name=spawnable_name,
+                displayName=spawnable["display_name"],
+                collider=collision_rect,
+                sprites=spawnable_sprite,
+                navigator=navigator,
+                actions=spawnable["actions"]
+            )
+
+        print("--------\nLoaded spawnables:\n")
+
+        for spawnable_name, spawnable in self.roket_spawnables.items():
+            print(f"{spawnable.displayName} ({spawnable.name})")
+
+        print("")
+
+    def load_roket_module_types(self):
+        self.roket_module_types = []
+
+        loaded_module_types = JsonLoader.load_from_file(DEFAULT_ROKET_MODULE_TYPE_PATH)
+
+        for module_type in loaded_module_types["ship_module_types"]:
+            if module_type not in self.roket_module_types:
+                self.roket_module_types.append(module_type)
+            else:
+                print(f"{__name__}:module_type_loader: module type {module_type} already loaded; skipping")
+
+        print("--------\nLoaded module types:\n")
+
+        for module_type in self.roket_module_types:
+            print(module_type)
+
+        print("") # sep
+
+    def load_roket_modules(self): # need to make safe!
+        self.roket_modules = {}
+
+        loaded_modules = JsonLoader.load_from_file(DEFAULT_ROKET_MODULE_PATH)
+
+        for module_name, module in loaded_modules["ship_modules"].items():
+
+            # prepare sprites
+            loaded_sprite_path = module["sprite"]
+
+            # prepare prefix
+            sprite_path_prefix = None
+
+            if module["sprite_source"] == "internal":
+                sprite_path_prefix = INTERNAL_SPRITE_PATH
+            elif module["sprite_source"] == "external":
+                sprite_path_prefix = EXTERNAL_SPRITE_PATH
+            else:
+                sprite_path_prefix = "" # when using fully custom paths
+
+            sprite_path = sprite_path_prefix + loaded_sprite_path
+
+            # generate sprite name
+            sprite_name = f"{module_name}_module"
+
+            sprite = self.sprite_handler.load_sprite(sprite_name, sprite_path, (100,100), "ca")
+
+            module_sprite = flatpane("sprite", {"main":sprite}, sprite="main")
+
+            self.roket_modules[module_name] = RoketModule(
+                                                            module_name,
+                                                            module["display_name"],
+                                                            module["module_type"],
+                                                            1,
+                                                            1,
+                                                            module["modifiers"],
+                                                            module_sprite
+                                                        )
+            
+        print("--------\nLoaded modules:\n")
+
+        for module_name, module in self.roket_modules.items():
+            print(f"{module.displayName} ({module.name}; {module.modType})")
+
+        print("")
+
+    def load_roket_bodies(self): # need to make safe!
+        self.roket_bodies = {}
+
+        loaded_bodies = JsonLoader.load_from_file(DEFAULT_ROKET_BODY_PATH)
+
+        for body_name in loaded_bodies["ship_bodies"]:
+            body = loaded_bodies["ship_bodies"][body_name]
+
+            # prepare sprites
+            loaded_sprite_paths = body["animation_sprites"]
+
+            # prepare prefix
+            sprite_path_prefix = None
+
+            if body["sprite_source"] == "internal":
+                sprite_path_prefix = INTERNAL_SPRITE_PATH
+            elif body["sprite_source"] == "external":
+                sprite_path_prefix = EXTERNAL_SPRITE_PATH
+            else:
+                sprite_path_prefix = "" # when using fully custom paths
+
+            # output sprite dict
+            sprite_dict = {}
+
+            # load sprites
+            for sprite_index in range(len(loaded_sprite_paths)):
+                sprite_path = sprite_path_prefix + loaded_sprite_paths[sprite_index]
+
+                # generate sprite name
+                sprite_name = f"{body_name}_anim_{sprite_index}"
+
+                sprite_dict[sprite_index] = self.sprite_handler.load_sprite(sprite_name, sprite_path, (100,100), "ca")
+
+
+            # create final flatpane
+            body_sprite = flatpane("sprite", sprite_dict, sprite=0)
+
+            # load module slots
+            loaded_slots = body["module_slots"]
+
+            # prepare module slots
+            module_slots = {}
+
+            # create modules
+            for slot_id_str in loaded_slots:
+                loaded_slot = loaded_slots[slot_id_str]
+                slot_id = None
+                try:
+                    slot_id = int(slot_id_str)
+                except:
+                    print("smula ig")
+                    continue
+                
+                slot = None
+
+                try:
+                    slot = RoketModuleSlot(
+                                            slotId=slot_id,
+                                            name=loaded_slot["name"],
+                                            allowedModuleTypes=loaded_slot["allowed_module_types"]
+                                        ) # modules have to be loaded later from a save
+                    
+                    module_slots[slot_id] = slot
+
+                except:
+                    print("bad luck ~ Yoru")
+                    continue
+
+            # create collider
+            collision_rect = pg.Rect(
+                0,
+                0,
+                body["collider_size"][0],
+                body["collider_size"][1]
+            )
+
+            collision_rect.center = body["collider_offset"]
+
+            # build final ship body ## BODIES DO NOT EXPLICITLY SAVE ACTIVE MODULES IN SLOTS - saved in game/hangar saves
+            self.roket_bodies[body_name] = RoketBody(
+                                                    name=body_name,
+                                                    displayName=body["display_name"],
+                                                    baseLives=body["base_lives"],
+                                                    baseSprites=body_sprite,
+                                                    position=(0, 0),
+                                                    size=body["size"],
+                                                    collisionRect=collision_rect,
+                                                    moduleSlots=module_slots
+                                                    )
+
+        print("--------\nLoaded ships:\n")
+
+        for ship_name, ship in self.roket_bodies.items():
+            print(f"{ship.get_property("displayName")} ({ship.name})")
+
+        print("")
 
     def load_keybinds(self):
         loaded_keybinds = JsonLoader.load_from_file(DEFAULT_KEYBIND_PATH)

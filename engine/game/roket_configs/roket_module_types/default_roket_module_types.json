@@ -1,0 +1,9 @@
+{
+    "ship_module_types":
+    [
+        "EngineModuleType",
+        "HullModuleType",
+        "AbilityModuleType",
+        "WeaponModuleType"
+    ]
+}

@@ -21,9 +21,9 @@ class flatpane: # just for displaying images or colors; for backgrounds/graphics
         except:
             try:
                 sprite_error_name = self.meta["sprite"]
-                print(f"{__name__}: Warning: no positional arguments given ({sprite_error_name})") # self.app.ext_append_to_log
+                #print(f"{__name__}: Warning: no positional arguments given ({sprite_error_name})") # self.app.ext_append_to_log
             except:
-                print(f"{__name__}: Warning: no positional arguments given (no_sprite_name)")
+                pass#print(f"{__name__}: Warning: no positional arguments given (no_sprite_name)")
                 
 
         if self.dtype in ["color", "col", "c", "colour"]: # this is just some dumb shis i don't remember writing, so..

@@ -1,0 +1,22 @@
+{
+    "spawnables":
+    {
+        "healDrone":
+        {
+            "display_name":"Healer drone",
+            "navigator":"s_point",
+            "speed":100,
+            "size":[100,100],
+            "collider_size":[100,100],
+            "actions":
+            {
+                "on_s_collision":["heal", [1]]
+            },
+            "sprite_source":"internal",
+            "animation_sprites":
+            [
+                "tba"
+            ]
+        }
+    }
+}

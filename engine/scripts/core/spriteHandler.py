@@ -13,7 +13,40 @@ class SpriteHandlerJSON:
         print(f"{__name__}: Starting initial sprite loading (using SpriteHandlerJSON)...\n")
         self.load_sprites()
 
-    def load_sprites(self, filePath=DEFAULT_SPRITE_JSON_PATH):
+    def load_sprite(self, spriteName:str, spriteFilePath:str, size:tuple, convert:str):
+        print(f"{__name__}: loading sprite...")
+
+        image = None
+
+        try:
+            image = pg.image.load(os.path.join(spriteFilePath))
+        except:
+            print(f"can't load {spriteName} into memory")
+            return
+        
+        try:
+            image = self.real_scale_sprite(image, size)
+        except:
+            print(f"can't scale {spriteName} to size {float(size[0])}:{float(size[1])}")
+            return
+
+        try:
+            match convert:
+                case "c": image = image.convert()
+                case "ca": image = image.convert_alpha()
+                case _: pass # no convert
+        except:
+            print(f"can't convert {spriteName}")
+            return
+        
+        self.app.sprites[spriteName] = image
+
+        print(f"{__name__}: loaded sprite {spriteName}")
+
+        return image
+
+
+    def load_sprites(self, filePath:str=DEFAULT_SPRITE_JSON_PATH):
         self.app.take_over_runtime_logger(f"{__name__}:sprite_loader_json")
         print(f"{__name__}: Beginning JSON sprite loading...\n")
 

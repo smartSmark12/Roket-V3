@@ -41,6 +41,14 @@ PERSISTENT_DATA_PATH = "engine/game/settings/persistent.json"
 
 DEFAULT_FONT_PATH = "engine/game/assets/fonts/Minecraft.otf"
 
+DEFAULT_ROKET_BODY_PATH = "engine/game/roket_configs/roket_bodies/default_roket_bodies.json"
+DEFAULT_ROKET_MODULE_PATH = "engine/game/roket_configs/roket_modules/default_roket_modules.json"
+DEFAULT_ROKET_MODULE_TYPE_PATH = "engine/game/roket_configs/roket_module_types/default_roket_module_types.json"
+DEFAULT_ROKET_SPAWNABLE_PATH = "engine/game/roket_configs/roket_spawnables/default_roket_spawnables.json"
+
+INTERNAL_SPRITE_PATH = "engine/game/assets/"
+EXTERNAL_SPRITE_PATH = "mods/"
+
 BUTTON_FONT_SIZE = 36                 # all font sizes are gamespace; rescaled to fit the active res
 H1_FONT_SIZE = 160
 VERSION_FONT_SIZE = 20
