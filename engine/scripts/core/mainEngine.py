@@ -316,7 +316,7 @@ class MainEngine:
         ship_window_size_mult = 0.4
         ship_window_size = (main_menu_ship_frame_width * ship_window_size_mult, main_menu_ship_frame_width * ship_window_size_mult)
         ship_window_pos = (main_menu_ship_frame_x + (main_menu_ship_frame_width - ship_window_size[0]) / 2, main_menu_background_frame_y + (main_menu_background_frame_height - ship_window_size[1]) / 2 - 50) # ja uz asi nedavam matiku pls proc 4 a ne 2
-        main_menu_scene.ship_window = SpriteWindow(self, self.sprites["lajf"], ship_window_pos, ship_window_size, self.LAYER_UI_TOP)
+        main_menu_scene.ship_window = SpriteWindow(self, self.get_active_ship().sprites.get_sprite(0), ship_window_pos, ship_window_size, self.LAYER_UI_TOP)
 
         ship_switch_size = (128, 280)
         ship_switch_left_button_pos = (main_menu_ship_frame_x + 30, main_menu_background_frame_y + (main_menu_background_frame_height - ship_switch_size[1]) / 2)
@@ -724,7 +724,6 @@ class MainEngine:
             active_ship_name_index = 0
 
         self.set_active_ship(ship_names[active_ship_name_index])
-
         
     def set_active_ship(self, shipName:str):
         ship_names = list(self.roket_bodies.keys())

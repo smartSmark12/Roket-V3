@@ -61,3 +61,12 @@ class flatpane: # just for displaying images or colors; for backgrounds/graphics
             print(f"{__name__}: Couldn't find sprite {spriteName} in the sprite list (did you forget to assign it during creation?)")
 
             return False
+        
+    def get_active_sprite(self) -> pg.Surface:
+        return self.get_sprite(self.get_active_sprite_name())
+    
+    def get_active_sprite_name(self) -> str:
+        return self.meta["sprite"]
+    
+    def get_sprite(self, spriteName:str) -> pg.Surface:
+        return self.sprite_list.get(spriteName)
