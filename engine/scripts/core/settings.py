@@ -53,6 +53,7 @@ BUTTON_FONT_SIZE = 36                 # all font sizes are gamespace; rescaled t
 H1_FONT_SIZE = 160
 VERSION_FONT_SIZE = 20
 GAMEMODE_FONT_SIZE = 50
+SCENE_LABEL_FONT_SIZE = 60
 
 TITLE_PLANET_SPAWNING_PERIOD = 8
 TITLE_PLANET_SPAWNING_ANICHANCE = 5 # its more like 1/antichance is the chance, so

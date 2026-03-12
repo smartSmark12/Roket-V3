@@ -176,6 +176,7 @@ class MainEngine:
         self.button_font = pg.Font(DEFAULT_FONT_PATH, int(BUTTON_FONT_SIZE * (self.height / HEIGHT)))
         self.version_font = pg.Font(DEFAULT_FONT_PATH, int(VERSION_FONT_SIZE * (self.height / HEIGHT)))
         self.mode_font = pg.Font(DEFAULT_FONT_PATH, int(GAMEMODE_FONT_SIZE * (self.height / HEIGHT)))
+        self.scene_label_font = pg.Font(DEFAULT_FONT_PATH, int(SCENE_LABEL_FONT_SIZE * (self.height / HEIGHT)))
 
         # load localization
         #self.localization_code = DEFAULT_LOCALIZATION_CODE ## temp
@@ -363,6 +364,8 @@ class MainEngine:
         main_menu_scene.buttons["return"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - main_menu_button_width) / 2), self.to_scale_y(main_menu_button_start_y + main_menu_button_y_offset), self.to_scale_x(main_menu_button_width), self.to_scale_y(main_menu_button_height)), 0, None, partial(self.scene_handler.setActiveScene, "title"), None, self)
 
         ## ship modification
+        ship_mod_scene.buttons = {}
+
         ship_mod_background_frame_size = (1600, 900)
         ship_mod_background_frame_pos = (
             (WIDTH - ship_mod_background_frame_size[0]) / 2,
@@ -379,12 +382,23 @@ class MainEngine:
         )
         ship_mod_scene.background_frame_rect = pg.Rect(self.to_scale(ship_mod_background_frame_pos), self.to_scale(ship_mod_background_frame_size))
 
-        ### ship mod buttons
-        ship_mod_scene.buttons = {}
+        ### hangar text
+        ship_mod_scene.hangar_text = "// " + self.texts["ship_hangar_hangar_text"]
+        ship_mod_scene.hangar_text_rect = pg.Rect( # DONT use this rect as a reference - to_scale applied
+            ship_mod_background_frame_pos[0] + ship_mod_return_button_size + ship_mod_return_button_margin + self.to_scale_x(20),
+            ship_mod_background_frame_pos[1] + self.to_scale_y(50),
+            0,
+            0
+        )
 
+        ### available mod slot window
+        ### ship window
+        ### module storage window
+
+        ### ship mod buttons
         ship_mod_scene.return_button_text = "<" # yes, this is hardcoded. judge me.
 
-        ship_mod_scene.buttons["return"] = button(flatpane("sprite", {"main":self.sprites["button_template_square"], "hover":self.sprites["button_template_square_dark"]}, sprite="main"), pg.Rect(self.to_scale((ship_mod_background_frame_pos[0] + 25, ship_mod_background_frame_pos[1] + 25)), self.to_scale((ship_mod_return_button_size, ship_mod_return_button_size))), 0, None, partial(self.scene_handler.setActiveScene, "main_menu"), None, self)
+        ship_mod_scene.buttons["return"] = button(flatpane("sprite", {"main":self.sprites["button_template_square"], "hover":self.sprites["button_template_square_dark"]}, sprite="main"), pg.Rect(self.to_scale((ship_mod_background_frame_pos[0] + ship_mod_return_button_margin, ship_mod_background_frame_pos[1] + ship_mod_return_button_margin)), self.to_scale((ship_mod_return_button_size, ship_mod_return_button_size))), 0, None, partial(self.scene_handler.setActiveScene, "main_menu"), None, self)
 
 
     def create_resolutions(self):
@@ -894,6 +908,9 @@ class MainEngine:
         
         # draw background frame
         self.draw("sprite", self.LAYER_UI_BOTTOM, {"sprite":ship_mod.background_frame, "rect":ship_mod.background_frame_rect})
+
+        # draw hangar text
+        self.draw("text", self.LAYER_UI_TOP, {"text":ship_mod.hangar_text, "rect":ship_mod.hangar_text_rect, "font":self.scene_label_font, "color":roket_dark_blue, "no_bg":True})
 
         # draw buttons
         for button in ship_mod.buttons:
