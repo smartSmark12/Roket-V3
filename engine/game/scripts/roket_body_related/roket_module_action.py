@@ -12,9 +12,10 @@ class RoketModuleAction:
                 return [int(parameters[0])] # just the amount of ship healing done
 
             case "spawn":
-                name = parameters[0]
+                name = parameters[0] # name of the spawnable (has to be registered)
+                position = parameters[1] # pos used for point, s_point etc. movement, where the starting position differs from ship position
                 
-                return [name] # name of the spawnable (has to be registered)
+                return [name, position]
 
             case "explode":
                 pass

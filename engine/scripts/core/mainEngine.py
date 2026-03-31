@@ -45,14 +45,21 @@ from scripts.core.settings import GAME_NAME, DEFAULT_SCENE_NAME
 from game.scripts.roket_body_related.roket_body import RoketBody
 from game.scripts.roket_body_related.roket_module import RoketModule # load modules from json file configs
 from game.scripts.roket_body_related.roket_module_slot import RoketModuleSlot
-from game.scripts.spawnnable_object import SpawnableObject
-from game.scripts.spawnable_navigator import Navigator
+from engine.game.scripts.roket_spawnable_related.spawnable_object import SpawnableObject
+from engine.game.scripts.roket_spawnable_related.spawnable_prefab import SpawnablePrefab
+from game.scripts.roket_spawnable_related.spawnable_navigator import Navigator
+from game.scripts.gamestate.gamestate_object import GameState
+from game.scripts.ship_modification_related.ship_modification_panel import ShipModPanel
+from game.scripts.ship_modification_related.ship_modification_page import ShipModPage
+from game.scripts.ship_modification_related.ship_modification_slot import ShipModInteractiveSlot
+
 """ from game.game import MainGame """
 
 ## example import
 from scripts.tileScripts.baseBiomeWeights import baseBiomeWeights
 
 from functools import partial
+from copy import deepcopy
 
 # something like from engine.scripts import * using https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwi46Of9hr-GAxVQhf0HHXmICu4QFnoECCYQAQ&url=https%3A%2F%2Fstackoverflow.com%2Fquestions%2F1057431%2Fhow-to-load-all-modules-in-a-folder&usg=AOvVaw3vlcgC_pzadT7glu9LmH2n&cshid=1717404751563860&opi=89978449
 # need to make a crash handler (official python function??)
@@ -177,6 +184,7 @@ class MainEngine:
         self.version_font = pg.Font(DEFAULT_FONT_PATH, int(VERSION_FONT_SIZE * (self.height / HEIGHT)))
         self.mode_font = pg.Font(DEFAULT_FONT_PATH, int(GAMEMODE_FONT_SIZE * (self.height / HEIGHT)))
         self.scene_label_font = pg.Font(DEFAULT_FONT_PATH, int(SCENE_LABEL_FONT_SIZE * (self.height / HEIGHT)))
+        self.ship_mod_slot_font = pg.Font(DEFAULT_FONT_PATH, int(SHIP_MODIFICATION_SLOT_FONT_SIZE * (self.height / HEIGHT)))
 
         # load localization
         #self.localization_code = DEFAULT_LOCALIZATION_CODE ## temp
@@ -186,11 +194,14 @@ class MainEngine:
         self.keybind_path = DEFAULT_KEYBIND_PATH ## also temp
         self.load_keybinds()
 
-        # load roket bodies and modules
-        self.load_spawnables()
-        self.load_roket_module_types()
-        self.load_roket_modules()
-        self.load_roket_bodies()
+        # load roket bodies and modules / mods (even internals) in general
+        self.load_internal_mods()
+
+        # set custom cursor
+        cursor_offset_mult = 1 #100/16
+        pg.mouse.set_cursor(
+            pg.Cursor((int(0 * cursor_offset_mult),int(0 * cursor_offset_mult)), self.sprites["cursor"])
+        )
 
         # create darker button variants
         BUTTON_COLOR_SUBTRACT_COLOR = (30, 30, 30)
@@ -331,7 +342,7 @@ class MainEngine:
         main_menu_scene.buttons["ship_modification"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale(ship_mod_button_pos), self.to_scale(ship_mod_button_size)), 0, None, partial(self.scene_handler.setActiveScene, "ship_modification"), None, self)
 
         main_menu_scene.ship_name_text = self.get_active_ship().get_property("displayName")
-        main_menu_scene.ship_name_text_center = (main_menu_ship_frame_x + main_menu_ship_frame_width / 2, main_menu_background_frame_y + self.to_scale_y(50))
+        main_menu_scene.ship_name_text_center = (main_menu_ship_frame_x + main_menu_ship_frame_width / 2, main_menu_background_frame_y + 50)
 
         main_menu_scene.left_switch_text = self.texts["main_menu_switch_left"]
         main_menu_scene.right_switch_text = self.texts["main_menu_switch_right"]
@@ -376,8 +387,8 @@ class MainEngine:
         ship_mod_return_button_size = 128
 
         ship_mod_scene.background_frame = UIFrameBuilder.get_ui_frame(
-            ship_mod_background_frame_size[0],
-            ship_mod_background_frame_size[1],
+            self.to_scale_x(ship_mod_background_frame_size[0]),
+            self.to_scale_y(ship_mod_background_frame_size[1]),
             self.sprites
         )
         ship_mod_scene.background_frame_rect = pg.Rect(self.to_scale(ship_mod_background_frame_pos), self.to_scale(ship_mod_background_frame_size))
@@ -385,13 +396,48 @@ class MainEngine:
         ### hangar text
         ship_mod_scene.hangar_text = "// " + self.texts["ship_hangar_hangar_text"]
         ship_mod_scene.hangar_text_rect = pg.Rect( # DONT use this rect as a reference - to_scale applied
-            ship_mod_background_frame_pos[0] + ship_mod_return_button_size + ship_mod_return_button_margin + self.to_scale_x(20),
-            ship_mod_background_frame_pos[1] + self.to_scale_y(50),
+            self.to_scale_x(ship_mod_background_frame_pos[0] + ship_mod_return_button_size + ship_mod_return_button_margin + 20),
+            self.to_scale_y(ship_mod_background_frame_pos[1] + 50),
             0,
             0
         )
 
         ### available mod slot window
+        ship_mod_scene.ship_slot_size = (500, 100)
+        ship_mod_scene.ship_slot_margin = 20
+
+        ship_mod_slot_button_size = 100
+
+        # eh idk just resize the fking button
+        self.sprites["button_template_square_smaller"] = self.sprite_handler.real_scale_sprite(self.sprites["button_template_square"], (ship_mod_slot_button_size, ship_mod_slot_button_size))
+        self.sprites["button_template_square_smaller_dark"] = self.sprite_handler.real_scale_sprite(self.sprites["button_template_square_dark"], (ship_mod_slot_button_size, ship_mod_slot_button_size))
+
+        ship_mod_scene.ship_mod_panel_size = (
+            ship_mod_scene.ship_slot_size[0] + 2 * ship_mod_scene.ship_slot_margin,
+            (SLOTS_IN_SHIP_MOD_PAGE + 1) * (ship_mod_scene.ship_slot_size[1] + ship_mod_scene.ship_slot_margin) + ship_mod_scene.ship_slot_margin # the +1 is for the page buttons under
+        )
+        ship_mod_scene.ship_mod_panel_pos = (
+            ship_mod_background_frame_pos[0] + ship_mod_scene.ship_slot_margin,
+            ship_mod_background_frame_pos[1] + 200
+        )
+
+        ship_mod_scene.slot_panel = ShipModPanel()
+        self.regenerate_ship_mod_slot_panel()
+
+        ship_mod_scene.slot_panel_background = UIFrameBuilder.get_ui_frame(
+            self.to_scale_x(ship_mod_scene.ship_mod_panel_size[0]),
+            self.to_scale_y(ship_mod_scene.ship_mod_panel_size[1]),
+            self.sprites
+        )
+
+        ship_mod_scene.slot_panel_rect = pg.Rect(self.to_scale(ship_mod_scene.ship_mod_panel_pos), self.to_scale(ship_mod_scene.ship_mod_panel_size))
+
+        ship_mod_scene.buttons["slot_page_left"] = button(flatpane("sprite", {"main":self.sprites["button_template_square_smaller"], "hover":self.sprites["button_template_square_smaller_dark"]}, sprite="main"), pg.Rect(self.to_scale((ship_mod_scene.ship_mod_panel_pos[0] + ship_mod_scene.ship_slot_margin, ship_mod_scene.ship_mod_panel_pos[1] + SLOTS_IN_SHIP_MOD_PAGE * (ship_mod_scene.ship_slot_size[1] + ship_mod_scene.ship_slot_margin) + ship_mod_scene.ship_slot_margin)), self.to_scale((ship_mod_slot_button_size, ship_mod_slot_button_size))), 0, None, partial(ship_mod_scene.slot_panel.prev_page), None, self)
+        ship_mod_scene.buttons["slot_page_right"] = button(flatpane("sprite", {"main":self.sprites["button_template_square_smaller"], "hover":self.sprites["button_template_square_smaller_dark"]}, sprite="main"), pg.Rect(self.to_scale((ship_mod_scene.ship_mod_panel_pos[0] + ship_mod_scene.ship_slot_size[0] - ship_mod_slot_button_size + ship_mod_scene.ship_slot_margin, ship_mod_scene.ship_mod_panel_pos[1] + SLOTS_IN_SHIP_MOD_PAGE * (ship_mod_scene.ship_slot_size[1] + ship_mod_scene.ship_slot_margin) + ship_mod_scene.ship_slot_margin)), self.to_scale((ship_mod_slot_button_size, ship_mod_slot_button_size))), 0, None, partial(ship_mod_scene.slot_panel.next_page), None, self)
+
+        ship_mod_scene.page_button_left_text = "<" # hahaaa have fun
+        ship_mod_scene.page_button_right_text = ">"
+
         ### ship window
         ### module storage window
 
@@ -400,6 +446,9 @@ class MainEngine:
 
         ship_mod_scene.buttons["return"] = button(flatpane("sprite", {"main":self.sprites["button_template_square"], "hover":self.sprites["button_template_square_dark"]}, sprite="main"), pg.Rect(self.to_scale((ship_mod_background_frame_pos[0] + ship_mod_return_button_margin, ship_mod_background_frame_pos[1] + ship_mod_return_button_margin)), self.to_scale((ship_mod_return_button_size, ship_mod_return_button_size))), 0, None, partial(self.scene_handler.setActiveScene, "main_menu"), None, self)
 
+    # VIRTUAL DISPLAY PREP
+
+    #################
 
     def create_resolutions(self):
         # set possible resolutions
@@ -448,6 +497,16 @@ class MainEngine:
         # assign blackbar sizes
         self.blackbar_x_size_aka_renderer_blit_x_offset = int((self.window_width - self.width) / 2)
         self.blackbar_y_size_aka_renderer_blit_y_offset = int((self.window_height - self.height) / 2)
+
+    # RESOURCE LOADING
+
+    ##################
+
+    def load_internal_mods(self):
+        self.load_spawnables()
+        self.load_roket_module_types()
+        self.load_roket_modules()
+        self.load_roket_bodies()
 
     def load_localization(self):
         self.texts = {}
@@ -511,22 +570,24 @@ class MainEngine:
                 spawnable["collider_size"][1]
             )
 
-            navigator = Navigator(spawnable["navigator"])
+            navigator = Navigator(self, spawnable["navigator"])
 
             # spawnable
-            self.roket_spawnables[spawnable_name] = SpawnableObject(
+            self.roket_spawnables[spawnable_name] = SpawnablePrefab( # the spawnable prefab is used ## yeah its late 
+                appInstance=self,
                 name=spawnable_name,
                 displayName=spawnable["display_name"],
                 collider=collision_rect,
                 sprites=spawnable_sprite,
                 navigator=navigator,
-                actions=spawnable["actions"]
+                actions=spawnable["actions"],
+                moveSpeed=spawnable["speed"]
             )
 
         print("--------\nLoaded spawnables:\n")
 
         for spawnable_name, spawnable in self.roket_spawnables.items():
-            print(f"{spawnable.displayName} ({spawnable.name})")
+            print(f"{spawnable.spawnableDisplayName} ({spawnable.spawnableName})")
 
         print("")
 
@@ -691,6 +752,37 @@ class MainEngine:
 
         print("")
 
+        # GAME LOADERS
+
+    def load_sounds(self):
+        pass
+
+    def load_settings(self):
+        settings_read = None
+
+        # try loading user settings        
+        settings_read = JsonLoader.load_from_file(ACTIVE_SETTINGS_PATH)
+
+        # load defaults if no settings file exists
+        if not settings_read:
+            settings_read = JsonLoader.load_from_file(DEFAULT_SETTINGS_PATH)
+            print("loaded default settings! Something's probably gone wrong :>")
+
+        #print(settings_read)
+
+        # apply settings
+        self.user_resolution = settings_read["resolution"]
+        self.user_fullscreen = settings_read["fullscreen"]
+        self.user_fps_limit = settings_read["fps_limit"]
+
+        self.active_resolution_index = 5 # uhhh changeme
+
+        self.localization_code = settings_read["localization"]
+
+    # KEYBINDS
+
+    ##################
+
     def load_keybinds(self):
         loaded_keybinds = JsonLoader.load_from_file(DEFAULT_KEYBIND_PATH)
 
@@ -725,8 +817,86 @@ class MainEngine:
 
         self.save_keybinds()
 
-    def render_version_info(self):
-        self.draw("text", self.LAYER_UI_TOP, {"text":self.scene_handler.getScene("title").version_text, "no_bg":True, "font":self.version_font, "rect":pg.Rect(self.to_scale_x(30), self.to_scale_y(HEIGHT - 50), 0, 0), "color":gray})
+    def get_keybind_pressed(self, keybind:str):
+        return self.keybinds_pressed[keybind]
+    
+    def get_keybind_changed(self, keybind:str):
+        return self.keybinds_changed[keybind]
+    
+    def get_keybind_just_pressed(self, keybind:str):
+        return self.get_keybind_pressed(keybind) and self.get_keybind_changed(keybind)
+
+    def get_keybind_keycode_name(self, keybind:str):
+        return self.keyhandler.keybind_keycode_names[keybind]
+    
+    def get_keybind_keycode_name_in_square_brackets(self, keybind): # returns a shortened and capitalized version
+        start = 0
+        length = 3
+        return "[" + self.get_keybind_keycode_name(keybind)[start : start + length].upper() + "]"
+    
+    # INTERNAL GAME RELATED SHIS
+
+    ##################
+
+    def create_gamestate(self):
+        self.gamestate = GameState() # idk anymore XD
+
+    def regenerate_ship_mod_slot_panel(self):
+        slot_panel:ShipModPanel = self.scene_handler.getScene("ship_modification").slot_panel
+        ship_mod = self.scene_handler.getScene("ship_modification")
+
+        # clear panel
+        slot_panel.clear_pages()
+
+        # create page data
+        slots = []
+        i = 0
+
+        for moduleSlotID, moduleSlot in self.get_active_ship().get_modules().items():
+            if i > SLOTS_IN_SHIP_MOD_PAGE - 1:
+                i = 0
+
+            slot = ShipModInteractiveSlot(
+                self,
+                pg.Rect(
+                    ship_mod.ship_mod_panel_pos[0] + ship_mod.ship_slot_margin,
+                    (i) * (ship_mod.ship_slot_size[1] + ship_mod.ship_slot_margin) + ship_mod.ship_mod_panel_pos[1] + ship_mod.ship_slot_margin,
+                    ship_mod.ship_slot_size[0],
+                    ship_mod.ship_slot_size[1]
+                ),
+                self.sprites["mod_slot_empty"],
+                self.sprites["lajf"],
+                moduleSlot.name,
+                moduleSlotID
+            )
+
+            slots.append(slot)
+
+            i += 1
+
+        # fill pages with data
+        i = 0
+
+        page = ShipModPage() # template page
+        page.clear_slots()
+
+        for slotIndex in range(len(slots)):
+            if i > SLOTS_IN_SHIP_MOD_PAGE - 1:
+                i = 0
+
+                slot_panel.add_page(ShipModPage(page.get_slots())) # essentially a dumb copy
+
+                page.clear_slots()
+
+            page.add_slot(slots[slotIndex])
+
+            i += 1
+
+        if len(page.get_slots()) > 0:
+            slot_panel.add_page(ShipModPage(page.get_slots()))
+
+        for i in slot_panel.get_page(0).get_slots():
+            print(i.get_slot_id(), i.title)
 
     def change_gamemode(self, gameModeName:str):
         self.selected_mode = gameModeName
@@ -759,6 +929,8 @@ class MainEngine:
             active_ship_name_index = 0
 
         self.set_active_ship(ship_names[active_ship_name_index])
+
+        self.regenerate_ship_mod_slot_panel()
         
     def set_active_ship(self, shipName:str):
         ship_names = list(self.roket_bodies.keys())
@@ -776,6 +948,26 @@ class MainEngine:
 
     def get_active_ship(self) -> RoketBody:
         return self.roket_bodies.get(self.active_ship_name)
+    
+    def get_ingame_ship(self):
+        return self.gamestate.get_roket_body()
+
+    def spawn_spawnable(self, spawnableName:str, spawnableTargetPos:tuple):
+        if spawnableName in self.roket_spawnables:
+            spawnablePrefab:SpawnablePrefab = self.roket_spawnables.get(spawnableName)
+
+            spawnablePrefab.create_spawnable(spawnableTargetPos) # incomplete
+
+    def destroy_spawnable(self, spawnableID:int): # need to keep ids?? painful
+        if spawnableID in self.gamestate.get_spawnables():
+            self.gamestate.get_spawnables().get(spawnableID)
+
+    # SCENE UPDATES AND RENDERS
+
+    ##################
+
+    def render_version_info(self):
+        self.draw("text", self.LAYER_UI_TOP, {"text":self.scene_handler.getScene("title").version_text, "no_bg":True, "font":self.version_font, "rect":pg.Rect(self.to_scale_x(30), self.to_scale_y(HEIGHT - 50), 0, 0), "color":gray})
 
     def title_update(self):
         title = self.scene_handler.getScene("title")
@@ -876,7 +1068,7 @@ class MainEngine:
         main_menu.ship_window.render()
 
         # draw ship name text
-        self.draw("text", self.LAYER_UI_TOP, {"text":main_menu.ship_name_text, "font":self.button_font, "center":main_menu.ship_name_text_center, "no_bg":True, "rect":pg.Rect(0,0,0,0), "color":black}) # idk maybe white
+        self.draw("text", self.LAYER_UI_TOP, {"text":main_menu.ship_name_text, "font":self.button_font, "center":self.to_scale(main_menu.ship_name_text_center), "no_bg":True, "rect":pg.Rect(0,0,0,0), "color":black}) # idk maybe white
 
         """ main_menu.ship_button_left.render() """
 
@@ -888,7 +1080,7 @@ class MainEngine:
         for button_name in main_menu.mode_button_names:
             button = main_menu.buttons[button_name]
 
-            if not (button.is_hovered(self.mouse_info[0]) or self.selected_mode == button_name):
+            if not (button.is_hovered(self.corrected_mouse_info[0]) or self.selected_mode == button_name):
                 self.draw("text", self.LAYER_UI_TOP, {"text":main_menu.mode_texts[button_name], "font":self.mode_font, "center":button.rect.center, "color":white, "no_bg":True})
 
         # draw version info
@@ -912,35 +1104,39 @@ class MainEngine:
         # draw hangar text
         self.draw("text", self.LAYER_UI_TOP, {"text":ship_mod.hangar_text, "rect":ship_mod.hangar_text_rect, "font":self.scene_label_font, "color":roket_dark_blue, "no_bg":True})
 
+        # draw ship slot panel
+        self.draw("sprite", self.LAYER_UI_BOTTOM, {"sprite":ship_mod.slot_panel_background, "rect":ship_mod.slot_panel_rect})
+
         # draw buttons
         for button in ship_mod.buttons:
-            ship_mod.buttons[button].render()
+            if button not in ["slot_page_left", "slot_page_right"]:
+                ship_mod.buttons[button].render()
+
+        # draw page buttons
+        if len(ship_mod.slot_panel.get_pages()) > 1:
+            for button in ["slot_page_left", "slot_page_right"]:
+                ship_mod.buttons[button].render()
 
         # draw button texts
         self.draw_button_text(ship_mod.return_button_text, ship_mod.buttons["return"])
+
+        if len(ship_mod.slot_panel.get_pages()) > 1:
+            self.draw_button_text(ship_mod.page_button_left_text, ship_mod.buttons["slot_page_left"])
+            self.draw_button_text(ship_mod.page_button_right_text, ship_mod.buttons["slot_page_right"])
+
+        # draw ship slot panel content
+        for interactiveSlot in ship_mod.slot_panel.get_current_page().get_slots():
+            interactiveSlot.render()
+
+    # INTERNAL RANDOM AHH HELPERS
+
+    ##################
 
     def draw_button_text(self, buttonText:str, button):
         self.draw("text", self.LAYER_UI_TOP, {"text":buttonText, "no_bg":True, "font":self.button_font, "center":button.rect.center, "color":black})
 
     def screen_to_game_coords(self, pos) -> tuple:
         return (pos[0] - self.blackbar_x_size_aka_renderer_blit_x_offset, pos[1] - self.blackbar_y_size_aka_renderer_blit_y_offset)
-    
-    def get_keybind_pressed(self, keybind:str):
-        return self.keybinds_pressed[keybind]
-    
-    def get_keybind_changed(self, keybind:str):
-        return self.keybinds_changed[keybind]
-    
-    def get_keybind_just_pressed(self, keybind:str):
-        return self.get_keybind_pressed(keybind) and self.get_keybind_changed(keybind)
-
-    def get_keybind_keycode_name(self, keybind:str):
-        return self.keyhandler.keybind_keycode_names[keybind]
-    
-    def get_keybind_keycode_name_in_square_brackets(self, keybind): # returns a shortened and capitalized version
-        start = 0
-        length = 3
-        return "[" + self.get_keybind_keycode_name(keybind)[start : start + length].upper() + "]"
     
     def spawn_title_planets(self):
 
@@ -997,6 +1193,10 @@ class MainEngine:
     def exit_game(self):
         print(f"{__name__}: exiting game")
         self.is_running = False
+
+    # ENGINE INTERNALS
+
+    ##################
 
     def create_runtime_logger(self):
         self.logger = LogHandler()
@@ -1118,31 +1318,6 @@ class MainEngine:
 
     def do_physics(self):
         pass
-                        
-    def load_sounds(self):
-        pass
-
-    def load_settings(self):
-        settings_read = None
-
-        # try loading user settings        
-        settings_read = JsonLoader.load_from_file(ACTIVE_SETTINGS_PATH)
-
-        # load defaults if no settings file exists
-        if not settings_read:
-            settings_read = JsonLoader.load_from_file(DEFAULT_SETTINGS_PATH)
-            print("loaded default settings! Something's probably gone wrong :>")
-
-        #print(settings_read)
-
-        # apply settings
-        self.user_resolution = settings_read["resolution"]
-        self.user_fullscreen = settings_read["fullscreen"]
-        self.user_fps_limit = settings_read["fps_limit"]
-
-        self.active_resolution_index = 5 # uhhh changeme
-
-        self.localization_code = settings_read["localization"]
 
     def render(self):
         if MULTITHREADED_RENDERING:
@@ -1230,7 +1405,11 @@ class MainEngine:
         """ self.animations["example_anim"].anim_pos = (self.mouse_info[0][0], self.mouse_info[0][1])
 
         self.animations_to_render.append("example_anim") """
- 
+
+    # ENGINE STARTUP SEQUENCE SHIS
+
+    ##################
+
     def run(self):
         while self.is_running:
             self.handle_events()

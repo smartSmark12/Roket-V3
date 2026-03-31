@@ -1,10 +1,10 @@
 ## Spawnables
 ### movement
-- straight - travel in a straight line with a set speed
+- straight - travel in a straight line with a set speed (can be negative to move down screen)
 - point - go to given point
-- s_point - travel to a point starting outside the screen below given point
-- asteroid - target closest asteroid
-- spawnable - target closest spawnable of given name
+- s_point - travel to a point starting outside the screen below (or above - determined by speed sign) given point
+- asteroid - target closest asteroid (spawned on ship)
+- spawnable - target closest spawnable of given name (spawned on ship)
 
 ### triggers
 - on_collision - collision with asteroid

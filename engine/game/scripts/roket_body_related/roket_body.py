@@ -11,11 +11,12 @@ class RoketBody:
     def __init__(self, name:str, displayName:str, baseLives:int, baseSprites:flatpane, position:tuple[int|float], size:tuple[int], collisionRect:pg.Rect, moduleSlots:dict[int, RoketModuleSlot], lives=None):
         self.name = name
         self.sprites = baseSprites
-        self.pos = position
+        """ self.pos = position """
         self.moduleSlots = moduleSlots
 
         self.properties = {
             "displayName":displayName,
+            "position":position,
             "baseLives":baseLives,
             "move_speed":1,
             "size":size,
@@ -63,6 +64,9 @@ class RoketBody:
     def move(self, targetPos:tuple):
         pass
 
+    def get_pos(self):
+        return self.get_property("position")
+
     def update_anim(self, dt:float):
         pass
 
@@ -71,6 +75,13 @@ class RoketBody:
 
     def remove_module(self, slotId:int, moduleName:str):
         pass
+
+    def get_module(self, moduleID:int):
+        if moduleID in self.moduleSlots.keys():
+            return self.moduleSlots.get(moduleID)
+        
+    def get_modules(self):
+        return self.moduleSlots
 
     def clear_modules(self):
         pass

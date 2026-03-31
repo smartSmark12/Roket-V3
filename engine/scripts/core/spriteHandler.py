@@ -91,7 +91,7 @@ class SpriteHandlerJSON:
 
             self.app.sprites[file_name] = image
 
-        print(f"\n{__name__}:\n------------\nTotal loaded sprites: {len(self.app.sprites)}\nTotal sprite loading errors: {errors["r"] + errors['m'] + errors['s'] + errors['c']} (r: {errors['r']}, m: {errors['r']}, s: {errors["s"]}, c: {errors['c']})\n")
+        print(f"\n{__name__}:\n------------\nTotal loaded sprites: {len(self.app.sprites)}\nTotal sprite loading errors: {errors["r"] + errors['m'] + errors['s'] + errors['c']} (r: {errors['r']}, m: {errors['m']}, s: {errors["s"]}, c: {errors['c']})\n")
 
         self.app.return_to_runtime_logger(f"{__name__}:sprite_loader_json")
 
@@ -196,7 +196,7 @@ class SpriteHandler:
                         errors_convert += 1
 
 
-            print(f"\n{__name__}:\n------------\nTotal loaded sprites: {len(self.app.sprites)}\nTotal sprite loading errors: {errors_read + errors_memory + errors_scale + errors_convert} (r: {errors_read}, m: {errors_memory}, s: {errors_scale}, c: {errors_scale})\n")
+            print(f"\n{__name__}:\n------------\nTotal loaded sprites: {len(self.app.sprites)}\nTotal sprite loading errors: {errors_read + errors_memory + errors_scale + errors_convert} (r: {errors_read}, m: {errors_memory}, s: {errors_scale}, c: {errors_convert})\n")
 
             for i in self.app.sprites:
                 print(f"{i}\n{self.app.sprites[i]}\n")

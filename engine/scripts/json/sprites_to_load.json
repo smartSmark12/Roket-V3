@@ -203,6 +203,16 @@
         "engine/game/assets/img/ui_builder/background.png",
         [100,100],
         "c"
+    ],
+    "cursor":[
+        "engine/game/assets/img/else/custom_cursor.png",
+        [100,100],
+        "ca"
+    ],
+    "mod_slot_empty":[
+        "engine/game/assets/img/menu/empty_modification_slot.png",
+        [128,128],
+        "c"   
     ]
 
 }
