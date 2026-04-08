@@ -91,7 +91,7 @@ class SpriteHandlerJSON:
 
             self.app.sprites[file_name] = image
 
-        print(f"\n{__name__}:\n------------\nTotal loaded sprites: {len(self.app.sprites)}\nTotal sprite loading errors: {errors["r"] + errors['m'] + errors['s'] + errors['c']} (r: {errors['r']}, m: {errors['m']}, s: {errors["s"]}, c: {errors['c']})\n")
+        print(f"\n{__name__}:\n------------\nTotal loaded sprites: {len(self.app.sprites)}\nTotal sprite loading errors: {errors['r'] + errors['m'] + errors['s'] + errors['c']} (r: {errors['r']}, m: {errors['m']}, s: {errors['s']}, c: {errors['c']})\n")
 
         self.app.return_to_runtime_logger(f"{__name__}:sprite_loader_json")
 

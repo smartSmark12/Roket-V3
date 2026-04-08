@@ -19,7 +19,7 @@ class ThreadedGameRenderer:
 
         self.current_log = []
 
-        _thread.start_new_thread(self.render_thread)
+        _thread.start_new_thread(self.render_thread, ())
 
     def render_thread(self):
 

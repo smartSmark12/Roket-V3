@@ -2,3 +2,8 @@ tests/
 .vscode/*
 .vs/*
 **/__pycache__/**
+build/
+dist/
+output/
+*.spec
+*.exe

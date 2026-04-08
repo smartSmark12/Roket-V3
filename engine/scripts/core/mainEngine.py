@@ -427,7 +427,8 @@ class MainEngine:
         ship_mod_scene.slot_panel_background = UIFrameBuilder.get_ui_frame(
             self.to_scale_x(ship_mod_scene.ship_mod_panel_size[0]),
             self.to_scale_y(ship_mod_scene.ship_mod_panel_size[1]),
-            self.sprites
+            self.sprites,
+            alpha=True
         )
 
         ship_mod_scene.slot_panel_rect = pg.Rect(self.to_scale(ship_mod_scene.ship_mod_panel_pos), self.to_scale(ship_mod_scene.ship_mod_panel_size))
@@ -748,7 +749,7 @@ class MainEngine:
         print("--------\nLoaded ships:\n")
 
         for ship_name, ship in self.roket_bodies.items():
-            print(f"{ship.get_property("displayName")} ({ship.name})")
+            print(f"{ship.get_property('displayName')} ({ship.name})")
 
         print("")
 

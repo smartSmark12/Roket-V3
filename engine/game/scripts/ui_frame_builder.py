@@ -4,7 +4,7 @@ from engine.scripts.colors import white
 
 class UIFrameBuilder:
     @staticmethod
-    def get_ui_frame(width:int, height:int, main_engine_sprite_dict:dict, side_left=True, side_top=True, side_right=True, side_bottom=True) -> pg.Surface:
+    def get_ui_frame(width:int, height:int, main_engine_sprite_dict:dict, side_left=True, side_top=True, side_right=True, side_bottom=True, alpha=False) -> pg.Surface:
         surf = pg.Surface((width, height)) # dont forget to ca
 
         if not UIFrameBuilder.check_for_min_size(width, height, main_engine_sprite_dict):
@@ -57,7 +57,10 @@ class UIFrameBuilder:
 
         surf.blit(background, (corners[0].width, corners[0].height))
 
-        return surf
+        if alpha:
+            return surf.convert_alpha()
+        else:
+            return surf
 
     @staticmethod
     def check_for_min_size(width:int, height:int, sprites:dict) -> bool: # a bit shis, but should be enough to kick me if i do it wrong XD
