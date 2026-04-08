@@ -206,7 +206,7 @@
     ],
     "cursor":[
         "engine/game/assets/img/else/custom_cursor.png",
-        [100,100],
+        [50,50],
         "ca"
     ],
     "mod_slot_empty":[
