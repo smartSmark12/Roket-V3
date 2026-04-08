@@ -2,8 +2,7 @@ import pygame as pg
 
 from game.scripts.sprite_window import SpriteWindow
 from scripts.colors import *
-
-max_title_length = 17
+from scripts.core.settings import MOD_SLOT_TITLE_LENGTH
 
 class ShipModInteractiveSlot:
     def __init__(self, appInstance, rect:pg.Rect, icon:pg.Surface, iconTop:pg.Surface|None, title:str, slotID:int):
@@ -34,7 +33,7 @@ class ShipModInteractiveSlot:
             self.app.draw("sprite", self.app.LAYER_UI_TOP, {"sprite":self.iconTop, "rect":self.corrected_rect})
 
         # text
-        self.app.draw("text", self.app.LAYER_UI_TOP, {"text":self.title[:max_title_length], "rect":pg.Rect(self.app.to_scale((self.rect.x + self.rect.height + 5, self.rect.y + 10)), self.app.to_scale((self.rect.width, self.rect.height))), "color":roket_dark_blue, "font":self.app.ship_mod_slot_font, "no_bg":True})
+        self.app.draw("text", self.app.LAYER_UI_TOP, {"text":self.title[:MOD_SLOT_TITLE_LENGTH], "rect":pg.Rect(self.app.to_scale((self.rect.x + self.rect.height + 5, self.rect.y + 10)), self.app.to_scale((self.rect.width, self.rect.height))), "color":roket_dark_blue, "font":self.app.ship_mod_slot_font, "no_bg":True})
 
     def get_slot_id(self):
         return self.slotID

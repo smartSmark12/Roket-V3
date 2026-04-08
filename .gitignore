@@ -3,6 +3,7 @@ tests/
 .vs/*
 **/__pycache__/**
 build/
+_builds/
 dist/
 output/
 *.spec

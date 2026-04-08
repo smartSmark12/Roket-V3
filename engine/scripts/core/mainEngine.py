@@ -403,7 +403,7 @@ class MainEngine:
         )
 
         ### available mod slot window
-        ship_mod_scene.ship_slot_size = (500, 100)
+        ship_mod_scene.ship_slot_size = (400, 100)
         ship_mod_scene.ship_slot_margin = 20
 
         ship_mod_slot_button_size = 100
