@@ -32,10 +32,10 @@ class ThreadedGameRenderer:
             else:
                 self.dt = self.clock.tick(FPS_RENDER_LIMIT) / 1000
 
-            with self.lock:
-                self.app.to_render_full.append(RenderItem("text", self.app.LAYER_UI_TOP, {"no_bg":True, "color":(255, 0, 0), "rect":pg.Rect(10, 50, 0, 0), "text":"REN: "+str(round(self.clock.get_fps()))}))
+            """ with self.lock:
+                self.app.to_render_full.append(RenderItem("text", self.app.LAYER_UI_TOP, {"no_bg":True, "color":(255, 0, 0), "rect":pg.Rect(10, 50, 0, 0), "text":"REN: "+str(round(self.clock.get_fps()))})) """
         
-            #with self.lock:
+            with self.lock:
                 if self.app.to_render_full != None and self.app.to_render_full != []:
                     self.to_render = self.app.to_render_full.copy()
 

@@ -1,8 +1,9 @@
 import pygame as pg
 import os
 import csv
+from functools import lru_cache
 
-from scripts.core.settings import DEFAULT_SPRITE_PATH, DEFAULT_SPRITE_JSON_PATH, WIDTH, HEIGHT
+from scripts.core.settings import DEFAULT_SPRITE_PATH, DEFAULT_SPRITE_JSON_PATH, WIDTH, HEIGHT, MAX_CACHED_SIZE
 from scripts.json_loader import JsonLoader
 
 class SpriteHandlerJSON:
@@ -135,6 +136,10 @@ class SpriteHandlerJSON:
             return (self.to_scalex(point[0], True), self.to_scaley(point[1], True))
         else:
             return (self.to_scalex(point[0], False), self.to_scaley(point[1], False))
+        
+    @lru_cache(maxsize=MAX_CACHED_SIZE)
+    def cached_rotate(self, sprite:pg.Surface, degrees:int|float):
+        return pg.transform.rotate(sprite, degrees)
 
 # the old version
 class SpriteHandler:

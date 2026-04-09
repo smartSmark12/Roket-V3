@@ -23,6 +23,9 @@
         100,
         1073741903
     ],
+    "debug_overlay_toggle": [
+        1073741884
+    ],
     "debug_reset_keybinds": [
         59
     ]
