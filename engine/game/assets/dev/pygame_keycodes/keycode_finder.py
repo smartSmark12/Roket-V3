@@ -1,0 +1,38 @@
+import pygame as p
+
+for i in [
+    p.K_a,
+    p.K_b,
+    p.K_c,
+    p.K_d,
+    p.K_e,
+    p.K_f,
+    p.K_g,
+    p.K_h,
+    p.K_i,
+    p.K_j,
+    p.K_k,
+    p.K_l,
+    p.K_m,
+    p.K_n,
+    p.K_o,
+    p.K_p,
+    p.K_q,
+    p.K_r,
+    p.K_s,
+    p.K_t,
+    p.K_u,
+    p.K_v,
+    p.K_w,
+    p.K_x,
+    p.K_y,
+    p.K_z,
+    p.K_INSERT,
+    p.K_DELETE,
+    p.K_HOME,
+    p.K_END,
+    p.K_PAGEUP,
+    p.K_PAGEDOWN,
+    p.K_KP_ENTER
+]:
+    print(p.key.name(i) + " " + str(i))
