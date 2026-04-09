@@ -140,6 +140,9 @@ class SpriteHandlerJSON:
     @lru_cache(maxsize=MAX_CACHED_SIZE)
     def cached_rotate(self, sprite:pg.Surface, degrees:int|float):
         return pg.transform.rotate(sprite, degrees)
+    
+    def rotate(self, sprite:pg.Surface, degrees:int|float):
+        return pg.transform.rotate(sprite, degrees)
 
 # the old version
 class SpriteHandler:
