@@ -26,6 +26,9 @@
     "debug_overlay_toggle": [
         1073741884
     ],
+    "fps_overlay_toggle": [
+        1073741883
+    ],
     "debug_reset_keybinds": [
         59
     ]

@@ -183,6 +183,7 @@ class MainEngine:
         self.corrected_mouse_info = None
 
         # debug overlay
+        self.default_debug_overlay_enabled = True
         self.debug_overlay_enabled = False
 
         # load fonts # can hardcode, cause you'll still need to relaunch the game to take effect
@@ -1211,20 +1212,49 @@ class MainEngine:
         print(f"{__name__}: exiting game")
         self.is_running = False
 
-    # ENGINE INTERNALS
+    # DEBUG OVERLAY
 
     ##################
+
+    def toggle_default_debug_overlay(self):
+        self.default_debug_overlay_enabled = not self.default_debug_overlay_enabled
+
+        if self.default_debug_overlay_enabled:
+            self.enable_default_debug_overlay()
+        else:
+            self.disable_default_debug_overlay()
+
+    def enable_default_debug_overlay(self):
+        self.default_debug_overlay_enabled = True
+
+    def disable_default_debug_overlay(self):
+        self.default_debug_overlay_enabled = False
+
+        if self.debug_overlay_enabled:
+            self.disable_debug_overlay()
 
     def toggle_debug_overlay(self):
         self.debug_overlay_enabled = not self.debug_overlay_enabled
 
         if self.debug_overlay_enabled:
-            self._debug_alarm_id = self.add_alarm("debug_overlay_update", DEBUG_OVERLAY_UPDATE_TIMEOUT, self.update_debug_overlay, True)
-            self._debug_process = psutil.Process() # should stay the same
-            self.update_debug_overlay()
-            
+            self.enable_debug_overlay()
         else:
-            self.remove_alarm(self._debug_alarm_id)
+            self.disable_debug_overlay() # cant be fucked to do this properly
+
+    def enable_debug_overlay(self):
+        self.debug_overlay_enabled = True
+
+        self._debug_alarm_id = self.add_alarm("debug_overlay_update", DEBUG_OVERLAY_UPDATE_TIMEOUT, self.update_debug_overlay, True)
+        self._debug_process = psutil.Process() # should stay the same
+        self.update_debug_overlay()
+
+        if not self.default_debug_overlay_enabled:
+            self.enable_default_debug_overlay() # idk
+
+    def disable_debug_overlay(self):
+        self.debug_overlay_enabled = False
+
+        self.remove_alarm(self._debug_alarm_id)
 
     def update_debug_overlay(self):
 
@@ -1234,12 +1264,18 @@ class MainEngine:
         self._debug_mem_used = round(self._debug_mem_info.rss / (1024 ** 2), 2) # ram usage in MB
         self._debug_cpu_use = round(psutil.cpu_percent(), 2) # cpu usage in %
 
-    def render_debug_overlay(self):
+    def render_default_debug_overlay(self):
         self.draw("text", self.LAYER_UI_DEBUG, {"text":f"UPS: {str(int(self.clock.get_fps()))}", "rect":(10, 0, 0, 0), "font":self.debug_overlay_font, "no_bg":True, "color":green})
         self.draw("text", self.LAYER_UI_DEBUG, {"text":f"FPS: {str(int(self.renderer.clock.get_fps()))}", "rect":(10, 50, 0, 0), "font":self.debug_overlay_font, "no_bg":True, "color":red})
+
+    def render_debug_overlay(self):
         self.draw("text", self.LAYER_UI_DEBUG, {"text":f"F/U: {str(round(self.renderer.clock.get_fps() / self.clock.get_fps(), 3))}", "rect":(10, 100, 0, 0), "font":self.debug_overlay_font, "no_bg":True, "color":white})
         self.draw("text", self.LAYER_UI_DEBUG, {"text":f"CPU: {self._debug_cpu_use} %", "rect":(10, 150, 0, 0), "font":self.debug_overlay_font, "no_bg":True, "color":white})
         self.draw("text", self.LAYER_UI_DEBUG, {"text":f"RAM: {self._debug_mem_used} MB", "rect":(10, 200, 0, 0), "font":self.debug_overlay_font, "no_bg":True})
+
+    # ENGINE INTERNALS
+
+    ##################
 
     def create_runtime_logger(self):
         self.logger = LogHandler()
@@ -1433,15 +1469,9 @@ class MainEngine:
         self.scene_handler.updateScene()
         self.scene_handler.renderScene()
 
-        # debug overlay handling
-        if self.get_keybind_just_pressed("debug_overlay_toggle"):
-            self.toggle_debug_overlay()
-
-        if self.debug_overlay_enabled:
-            self.render_debug_overlay()
-
         # post frame stuff
         #self.render_fps()
+        #self.render_default_debug_overlay()
         self.collect_logs()
         self.print_log() # print and clear log of current cycle
 
@@ -1451,6 +1481,20 @@ class MainEngine:
             self.pause_alarm(self.title_planet_alarm)
         else:
             self.unpause_alarm(self.title_planet_alarm)
+
+        # handle debug overlay
+        # debug overlay handling
+        if self.get_keybind_just_pressed("debug_overlay_toggle"):
+            self.toggle_debug_overlay()
+
+        if self.get_keybind_just_pressed("fps_overlay_toggle"):
+            self.toggle_default_debug_overlay()
+
+        if self.default_debug_overlay_enabled:
+            self.render_default_debug_overlay()
+
+        if self.debug_overlay_enabled:
+            self.render_debug_overlay()
 
         """ self.animations["example_anim"].anim_pos = (self.mouse_info[0][0], self.mouse_info[0][1])
 
