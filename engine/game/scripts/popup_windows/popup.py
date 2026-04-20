@@ -56,9 +56,8 @@ class PopupWindow:
     
     def update_buttons(self):
         self.button.activation_detection(self.app.corrected_mouse_info)
-    
-    def render(self):
-        # draw background
+
+    def _render_background(self):
         self.app.draw(
             "sprite",
             self.app.LAYER_POPUP_BOTTOM,
@@ -68,7 +67,7 @@ class PopupWindow:
             }
         )
 
-        # draw texts
+    def _render_text(self):
         for text_index in range(len(self.content)):
             text = self.content[text_index]
             self.app.draw(
@@ -84,6 +83,17 @@ class PopupWindow:
                 }
             )
 
-        # draw button
+    def _render_button(self):
         self.button.render()
         self.app.draw_button_text(self.action, self.button, self.app.LAYER_POPUP_TEXT)
+    
+    def render(self):
+        # draw background
+        self._render_background()
+
+        # draw texts
+        self._render_text()
+
+        # draw button
+        self._render_button()
+        

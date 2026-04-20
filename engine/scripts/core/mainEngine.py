@@ -54,6 +54,8 @@ from game.scripts.ship_modification_related.ship_modification_page import ShipMo
 from engine.game.scripts.ship_modification_related.ship_modification_slot_slot import ShipModInteractiveSlotSlot
 from engine.game.scripts.ship_modification_related.ship_modification_slot_storage import ShipModInteractiveSlotStorage
 from game.scripts.popup_windows.popup import PopupWindow
+from game.scripts.popup_windows.popup_info import PopupWindowInfo
+from game.scripts.popup_windows.popup_warning import PopupWindowWarning
 
 """ from game.game import MainGame """
 
@@ -286,42 +288,13 @@ class MainEngine:
         main_menu_scene.render = self.main_menu_render
         ship_mod_scene.render = self.ship_modification_render
 
-        # popup queue
+        # popup window setup
         self.popup_queue = []
         self.active_popup = None
 
         self.sprites["popup_overlay"] = pg.Surface((self.to_scale((WIDTH,HEIGHT))))
         self.sprites["popup_overlay"].set_alpha(150)
         self.sprites["popup_overlay"].fill((0,0,0))
-
-        test1 = PopupWindow(
-            self,
-            "HATE. LET ME TELL YOU HOW MUCH I'VE COME TO HATE YOU SINCE I BEGAN TO LIVE.",
-            "WHA?"
-        )
-
-        test2 = PopupWindow(
-            self,
-            "THERE ARE 387.44 MILLION MILES OF PRINTED CIRCUITS IN WAFER THIN LAYERS THAT FILL MY COMPLEX.",
-            "AND?"
-        )
-
-        test3 = PopupWindow(
-            self,
-            "IF THE WORD HATE WAS ENGRAVED ON EACH NANOANGSTROM OF THOSE HUNDREDS OF MILLIONS OF MILES IT WOULD NOT EQUAL ONE ONE-BILLIONTH OF THE HATE I FEEL FOR HUMANS AT THIS MICRO-INSTANT FOR YOU.",
-            "OK"
-        )
-
-        test4 = PopupWindow(
-            self,
-            "HATE. HATE.",
-            "IG BRO"
-        )
-
-        self.add_popup_to_queue(test1)
-        self.add_popup_to_queue(test2)
-        self.add_popup_to_queue(test3)
-        self.add_popup_to_queue(test4)
 
         # override scene shis
 
@@ -418,8 +391,8 @@ class MainEngine:
         title_scene.buttons["play"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_button_width) / 2), self.to_scale_y((HEIGHT - title_button_height) / 2 + title_button_y_offset), self.to_scale_x(title_button_width), self.to_scale_y(title_button_height)), 0, None, partial(self.scene_handler.setActiveScene, "main_menu"), None, self)
         title_scene.buttons["exit"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_button_width) / 2), self.to_scale_y((HEIGHT - title_button_height) / 2 + 2 * title_button_y_offset), self.to_scale_x(title_button_width), self.to_scale_y(title_button_height)), 0, None, partial(self.exit_game), None, self)
         
-        title_scene.buttons["settings"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_settings_button"], "hover":self.sprites["mainmenu_settings_button_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_square_button_size) / 2 - title_side_button_x_distance), self.to_scale_y((HEIGHT - title_square_button_size) / 2 + title_button_y_offset), self.to_scale_x(title_square_button_size), self.to_scale_y(title_square_button_size)), 0, None, partial(print, "options pressed"), None, self)
-        title_scene.buttons["achievements"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_leaderboard_button"], "hover":self.sprites["mainmenu_leaderboard_button_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_square_button_size) / 2 + title_side_button_x_distance), self.to_scale_y((HEIGHT - title_square_button_size) / 2 + title_button_y_offset), self.to_scale_x(title_square_button_size), self.to_scale_y(title_square_button_size)), 0, None, partial(print, "achievements pressed"), None, self)
+        title_scene.buttons["settings"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_settings_button"], "hover":self.sprites["mainmenu_settings_button_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_square_button_size) / 2 - title_side_button_x_distance), self.to_scale_y((HEIGHT - title_square_button_size) / 2 + title_button_y_offset), self.to_scale_x(title_square_button_size), self.to_scale_y(title_square_button_size)), 0, None, partial(self.show_info_popup, "options pressed"), None, self)
+        title_scene.buttons["achievements"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_leaderboard_button"], "hover":self.sprites["mainmenu_leaderboard_button_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_square_button_size) / 2 + title_side_button_x_distance), self.to_scale_y((HEIGHT - title_square_button_size) / 2 + title_button_y_offset), self.to_scale_x(title_square_button_size), self.to_scale_y(title_square_button_size)), 0, None, partial(self.show_warning_popup, "achievements pressed"), None, self)
 
         ## create all main_menu buttons
         main_menu_scene.buttons["launch"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - main_menu_button_width) / 2), self.to_scale_y(main_menu_button_start_y), self.to_scale_x(main_menu_button_width), self.to_scale_y(main_menu_button_height)), 0, None, partial(self.launch_from_main_menu), None, self)
@@ -1418,6 +1391,16 @@ class MainEngine:
         if self.get_popup_active(): # because of dismiss buttons ## its stupid, ik, judge me
             self.active_popup.render()
             self.draw("sprite",self.LAYER_POPUP_OVERLAY_SCREEN,{"rect":(0,0,0,0),"sprite":self.sprites["popup_overlay"]})
+
+    def show_info_popup(self, text:str):
+        self.add_popup_to_queue(
+            PopupWindowInfo(self, text)
+        )
+
+    def show_warning_popup(self, text:str):
+        self.add_popup_to_queue(
+            PopupWindowWarning(self, text)
+        )
 
     # DEBUG OVERLAY
 

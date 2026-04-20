@@ -15,6 +15,12 @@
         "main_menu_mode_infinite":"NEKONEČNÉ",
         "main_menu_mode_dummy":"BHAHAHA",
         "ship_hangar_hangar_text":"HANGÁR",
-        "ship_hangar_select_slot":"Žádné dostupné moduly"
+        "ship_hangar_select_slot":"Žádné dostupné moduly",
+        "popup_window_info_dismiss":"ZAVŘÍT",
+        "popup_window_warning_dismiss":"BUDIŽ",
+        "popup_window_choice_accept":"ANO",
+        "popup_window_choice_refuse":"NE",
+        "popup_window_choice_continue":"POKRAČOVAT",
+        "popup_window_choice_cancel":"ZRUŠIT"
     }
 }

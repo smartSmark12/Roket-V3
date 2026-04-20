@@ -15,6 +15,12 @@
         "main_menu_mode_infinite":"ENDLESS",
         "main_menu_mode_dummy":"DUMMY",
         "ship_hangar_hangar_text":"HANGAR",
-        "ship_hangar_select_slot":"No available modules"
+        "ship_hangar_select_slot":"No available modules",
+        "popup_window_info_dismiss":"DISMISS",
+        "popup_window_warning_dismiss":"I'M AWARE",
+        "popup_window_choice_accept":"YES",
+        "popup_window_choice_refuse":"NO",
+        "popup_window_choice_continue":"CONTINUE",
+        "popup_window_choice_cancel":"CANCEL"
     }
 }
