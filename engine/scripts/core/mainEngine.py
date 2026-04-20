@@ -51,7 +51,9 @@ from game.scripts.roket_spawnable_related.spawnable_navigator import Navigator
 from game.scripts.gamestate.gamestate_object import GameState
 from game.scripts.ship_modification_related.ship_modification_panel import ShipModPanel
 from game.scripts.ship_modification_related.ship_modification_page import ShipModPage
-from game.scripts.ship_modification_related.ship_modification_slot import ShipModInteractiveSlot
+from engine.game.scripts.ship_modification_related.ship_modification_slot_slot import ShipModInteractiveSlotSlot
+from engine.game.scripts.ship_modification_related.ship_modification_slot_storage import ShipModInteractiveSlotStorage
+from game.scripts.popup_windows.popup import PopupWindow
 
 """ from game.game import MainGame """
 
@@ -126,7 +128,11 @@ class MainEngine:
         self.render_layers = RENDER_LAYERS # change in setting file (engine -> scripts -> core -> settings.py)
 
         self.LAYER_UI_TOP = 9
-        self.LAYER_UI_DEBUG = 11
+        self.LAYER_UI_DEBUG = self.render_layers - 1
+        self.LAYER_POPUP_OVERLAY_SCREEN = 13
+        self.LAYER_POPUP_BOTTOM = 14
+        self.LAYER_POPUP_TOP = 15
+        self.LAYER_POPUP_TEXT = 16
 
         self.animations_to_render = []
         self.to_render = []
@@ -279,6 +285,43 @@ class MainEngine:
         title_scene.render = self.title_render
         main_menu_scene.render = self.main_menu_render
         ship_mod_scene.render = self.ship_modification_render
+
+        # popup queue
+        self.popup_queue = []
+        self.active_popup = None
+
+        self.sprites["popup_overlay"] = pg.Surface((self.to_scale((WIDTH,HEIGHT))))
+        self.sprites["popup_overlay"].set_alpha(150)
+        self.sprites["popup_overlay"].fill((0,0,0))
+
+        test1 = PopupWindow(
+            self,
+            "HATE. LET ME TELL YOU HOW MUCH I'VE COME TO HATE YOU SINCE I BEGAN TO LIVE.",
+            "WHA?"
+        )
+
+        test2 = PopupWindow(
+            self,
+            "THERE ARE 387.44 MILLION MILES OF PRINTED CIRCUITS IN WAFER THIN LAYERS THAT FILL MY COMPLEX.",
+            "AND?"
+        )
+
+        test3 = PopupWindow(
+            self,
+            "IF THE WORD HATE WAS ENGRAVED ON EACH NANOANGSTROM OF THOSE HUNDREDS OF MILLIONS OF MILES IT WOULD NOT EQUAL ONE ONE-BILLIONTH OF THE HATE I FEEL FOR HUMANS AT THIS MICRO-INSTANT FOR YOU.",
+            "OK"
+        )
+
+        test4 = PopupWindow(
+            self,
+            "HATE. HATE.",
+            "IG BRO"
+        )
+
+        self.add_popup_to_queue(test1)
+        self.add_popup_to_queue(test2)
+        self.add_popup_to_queue(test3)
+        self.add_popup_to_queue(test4)
 
         # override scene shis
 
@@ -444,11 +487,35 @@ class MainEngine:
         ship_mod_scene.buttons["slot_page_left"] = button(flatpane("sprite", {"main":self.sprites["button_template_square_smaller"], "hover":self.sprites["button_template_square_smaller_dark"]}, sprite="main"), pg.Rect(self.to_scale((ship_mod_scene.ship_mod_panel_pos[0] + ship_mod_scene.ship_slot_margin, ship_mod_scene.ship_mod_panel_pos[1] + SLOTS_IN_SHIP_MOD_PAGE * (ship_mod_scene.ship_slot_size[1] + ship_mod_scene.ship_slot_margin) + ship_mod_scene.ship_slot_margin)), self.to_scale((ship_mod_slot_button_size, ship_mod_slot_button_size))), 0, None, partial(ship_mod_scene.slot_panel.prev_page), None, self)
         ship_mod_scene.buttons["slot_page_right"] = button(flatpane("sprite", {"main":self.sprites["button_template_square_smaller"], "hover":self.sprites["button_template_square_smaller_dark"]}, sprite="main"), pg.Rect(self.to_scale((ship_mod_scene.ship_mod_panel_pos[0] + ship_mod_scene.ship_slot_size[0] - ship_mod_slot_button_size + ship_mod_scene.ship_slot_margin, ship_mod_scene.ship_mod_panel_pos[1] + SLOTS_IN_SHIP_MOD_PAGE * (ship_mod_scene.ship_slot_size[1] + ship_mod_scene.ship_slot_margin) + ship_mod_scene.ship_slot_margin)), self.to_scale((ship_mod_slot_button_size, ship_mod_slot_button_size))), 0, None, partial(ship_mod_scene.slot_panel.next_page), None, self)
 
-        ship_mod_scene.page_button_left_text = "<" # hahaaa have fun
+        ship_mod_scene.page_button_left_text = "<" # do you realistically need a translation for this?? The answer is no, shut up.
         ship_mod_scene.page_button_right_text = ">"
 
         ### ship window
         ### module storage window
+        ship_mod_scene.storage_slot_size = (100, 100)
+        ship_mod_scene.storage_slot_margin = 20
+
+        ship_mod_scene.storage_panel_size = (
+            (ship_mod_scene.storage_slot_size[0] + ship_mod_scene.storage_slot_margin) * SLOTS_IN_SHIP_MOD_STORAGE_PAGE[0] + ship_mod_scene.storage_slot_margin,
+            (SLOTS_IN_SHIP_MOD_STORAGE_PAGE[1] + 1) * (ship_mod_scene.storage_slot_size[1] + ship_mod_scene.storage_slot_margin) + ship_mod_scene.storage_slot_margin # the +1 is for the page buttons under
+        )
+
+        ship_mod_scene.storage_panel_pos = (
+            ship_mod_background_frame_pos[0] + ship_mod_background_frame_size[0] - (ship_mod_scene.storage_panel_size[0] + ship_mod_scene.ship_slot_margin),
+            ship_mod_background_frame_pos[1] + ship_mod_scene.ship_slot_margin
+        )
+
+        ship_mod_scene.storage_panel = ShipModPanel()
+        #self.regenerate_ship_mod_slot_panel()
+
+        ship_mod_scene.storage_panel_background = UIFrameBuilder.get_ui_frame(
+            self.to_scale_x(ship_mod_scene.storage_panel_size[0]),
+            self.to_scale_y(ship_mod_scene.storage_panel_size[1]),
+            self.sprites,
+            alpha=True
+        )
+
+        ship_mod_scene.storage_panel_rect = pg.Rect(self.to_scale(ship_mod_scene.storage_panel_pos), self.to_scale(ship_mod_scene.storage_panel_size))
 
         ### ship mod buttons
         ship_mod_scene.return_button_text = "<" # yes, this is hardcoded. judge me.
@@ -723,6 +790,7 @@ class MainEngine:
                     slot = RoketModuleSlot(
                                             slotId=slot_id,
                                             name=loaded_slot["name"],
+                                            position=loaded_slot["position"],
                                             allowedModuleTypes=loaded_slot["allowed_module_types"]
                                         ) # modules have to be loaded later from a save
                     
@@ -865,7 +933,7 @@ class MainEngine:
             if i > SLOTS_IN_SHIP_MOD_PAGE - 1:
                 i = 0
 
-            slot = ShipModInteractiveSlot(
+            slot = ShipModInteractiveSlotSlot(
                 self,
                 pg.Rect(
                     ship_mod.ship_mod_panel_pos[0] + ship_mod.ship_slot_margin,
@@ -876,6 +944,8 @@ class MainEngine:
                 self.sprites["mod_slot_empty"],
                 self.sprites["lajf"],
                 moduleSlot.name,
+                moduleSlot.pos,
+                moduleSlot.allowedModTypes,
                 moduleSlotID
             )
 
@@ -907,6 +977,67 @@ class MainEngine:
         for i in slot_panel.get_page(0).get_slots():
             print(i.get_slot_id(), i.title)
 
+    def regenerate_ship_storage_panel(self):
+        ship_mod = self.scene_handler.getScene("ship_modification")
+        storage_panel:ShipModPanel = ship_mod.storage_panel
+
+        # clear panel
+        storage_panel.clear_pages()
+
+        # create page data
+        displayed_modules = self.displayed_storage_modules
+
+        slots = []
+        x = 0
+        y = 0
+
+        for storage_slot in displayed_modules:
+            if x > SLOTS_IN_SHIP_MOD_STORAGE_PAGE[0] - 1:
+                x = 0
+                y += 1
+
+            if y > SLOTS_IN_SHIP_MOD_STORAGE_PAGE[1] - 1:
+                y = 0
+
+            slot = ShipModInteractiveSlotStorage(
+                self,
+                pg.Rect(
+                    x * (ship_mod.storage_slot_size[0] + ship_mod.storage_slot_margin) + ship_mod.storage_panel_pos[0] + ship_mod.storage_slot_margin,
+                    y * (ship_mod.storage_slot_size[1] + ship_mod.storage_slot_margin) + ship_mod.storage_panel_pos[1] + ship_mod.storage_slot_margin,
+                    ship_mod.storage_slot_size[0],
+                    ship_mod.storage_slot_size[1]
+                ),
+                self.sprites["mod_slot_empty"],
+                storage_slot.modSprites.get_sprite("main")
+            )
+
+            slots.append(slot)
+
+            x += 1
+
+        # fill pages with data
+        i = 0
+
+        page = ShipModPage() # template page
+        page.clear_slots()
+
+        for slotIndex in range(len(slots)):
+            if i > SLOTS_IN_SHIP_MOD_STORAGE_PAGE[0] * SLOTS_IN_SHIP_MOD_STORAGE_PAGE[1] - 1:
+                i = 0
+
+                storage_panel.add_page(ShipModPage(page.get_slots())) # essentially a dumb copy
+
+                page.clear_slots()
+
+            page.add_slot(slots[slotIndex])
+
+            i += 1
+
+        if len(page.get_slots()) > 0:
+            storage_panel.add_page(ShipModPage(page.get_slots()))
+
+        #print(len(storage_panel.get_page(0).get_slots()))
+
     def change_gamemode(self, gameModeName:str):
         self.selected_mode = gameModeName
 
@@ -920,6 +1051,18 @@ class MainEngine:
 
             case "mode_dummy":
                 print("dummy launch!")
+
+    def select_ship_mod_module_types(self, modTypes:list[str]):
+        #ship_mod_scene = self.scene_handler.getScene("ship_modification")
+
+        self.displayed_storage_modules = []
+
+        for key, module in self.roket_modules.items():
+            if module.modType in modTypes:
+                #print(module.modType)
+                self.displayed_storage_modules.append(module)
+
+        self.regenerate_ship_storage_panel()
 
     def cycle_main_menu_ship(self, direction:bool):
         active_ship_name = self.active_ship_name
@@ -1104,6 +1247,15 @@ class MainEngine:
             button.activation_detection(self.corrected_mouse_info)
             button.update_hold_time(self.corrected_mouse_info)
 
+        slot_panel:ShipModPanel = ship_mod.slot_panel
+
+        # update mod slots
+        for slot in slot_panel.get_current_page().get_slots():
+            if slot.activation_detection():
+                print("selected slot", slot.title, "types", slot.allowedModTypes)
+
+                self.select_ship_mod_module_types(slot.allowedModTypes)
+
     def ship_modification_render(self):
         ship_mod = self.scene_handler.getScene("ship_modification")
         
@@ -1137,12 +1289,42 @@ class MainEngine:
         for interactiveSlot in ship_mod.slot_panel.get_current_page().get_slots():
             interactiveSlot.render()
 
+        # draw ship storage panel
+        self.draw("sprite", self.LAYER_UI_BOTTOM, {"sprite":ship_mod.storage_panel_background, "rect":ship_mod.storage_panel_rect})
+
+        # draw buttons
+        """ for button in ship_mod.buttons:
+            if button not in ["slot_page_left", "slot_page_right"]:
+                ship_mod.buttons[button].render()
+
+        # draw page buttons
+        if len(ship_mod.slot_panel.get_pages()) > 1:
+            for button in ["slot_page_left", "slot_page_right"]:
+                ship_mod.buttons[button].render() """
+
+
+        """ if len(ship_mod.slot_panel.get_pages()) > 1:
+            self.draw_button_text(ship_mod.page_button_left_text, ship_mod.buttons["slot_page_left"])
+            self.draw_button_text(ship_mod.page_button_right_text, ship_mod.buttons["slot_page_right"]) """
+
+        # draw ship slot panel content
+        if len(ship_mod.storage_panel.get_pages()) > 0:
+            for interactiveSlot in ship_mod.storage_panel.get_current_page().get_slots():
+                interactiveSlot.render()
+
+        else:
+            self.draw("text", self.LAYER_UI_TOP, {"text":self.texts["ship_hangar_select_slot"], "rect":(0,0,0,0), "center":self.to_scale((ship_mod.storage_panel_pos[0] + ship_mod.storage_panel_size[0] / 2, ship_mod.storage_panel_pos[1] + ship_mod.storage_panel_size[1] / 2)), "no_bg":True, "color":roket_dark_blue, "font":self.ship_mod_slot_font})
+
     # INTERNAL RANDOM AHH HELPERS
 
     ##################
 
-    def draw_button_text(self, buttonText:str, button):
-        self.draw("text", self.LAYER_UI_TOP, {"text":buttonText, "no_bg":True, "font":self.button_font, "center":button.rect.center, "color":black})
+    def draw_button_text(self, buttonText:str, button, layer:int|None=None):
+        drawLayer = layer
+        if drawLayer == None:
+            drawLayer = self.LAYER_UI_TOP
+
+        self.draw("text", drawLayer, {"text":buttonText, "no_bg":True, "font":self.button_font, "center":button.rect.center, "color":black})
 
     def screen_to_game_coords(self, pos) -> tuple:
         return (pos[0] - self.blackbar_x_size_aka_renderer_blit_x_offset, pos[1] - self.blackbar_y_size_aka_renderer_blit_y_offset)
@@ -1211,6 +1393,31 @@ class MainEngine:
     def exit_game(self):
         print(f"{__name__}: exiting game")
         self.is_running = False
+
+    # popup windows
+
+    def add_popup_to_queue(self, popupToAdd:PopupWindow):
+        self.popup_queue.append(popupToAdd)
+
+    def show_popup_if_available(self):
+        if not self.get_popup_active() and len(self.popup_queue) > 0:
+            self.active_popup = self.popup_queue.pop(0)
+
+    def hide_active_popup(self):
+        self.active_popup = None
+
+    def get_popup_active(self):
+        if self.active_popup != None:
+            return True
+        else:
+            return False
+
+    def update_and_render_active_popup(self):
+        self.active_popup.update_buttons()
+
+        if self.get_popup_active(): # because of dismiss buttons ## its stupid, ik, judge me
+            self.active_popup.render()
+            self.draw("sprite",self.LAYER_POPUP_OVERLAY_SCREEN,{"rect":(0,0,0,0),"sprite":self.sprites["popup_overlay"]})
 
     # DEBUG OVERLAY
 
@@ -1465,8 +1672,16 @@ class MainEngine:
         # do main game logic
         self.do_logic()
 
+        # show popup if available
+        self.show_popup_if_available()
+
         # update and render active scene
-        self.scene_handler.updateScene()
+        if not self.get_popup_active():
+            self.scene_handler.updateScene()
+
+        else:
+            self.update_and_render_active_popup()
+        
         self.scene_handler.renderScene()
 
         # post frame stuff

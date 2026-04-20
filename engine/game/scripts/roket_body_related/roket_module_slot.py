@@ -1,9 +1,10 @@
 from game.scripts.roket_body_related.roket_module import RoketModule
 
 class RoketModuleSlot:
-    def __init__(self, slotId:int, name:str, allowedModuleTypes:list[str], module:RoketModule|None=None):
+    def __init__(self, slotId:int, name:str, position:tuple, allowedModuleTypes:list[str], module:RoketModule|None=None):
         self.slotId = slotId
         self.name = name # essentially display name
+        self.pos = position
         self.allowedModTypes = allowedModuleTypes
         self.module = None
         

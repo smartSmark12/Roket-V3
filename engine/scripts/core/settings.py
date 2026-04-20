@@ -42,7 +42,7 @@ ACTIVE_SETTINGS_PATH = "engine/game/settings/roket_settings.json"
 
 PERSISTENT_DATA_PATH = "engine/game/settings/persistent.json"
 
-DEFAULT_FONT_PATH = "engine/game/assets/fonts/Minecraft.otf"
+DEFAULT_FONT_PATH = "engine/game/assets/fonts/Monocraft.otf"
 
 DEFAULT_ROKET_BODY_PATH = "engine/game/roket_configs/roket_bodies/default_roket_bodies.json"
 DEFAULT_ROKET_MODULE_PATH = "engine/game/roket_configs/roket_modules/default_roket_modules.json"
@@ -60,10 +60,14 @@ SCENE_LABEL_FONT_SIZE = 60
 SHIP_MODIFICATION_SLOT_FONT_SIZE = 28
 
 SLOTS_IN_SHIP_MOD_PAGE = 4
+SLOTS_IN_SHIP_MOD_STORAGE_PAGE = [4, 6]
 MOD_SLOT_TITLE_LENGTH = 15
 
 TITLE_PLANET_SPAWNING_PERIOD = 8
 TITLE_PLANET_SPAWNING_ANICHANCE = 5 # its more like 1/antichance is the chance, so
+
+POPUP_WINDOW_SIZE = [640, 360]
+POPUP_WINDOW_TEXT_LENGTH = 32
 
 # server settings
 SERVER_CONNECTIONS:int = 4          # max connections the server will expect at start

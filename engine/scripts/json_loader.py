@@ -15,7 +15,7 @@ class JsonLoader:
     @staticmethod
     def load_from_file(filepath:str) -> dict:
         try:
-            with open(filepath, "r") as file:
+            with open(filepath, "r", encoding="utf-8") as file:
                 return json.load(file)
         except:
             print(f"JsonLoader:readError: couldn't read data from file {filepath}")
@@ -26,7 +26,7 @@ class JsonLoader:
         """ try: """
         if JsonLoader.create_new_file(filepath):
             print(f"JsonLoader: created new file at {filepath}")
-        with open(filepath, "w") as file:
+        with open(filepath, "w", encoding="utf-8") as file:
             file.write(json.dumps(data, indent=4))
         """ except:
             print(f"JsonLoader:writeError: couldn't write data:\n{data}\nto file:\n{filepath}") """

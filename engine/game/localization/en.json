@@ -14,6 +14,7 @@
         "main_menu_mode_career":"CAREER",
         "main_menu_mode_infinite":"ENDLESS",
         "main_menu_mode_dummy":"DUMMY",
-        "ship_hangar_hangar_text":"HANGAR"
+        "ship_hangar_hangar_text":"HANGAR",
+        "ship_hangar_select_slot":"No available modules"
     }
 }

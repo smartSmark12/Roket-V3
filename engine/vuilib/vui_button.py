@@ -4,7 +4,7 @@ from vuilib.vui_flatpane import flatpane
 """ from scripts.datablock import Datablock """
 
 class button:
-    def __init__(self, flatpane_sprite: flatpane, rect: pg.Rect | tuple, hold_time: int | float, on_hover_function, on_click_function, on_hold_function, appInstance):
+    def __init__(self, flatpane_sprite: flatpane, rect: pg.Rect | tuple, hold_time: int | float, on_hover_function, on_click_function, on_hold_function, appInstance, renderLayer:int|None=None):
         self.rect = rect
         self.sprite = flatpane_sprite
         self.hold_time = hold_time
@@ -22,6 +22,11 @@ class button:
             except:
                 self.app.ext_append_to_log(f"{__name__}: incorrect Rect type entered for button ({self.rect})")
                 self.rect = pg.Rect(100, 100, 100, 100)
+
+        if renderLayer == None:
+            self.renderLayer = self.app.LAYER_UI_BOTTOM
+        else:
+            self.renderLayer = renderLayer
 
     def activation_detection(self, mouse_info: tuple):
         if self.is_hovered(mouse_info[0]):
@@ -64,7 +69,7 @@ class button:
         self.sprite.set_active_sprite(spriteName)
 
     def render(self):
-        self.app.draw("sprite", self.app.LAYER_UI_BOTTOM, {"sprite":self.sprite.sprite, "rect":self.rect})
+        self.app.draw("sprite", self.renderLayer, {"sprite":self.sprite.sprite, "rect":self.rect})
 
     def on_hover(self):
         if self.on_hover_function != None:
