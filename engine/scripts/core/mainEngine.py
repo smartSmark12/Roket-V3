@@ -56,6 +56,8 @@ from engine.game.scripts.ship_modification_related.ship_modification_slot_storag
 from game.scripts.popup_windows.popup import PopupWindow
 from game.scripts.popup_windows.popup_info import PopupWindowInfo
 from game.scripts.popup_windows.popup_warning import PopupWindowWarning
+from game.scripts.popup_windows.popup_yes_no import PopupWindowYesNo
+from game.scripts.vuilib_extension.text_button import TextButton
 
 """ from game.game import MainGame """
 
@@ -335,6 +337,14 @@ class MainEngine:
         title_scene.buttons = {}
         title_scene.planets = []
 
+        ## create all title buttons
+        title_scene.buttons["play"] = TextButton(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_button_width) / 2), self.to_scale_y((HEIGHT - title_button_height) / 2 + title_button_y_offset), self.to_scale_x(title_button_width), self.to_scale_y(title_button_height)), 0, None, partial(self.scene_handler.setActiveScene, "main_menu"), None, self, title_scene.play_text)
+        title_scene.buttons["exit"] = TextButton(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_button_width) / 2), self.to_scale_y((HEIGHT - title_button_height) / 2 + 2 * title_button_y_offset), self.to_scale_x(title_button_width), self.to_scale_y(title_button_height)), 0, None, partial(self.exit_game), None, self, title_scene.exit_text)
+        
+        title_scene.buttons["settings"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_settings_button"], "hover":self.sprites["mainmenu_settings_button_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_square_button_size) / 2 - title_side_button_x_distance), self.to_scale_y((HEIGHT - title_square_button_size) / 2 + title_button_y_offset), self.to_scale_x(title_square_button_size), self.to_scale_y(title_square_button_size)), 0, None, partial(self.show_info_popup, "options pressed"), None, self)
+        title_scene.buttons["achievements"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_leaderboard_button"], "hover":self.sprites["mainmenu_leaderboard_button_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_square_button_size) / 2 + title_side_button_x_distance), self.to_scale_y((HEIGHT - title_square_button_size) / 2 + title_button_y_offset), self.to_scale_x(title_square_button_size), self.to_scale_y(title_square_button_size)), 0, None, partial(self.show_warning_popup, "achievements pressed"), None, self)
+
+
         ## main_menu
         main_menu_scene.launch_text = self.texts["main_menu_launch"] + " " + self.get_keybind_keycode_name_in_square_brackets("ui_forward")
         main_menu_scene.return_text = self.texts["main_menu_return"] + " " + self.get_keybind_keycode_name_in_square_brackets("ui_back")
@@ -347,6 +357,10 @@ class MainEngine:
         main_menu_scene.news_frame = UIFrameBuilder.get_ui_frame(self.to_scale_x(main_menu_news_frame_width), self.to_scale_y(main_menu_background_frame_height), self.sprites)
         main_menu_scene.news_frame_pos = (main_menu_news_frame_x, main_menu_background_frame_y)
         main_menu_scene.buttons = {}
+
+        main_menu_scene.buttons["launch"] = TextButton(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - main_menu_button_width) / 2), self.to_scale_y(main_menu_button_start_y), self.to_scale_x(main_menu_button_width), self.to_scale_y(main_menu_button_height)), 0, None, partial(self.launch_from_main_menu), None, self, main_menu_scene.launch_text)
+        main_menu_scene.buttons["return"] = TextButton(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - main_menu_button_width) / 2), self.to_scale_y(main_menu_button_start_y + main_menu_button_y_offset), self.to_scale_x(main_menu_button_width), self.to_scale_y(main_menu_button_height)), 0, None, partial(self.scene_handler.setActiveScene, "title"), None, self, main_menu_scene.return_text)
+
 
         ### ship frame
         ship_window_size_mult = 0.4
@@ -361,18 +375,23 @@ class MainEngine:
         ship_mod_button_size = (main_menu_button_width, main_menu_button_height)
         ship_mod_button_pos = (main_menu_ship_frame_x + (main_menu_ship_frame_width - ship_mod_button_size[0]) / 2, main_menu_background_frame_y + 420)
 
-        main_menu_scene.buttons["ship_switch_left"] = button(flatpane("sprite", {"main":self.sprites["button_template_vertical"], "hover":self.sprites["button_template_vertical_dark"]}, sprite="main"), pg.Rect(self.to_scale(ship_switch_left_button_pos), self.to_scale(ship_switch_size)), 0, None, partial(self.cycle_main_menu_ship, direction=0), None, self)
-        main_menu_scene.buttons["ship_switch_right"] = button(flatpane("sprite", {"main":self.sprites["button_template_vertical"], "hover":self.sprites["button_template_vertical_dark"]}, sprite="main"), pg.Rect(self.to_scale(ship_switch_right_button_pos), self.to_scale(ship_switch_size)), 0, None, partial(self.cycle_main_menu_ship, direction=1), None, self)
-        main_menu_scene.buttons["ship_modification"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale(ship_mod_button_pos), self.to_scale(ship_mod_button_size)), 0, None, partial(self.scene_handler.setActiveScene, "ship_modification"), None, self)
+        main_menu_scene.buttons["ship_switch_left"] = TextButton(flatpane("sprite", {"main":self.sprites["button_template_vertical"], "hover":self.sprites["button_template_vertical_dark"]}, sprite="main"), pg.Rect(self.to_scale(ship_switch_left_button_pos), self.to_scale(ship_switch_size)), 0, None, partial(self.cycle_main_menu_ship, direction=0), None, self, self.texts["main_menu_switch_left"])
+        main_menu_scene.buttons["ship_switch_right"] = TextButton(flatpane("sprite", {"main":self.sprites["button_template_vertical"], "hover":self.sprites["button_template_vertical_dark"]}, sprite="main"), pg.Rect(self.to_scale(ship_switch_right_button_pos), self.to_scale(ship_switch_size)), 0, None, partial(self.cycle_main_menu_ship, direction=1), None, self, self.texts["main_menu_switch_right"])
+        main_menu_scene.buttons["ship_modification"] = TextButton(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale(ship_mod_button_pos), self.to_scale(ship_mod_button_size)), 0, None, partial(self.scene_handler.setActiveScene, "ship_modification"), None, self, self.texts["main_menu_ship_modification"])
 
         main_menu_scene.ship_name_text = self.get_active_ship().get_property("displayName")
         main_menu_scene.ship_name_text_center = (main_menu_ship_frame_x + main_menu_ship_frame_width / 2, main_menu_background_frame_y + 50)
 
-        main_menu_scene.left_switch_text = self.texts["main_menu_switch_left"]
+        """ main_menu_scene.left_switch_text = self.texts["main_menu_switch_left"]
         main_menu_scene.right_switch_text = self.texts["main_menu_switch_right"]
-        main_menu_scene.mod_button_text = self.texts["main_menu_ship_modification"]
+        main_menu_scene.mod_button_text = self.texts["main_menu_ship_modification"] """
 
         ### gamemode frame
+        main_menu_scene.mode_texts = {}
+        main_menu_scene.mode_texts["mode_career"] = self.texts["main_menu_mode_career"]
+        main_menu_scene.mode_texts["mode_infinite"] = self.texts["main_menu_mode_infinite"]
+        main_menu_scene.mode_texts["mode_dummy"] = self.texts["main_menu_mode_dummy"]
+
         mode_button_size = (360, 146)
         mode_button_margin = 40
         mode_button_start_pos = (main_menu_mode_frame_x + mode_button_margin, main_menu_background_frame_y + mode_button_margin)
@@ -381,22 +400,6 @@ class MainEngine:
         main_menu_scene.buttons["mode_dummy"] = button(flatpane("sprite", {"main":self.sprites["button_mode_dummy_baw"], "hover":self.sprites["button_mode_dummy"]}, sprite="main"), pg.Rect(self.to_scale((mode_button_start_pos[0], mode_button_start_pos[1] + 2 * mode_button_size[1] + 2 * mode_button_margin)), self.to_scale(mode_button_size)), 0, None, partial(self.change_gamemode, "mode_dummy"), None, self)
 
         main_menu_scene.mode_button_names = ["mode_career", "mode_infinite", "mode_dummy"]
-
-        main_menu_scene.mode_texts = {}
-        main_menu_scene.mode_texts["mode_career"] = self.texts["main_menu_mode_career"]
-        main_menu_scene.mode_texts["mode_infinite"] = self.texts["main_menu_mode_infinite"]
-        main_menu_scene.mode_texts["mode_dummy"] = self.texts["main_menu_mode_dummy"]
-
-        ## create all title buttons
-        title_scene.buttons["play"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_button_width) / 2), self.to_scale_y((HEIGHT - title_button_height) / 2 + title_button_y_offset), self.to_scale_x(title_button_width), self.to_scale_y(title_button_height)), 0, None, partial(self.scene_handler.setActiveScene, "main_menu"), None, self)
-        title_scene.buttons["exit"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_button_width) / 2), self.to_scale_y((HEIGHT - title_button_height) / 2 + 2 * title_button_y_offset), self.to_scale_x(title_button_width), self.to_scale_y(title_button_height)), 0, None, partial(self.exit_game), None, self)
-        
-        title_scene.buttons["settings"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_settings_button"], "hover":self.sprites["mainmenu_settings_button_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_square_button_size) / 2 - title_side_button_x_distance), self.to_scale_y((HEIGHT - title_square_button_size) / 2 + title_button_y_offset), self.to_scale_x(title_square_button_size), self.to_scale_y(title_square_button_size)), 0, None, partial(self.show_info_popup, "options pressed"), None, self)
-        title_scene.buttons["achievements"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_leaderboard_button"], "hover":self.sprites["mainmenu_leaderboard_button_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_square_button_size) / 2 + title_side_button_x_distance), self.to_scale_y((HEIGHT - title_square_button_size) / 2 + title_button_y_offset), self.to_scale_x(title_square_button_size), self.to_scale_y(title_square_button_size)), 0, None, partial(self.show_warning_popup, "achievements pressed"), None, self)
-
-        ## create all main_menu buttons
-        main_menu_scene.buttons["launch"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - main_menu_button_width) / 2), self.to_scale_y(main_menu_button_start_y), self.to_scale_x(main_menu_button_width), self.to_scale_y(main_menu_button_height)), 0, None, partial(self.launch_from_main_menu), None, self)
-        main_menu_scene.buttons["return"] = button(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - main_menu_button_width) / 2), self.to_scale_y(main_menu_button_start_y + main_menu_button_y_offset), self.to_scale_x(main_menu_button_width), self.to_scale_y(main_menu_button_height)), 0, None, partial(self.scene_handler.setActiveScene, "title"), None, self)
 
         ## ship modification
         ship_mod_scene.buttons = {}
@@ -494,6 +497,8 @@ class MainEngine:
         ship_mod_scene.return_button_text = "<" # yes, this is hardcoded. judge me.
 
         ship_mod_scene.buttons["return"] = button(flatpane("sprite", {"main":self.sprites["button_template_square"], "hover":self.sprites["button_template_square_dark"]}, sprite="main"), pg.Rect(self.to_scale((ship_mod_background_frame_pos[0] + ship_mod_return_button_margin, ship_mod_background_frame_pos[1] + ship_mod_return_button_margin)), self.to_scale((ship_mod_return_button_size, ship_mod_return_button_size))), 0, None, partial(self.scene_handler.setActiveScene, "main_menu"), None, self)
+
+        self.show_choice_yes_no_popup("Are you sure whatever you're doing is worth it? This is a very long dummy text that is utterly useless for anything else :33")
 
     # VIRTUAL DISPLAY PREP
 
@@ -1136,8 +1141,8 @@ class MainEngine:
         self.render_version_info()
 
         # draw button texts
-        self.draw_button_text(title.play_text, title.buttons["play"])
-        self.draw_button_text(title.exit_text, title.buttons["exit"])
+        """ self.draw_button_text(title.play_text, title.buttons["play"])
+        self.draw_button_text(title.exit_text, title.buttons["exit"]) """
 
         for button in title.buttons:
             title.buttons[button].render()
@@ -1177,11 +1182,11 @@ class MainEngine:
         main_menu = self.scene_handler.getScene("main_menu")
         
         # draw button texts
-        self.draw_button_text(main_menu.launch_text, main_menu.buttons["launch"])
+        """ self.draw_button_text(main_menu.launch_text, main_menu.buttons["launch"])
         self.draw_button_text(main_menu.return_text, main_menu.buttons["return"])
         self.draw_button_text(main_menu.left_switch_text, main_menu.buttons["ship_switch_left"])
         self.draw_button_text(main_menu.right_switch_text, main_menu.buttons["ship_switch_right"])
-        self.draw_button_text(main_menu.mod_button_text, main_menu.buttons["ship_modification"])
+        self.draw_button_text(main_menu.mod_button_text, main_menu.buttons["ship_modification"]) """
 
         # draw background frame
         #self.draw("sprite", self.LAYER_UI_BOTTOM, {"sprite":main_menu.background_frame, "rect":(self.to_scale_x(main_menu.background_frame_pos[0]), self.to_scale_y(main_menu.background_frame_pos[1]), 0, 0)})
@@ -1386,7 +1391,7 @@ class MainEngine:
             return False
 
     def update_and_render_active_popup(self):
-        self.active_popup.update_buttons()
+        self.active_popup.update()
 
         if self.get_popup_active(): # because of dismiss buttons ## its stupid, ik, judge me
             self.active_popup.render()
@@ -1400,6 +1405,11 @@ class MainEngine:
     def show_warning_popup(self, text:str):
         self.add_popup_to_queue(
             PopupWindowWarning(self, text)
+        )
+
+    def show_choice_yes_no_popup(self, text:str):
+        self.add_popup_to_queue(
+            PopupWindowYesNo(self, text)
         )
 
     # DEBUG OVERLAY
