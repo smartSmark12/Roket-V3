@@ -44,6 +44,8 @@ PERSISTENT_DATA_PATH = "engine/game/settings/persistent.json"
 
 DEFAULT_FONT_PATH = "engine/game/assets/fonts/Monocraft.otf"
 
+DEFAULT_MOD_PATH = "mods"
+DEFAULT_CORE_MOD_PATH = "engine/game/internal_mods/core/"
 DEFAULT_ROKET_BODY_PATH = "engine/game/roket_configs/roket_bodies/default_roket_bodies.json"
 DEFAULT_ROKET_MODULE_PATH = "engine/game/roket_configs/roket_modules/default_roket_modules.json"
 DEFAULT_ROKET_MODULE_TYPE_PATH = "engine/game/roket_configs/roket_module_types/default_roket_module_types.json"

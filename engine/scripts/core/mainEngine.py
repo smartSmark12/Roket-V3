@@ -212,9 +212,6 @@ class MainEngine:
         self.keybind_path = DEFAULT_KEYBIND_PATH ## also temp
         self.load_keybinds()
 
-        # load roket bodies and modules / mods (even internals) in general
-        self.load_internal_mods()
-
         # set custom cursor
         cursor_offset_mult = 1 #100/16
         pg.mouse.set_cursor(
@@ -258,6 +255,17 @@ class MainEngine:
         # rocket config select
         #self.selected_roket_body = self.roket_bodies["legacy"]
 
+        # popup window setup
+        self.popup_queue = []
+        self.active_popup = None
+
+        self.sprites["popup_overlay"] = pg.Surface((self.to_scale((WIDTH,HEIGHT))))
+        self.sprites["popup_overlay"].set_alpha(150)
+        self.sprites["popup_overlay"].fill((0,0,0))
+
+        # load roket bodies and modules / mods (even internals) in general
+        self.load_core_mod()
+
         # add all scenes
         self.scene_handler.addScene(Scene(self, "title"))               # the main game title
         self.scene_handler.addScene(Scene(self, "main_menu"))           # main menu - root point
@@ -289,14 +297,6 @@ class MainEngine:
         title_scene.render = self.title_render
         main_menu_scene.render = self.main_menu_render
         ship_mod_scene.render = self.ship_modification_render
-
-        # popup window setup
-        self.popup_queue = []
-        self.active_popup = None
-
-        self.sprites["popup_overlay"] = pg.Surface((self.to_scale((WIDTH,HEIGHT))))
-        self.sprites["popup_overlay"].set_alpha(150)
-        self.sprites["popup_overlay"].fill((0,0,0))
 
         # override scene shis
 
@@ -556,11 +556,40 @@ class MainEngine:
 
     ##################
 
+    def load_mod(self, modPath:str):
+        modInfo = JsonLoader.load_from_file(modPath + "mod_info.json")
+
+        print("--------\nLoading mod file:\n")
+        print(f"{modInfo['mod_name']} ({modInfo['mod_id']}) by {modInfo['mod_author']} (v:{modInfo['mod_version']})")
+
+        self.show_info_popup(f"loaded mod: {modInfo['mod_name']} ({modInfo['mod_id']}) by {modInfo['mod_author']} (v:{modInfo['mod_version']})")
+
+        features = modInfo['mod_features']
+
+        for feature in features:
+            featurePath = modPath + features[feature]
+            match feature:
+                case "module_types":
+                    self.load_roket_module_types(featurePath)
+                case "modules":
+                    self.load_roket_modules(featurePath)
+                case "spawnables":
+                    self.load_spawnables(featurePath)
+                case "ships":
+                    self.load_roket_bodies(featurePath)
+                case "environment_objects": pass
+                case "environments": pass
+                case "levels": pass
+                case "careers": pass
+
     def load_internal_mods(self):
         self.load_spawnables()
         self.load_roket_module_types()
         self.load_roket_modules()
         self.load_roket_bodies()
+
+    def load_core_mod(self):
+        self.load_mod(DEFAULT_CORE_MOD_PATH)
 
     def load_localization(self):
         self.texts = {}
@@ -580,10 +609,10 @@ class MainEngine:
         # debug
         print(f"{__name__}: loaded localization: {self.localization_code}")
 
-    def load_spawnables(self):
+    def load_spawnables(self, path:str):
         self.roket_spawnables = {}
 
-        loaded_spawnables = JsonLoader.load_from_file(DEFAULT_ROKET_SPAWNABLE_PATH)
+        loaded_spawnables = JsonLoader.load_from_file(path)
 
         for spawnable_name, spawnable in loaded_spawnables["spawnables"].items():
 
@@ -645,10 +674,10 @@ class MainEngine:
 
         print("")
 
-    def load_roket_module_types(self):
+    def load_roket_module_types(self, path:str):
         self.roket_module_types = []
 
-        loaded_module_types = JsonLoader.load_from_file(DEFAULT_ROKET_MODULE_TYPE_PATH)
+        loaded_module_types = JsonLoader.load_from_file(path)
 
         for module_type in loaded_module_types["ship_module_types"]:
             if module_type not in self.roket_module_types:
@@ -663,10 +692,10 @@ class MainEngine:
 
         print("") # sep
 
-    def load_roket_modules(self): # need to make safe!
+    def load_roket_modules(self, path:str): # need to make safe!
         self.roket_modules = {}
 
-        loaded_modules = JsonLoader.load_from_file(DEFAULT_ROKET_MODULE_PATH)
+        loaded_modules = JsonLoader.load_from_file(path)
 
         for module_name, module in loaded_modules["ship_modules"].items():
 
@@ -709,10 +738,10 @@ class MainEngine:
 
         print("")
 
-    def load_roket_bodies(self): # need to make safe!
+    def load_roket_bodies(self, path:str): # need to make safe!
         self.roket_bodies = {}
 
-        loaded_bodies = JsonLoader.load_from_file(DEFAULT_ROKET_BODY_PATH)
+        loaded_bodies = JsonLoader.load_from_file(path)
 
         for body_name in loaded_bodies["ship_bodies"]:
             body = loaded_bodies["ship_bodies"][body_name]

@@ -1,0 +1,22 @@
+{
+    "version":"3.0.1",
+    "mod_version":"1.0.0",
+    "mod_id":"core",
+    "mod_author":"Arak",
+    "mod_name":"Core",
+    "mod_dependencies":
+    {
+
+    },
+    "mod_features":
+    {
+        "module_types":"default_roket_module_types.json",
+        "modules":"default_roket_modules.json",
+        "spawnables":"default_roket_spawnables.json",
+        "ships":"default_roket_bodies.json",
+        "environment_objects":"default_roket_environment_objects.json",
+        "environments":"default_roket_environments.json",
+        "careers":"default_roket_careers.json",
+        "levels":"default_roket_levels.json"   
+    }
+}
