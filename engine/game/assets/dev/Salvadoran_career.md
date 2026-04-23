@@ -26,9 +26,10 @@
     - [Miranda](#miranda)
       - [Shuttle](#shuttle)
     - [Dyrriani](#dyrriani)
-      - [Mary - working name](#mary---working-name)
+      - [Fragment](#fragment)
     - [Heliantus](#heliantus)
-      - [Ghost](#ghost)
+      - [Freighter - working name](#freighter---working-name)
+      - [Ghost - working name](#ghost---working-name)
     - [Salvadoran](#salvadoran)
       - [Second Sol](#second-sol)
 
@@ -132,18 +133,39 @@
 ## Ships
 
 ### Miranda
-Ships unlocked from the start
+*Ships unlocked from the start*
 
 #### Shuttle
+<img src="../img/ships/Legacy/ship1_anim1.png" alt="temp legacy" width="100"/>
 
 ### Dyrriani
+*Pirate inspired / war ships*
 
-#### Mary - working name
+#### Fragment
+<img src="../img/else/lajf_buff.png" alt="fragment" width="100"/>
+
+- highly modular
+- almost fully dependent on modules
+- SPAT themed (*Wing pirates from my cosmoteer? XD*)
 
 ### Heliantus
+*Modular, industrial, advanced ships*
 
-#### Ghost
+#### Freighter - working name
+<img src="../img/else/lajf_buff.png" alt="temp" width="100"/>
+
+- heavy modular freighter-like ship
+
+#### Ghost - working name
+<img src="../img/ships/Runner/Runner_anim1.png" alt="temp runner" width="100"/>
+
+- fast, cloaking ship (similar to runner)
+- only a few modules, strong engine and cloaking module, weak weapons
 
 ### Salvadoran
+*Powerful specialized endgame ships*
 
 #### Second Sol
+<img src="../img/else/lajf_buff.png" alt="second sol" width="100"/>
+
+- one single powerful core laser
