@@ -22,5 +22,8 @@
         "popup_window_choice_refuse":"NO",
         "popup_window_choice_continue":"CONTINUE",
         "popup_window_choice_cancel":"CANCEL"
+    },
+    "dialogues": {
+
     }
 }

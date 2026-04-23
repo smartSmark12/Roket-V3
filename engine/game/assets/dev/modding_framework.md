@@ -1,0 +1,91 @@
+# Modding framework outlook
+
+## Moddable asset list
+- Body related:
+  - Ships
+    - name
+    - displayName
+    - baseLives
+    - size (*the actual size of the ship ingame*)
+    - colliderSize (*size of the rectangle collider different from the physical size of the ship*)
+    - colliderOffset (*x, y offset of the collider relative to the ships center*)
+    - spriteSource
+    - sprites
+    - moduleSlots
+      - id (*~name*)
+      - name (*displayName*)
+      - position (*the actual position on the ship*)
+      - allowedModuleTypes
+  - Modules
+    - name
+    - displayName
+    - moduleType
+    - spriteSource (*either internal or external; a prefix of the sprite value*)
+    - sprite (*name of the sprite used in combination with the spriteSource prefix*)
+    - modifiers (*ship parameter modifier; eg.: moveSpeed, hullHealth*)
+    - actions (*an action and its cost (bound automatically?)*)
+  - ModuleTypes
+    - name
+  - Spawnables
+    - name
+    - displayName
+    - navigator (*one of the preset navigators used in combination with speed and action / event controlled spawnPosition*)
+    - speed
+    - size (*size of the sprite ingame*)
+    - colliderSize (*size of the active collider*)
+    - actions (*specified somewhere else already idrc*)
+    - spriteSource (*internal / external*)
+    - sprites (*a possibly animated flatpane (?)*)
+
+- Level related:
+  - Careers
+    - name
+    - displayName
+    - icon (*shown as a small square in the main menu career selection*)
+    - levels
+    - requirements
+      - beatenLevels
+      - beatenCareers
+    - allowedShips (*global rule for all levels in a career*)
+    - disallowedShips
+  - Levels
+    - name
+    - displayName
+    - icon (*shown as a small square in the main menu career selection*)
+    - stages (*each level can have multiple stages with different environments, spawnables, ...*)
+      - name
+      - stageChangeText (*displays as an overlay when the stage is reached; eg.: "8-2 // Light up the night"*)
+      - environment
+      - events
+        - random (*executed based on a set chance per spawnOpportunityTimeout*)
+          - spawnables (*eg.: asteroids, enemy drones*)
+          - shipAction (*eg.: scripted damage / heal*)
+        - forced (*executed at a set event; eg.: levelTime, score, stageChange*)
+          - spawnables
+          - shipAction
+          - unlockAction (*eg.: unlock a ship / module after beating a certain level / stage*)
+          - dialogue (*shows a specified dialogue screen*)
+    - requirements
+      - beatenLevels
+      - equippedModules (*only allows you to enter the level with a set module equipped on your currently selected ship*)
+      - equippedModuleTypes (*only allows you to enter if you have a specific moduleType module equipped; eg.: warpModuleType, weaponModuleType*)
+      - selectedShips (*allows the control of a specific ship equipped for a tutorial for example*)
+    - allowedShips
+    - disallowedShips
+  - Environments
+    - name
+    - backgroundColor
+    - environmentObjectEvents (*spawn a specified environmentObject*)
+      - random (*executed based on a set chance per spawnOpportunityTimeout*)
+      - forced (*executed at a set event; eg.: levelTime, score*)
+  - EnvironmentObjects (*objects without effect on the player; eg.: background parallax stars, planets flying by*)
+    - name
+    - moveVector (*the direction×speed the environmentObject moves by*)
+    - sprites (*a possibly animated flatpane (?)*)
+
+- Misc/Other:
+  - Localization
+    - code (*eg.: en, cz, pl*)
+    - name (*name displayed in settings, NOT an internal one*)
+    - texts
+    - dialogue

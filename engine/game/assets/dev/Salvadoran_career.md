@@ -32,6 +32,7 @@
       - [Ghost - working name](#ghost---working-name)
     - [Salvadoran](#salvadoran)
       - [Second Sol](#second-sol)
+      - [Monolith - working name](#monolith---working-name)
 
 ## name ideas
 [common to latin plant names](https://planterschoice.com/ask-the-experts/index-of-common-names-common-to-latin/)
@@ -159,7 +160,7 @@
 #### Ghost - working name
 <img src="../img/ships/Runner/Runner_anim1.png" alt="temp runner" width="100"/>
 
-- fast, cloaking ship (similar to runner)
+- fast, cloaking ship (similar to Runner)
 - only a few modules, strong engine and cloaking module, weak weapons
 
 ### Salvadoran
@@ -169,3 +170,9 @@
 <img src="../img/else/lajf_buff.png" alt="second sol" width="100"/>
 
 - one single powerful core laser
+
+#### Monolith - working name
+<img src="../img/else/lajf_buff.png" alt="temp" width="100"/>
+
+- Tonk-like heavy armored slow ship with a powerful core
+- can call reinforcements?? (drones?)
