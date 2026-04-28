@@ -31,6 +31,7 @@ MAX_CACHED_SIZE = 360*4
 
 ## game settings cause me be lazy :33
 DEFAULT_LOCALIZATION_CODE = "en"
+DEFAULT_LOCALIZATION_PATH = "engine/game/internal_mods/core/en.json"
 LOCALIZATION_PATH = "./engine/game/localization/"
 LOCALIZATION_POSTFIX = ".json"
 

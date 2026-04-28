@@ -58,6 +58,7 @@ from game.scripts.popup_windows.popup_info import PopupWindowInfo
 from game.scripts.popup_windows.popup_warning import PopupWindowWarning
 from game.scripts.popup_windows.popup_yes_no import PopupWindowYesNo
 from game.scripts.vuilib_extension.text_button import TextButton
+from game.scripts.localizationResource import LocalizationResource
 
 """ from game.game import MainGame """
 
@@ -206,7 +207,7 @@ class MainEngine:
 
         # load localization
         #self.localization_code = DEFAULT_LOCALIZATION_CODE ## temp
-        self.load_localization()
+        #self.load_localization()
 
         # load keybinds
         self.keybind_path = DEFAULT_KEYBIND_PATH ## also temp
@@ -263,8 +264,17 @@ class MainEngine:
         self.sprites["popup_overlay"].set_alpha(150)
         self.sprites["popup_overlay"].fill((0,0,0))
 
+        # create content dicts
+        self.create_empty_content_dicts()
+
+        # default localization for mod loading errors etc
+        self.load_default_localization()
+
         # load roket bodies and modules / mods (even internals) in general
         self.load_core_mod()
+
+        # 'use' the selected (and now loaded) localization resources
+        self.load_localization()
 
         # add all scenes
         self.scene_handler.addScene(Scene(self, "title"))               # the main game title
@@ -556,6 +566,14 @@ class MainEngine:
 
     ##################
 
+    def create_empty_content_dicts(self):
+        self.localization_resources = []
+        self.texts = {}
+        self.roket_spawnables = {}
+        self.roket_module_types = []
+        self.roket_modules = {}
+        self.roket_bodies = {}
+
     def load_mod(self, modPath:str):
         modInfo = JsonLoader.load_from_file(modPath + "mod_info.json")
 
@@ -567,7 +585,11 @@ class MainEngine:
         features = modInfo['mod_features']
 
         for feature in features:
-            featurePath = modPath + features[feature]
+            if type(features[feature]) == str:
+                featurePath = modPath + features[feature]
+            elif type(features[feature]) == list:
+                featurePath = [modPath + i for i in features[feature]]
+
             match feature:
                 case "module_types":
                     self.load_roket_module_types(featurePath)
@@ -581,8 +603,11 @@ class MainEngine:
                 case "environments": pass
                 case "levels": pass
                 case "careers": pass
+                case "localization":
+                    self.load_localization_resource(featurePath)
 
     def load_internal_mods(self):
+        self.load_localization()
         self.load_spawnables()
         self.load_roket_module_types()
         self.load_roket_modules()
@@ -590,27 +615,58 @@ class MainEngine:
 
     def load_core_mod(self):
         self.load_mod(DEFAULT_CORE_MOD_PATH)
+        
+    def load_localization_resource(self, path:str|list[str]):
+        paths = []
+
+        if type(path) == str:
+            paths.append(path)
+        else:
+            paths = path
+
+        for path in paths:
+
+            loaded_localization = JsonLoader.load_from_file(path)
+
+            code = loaded_localization['code']
+            name = loaded_localization['name']
+            path = path
+
+            self.create_localization_resource(code, name, path)
+    
+    def create_localization_resource(self, localizationCode:str, localizationName:str, localizationPath:str): # dont yell at me, i get it. this whole thing sucks ass (but it works haha)
+        if localizationCode in [r.get_code() for r in self.localization_resources]:
+            [r for r in self.localization_resources if r.get_code() == localizationCode][0].add_path(localizationPath)
+        else:
+            self.localization_resources.append(LocalizationResource(localizationCode, localizationName, [localizationPath]))
+
+    def load_default_localization(self):
+        # load default localization
+        loaded_localization = JsonLoader.load_from_file(DEFAULT_LOCALIZATION_PATH)
+
+        self.texts = loaded_localization["texts"]
 
     def load_localization(self):
-        self.texts = {}
 
         # load default localization
-        loaded_localization = JsonLoader.load_from_file(LOCALIZATION_PATH + DEFAULT_LOCALIZATION_CODE + LOCALIZATION_POSTFIX)
+        loaded_localization = JsonLoader.load_from_file(DEFAULT_LOCALIZATION_PATH)
 
         self.texts = loaded_localization["texts"]
 
         # load new localization
-        loaded_localization = JsonLoader.load_from_file(LOCALIZATION_PATH + self.localization_code + LOCALIZATION_POSTFIX)
+        localization_res = [r for r in self.localization_resources if r.get_code() == self.localization_code][0]
 
-        # replace default localization
-        for text in loaded_localization["texts"]:
-            self.texts[text] = loaded_localization["texts"][text]
+        for path in localization_res.get_paths():
+            loaded_localization = JsonLoader.load_from_file(path)
+
+            # replace default localization
+            for text in loaded_localization["texts"]:
+                self.texts[text] = loaded_localization["texts"][text]
 
         # debug
-        print(f"{__name__}: loaded localization: {self.localization_code}")
+        print(f"{__name__}: loaded localization: {localization_res.get_code()} ({localization_res.get_name()})")
 
     def load_spawnables(self, path:str):
-        self.roket_spawnables = {}
 
         loaded_spawnables = JsonLoader.load_from_file(path)
 
@@ -675,7 +731,6 @@ class MainEngine:
         print("")
 
     def load_roket_module_types(self, path:str):
-        self.roket_module_types = []
 
         loaded_module_types = JsonLoader.load_from_file(path)
 
@@ -693,7 +748,6 @@ class MainEngine:
         print("") # sep
 
     def load_roket_modules(self, path:str): # need to make safe!
-        self.roket_modules = {}
 
         loaded_modules = JsonLoader.load_from_file(path)
 
@@ -739,7 +793,6 @@ class MainEngine:
         print("")
 
     def load_roket_bodies(self, path:str): # need to make safe!
-        self.roket_bodies = {}
 
         loaded_bodies = JsonLoader.load_from_file(path)
 

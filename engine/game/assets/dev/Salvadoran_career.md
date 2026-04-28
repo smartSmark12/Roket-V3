@@ -16,7 +16,7 @@
       - [Heliantus United](#heliantus-united)
       - [Calendula arvensis](#calendula-arvensis)
       - [Borealis recovery](#borealis-recovery)
-      - [Adrift between the stars](#adrift-between-the-stars)
+      - [Adrift amidst the stars](#adrift-amidst-the-stars)
     - [Salvadoran system](#salvadoran-system)
       - [Another sun](#another-sun)
       - [Salvadoran system](#salvadoran-system-1)
@@ -108,7 +108,7 @@
 - a hiding game
   - scanning enemies which one-shot you and cant be destroyed, only avoided using the ghost's cloaking device
 
-#### Adrift between the stars
+#### Adrift amidst the stars
 - warp out of Heliantus
 
 ### Salvadoran system
@@ -124,6 +124,8 @@
 
 #### Celestial stability
 - purple system color
+- a collapsing black hole based system
+  - level themed about swift escape rather than fight, almost accidentally placing you at the final bossfight
 
 #### Salvadoran system II - Finale
 
