@@ -24,6 +24,6 @@
         "popup_window_choice_cancel":"CANCEL"
     },
     "dialogues": {
-
+        "test_dialogue":"The missile knows where it is, because it knows where it isn't"
     }
 }

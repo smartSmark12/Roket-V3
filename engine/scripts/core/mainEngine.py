@@ -183,6 +183,8 @@ class MainEngine:
     def game_on_init(self):
         # set render layers
         self.LAYER_UI_BOTTOM = 7
+        self.LAYER_UI_TOP_BOTTOM = self.LAYER_UI_TOP + 1
+        self.LAYER_UI_TOP_TOP = self.LAYER_UI_TOP_BOTTOM + 1
         self.LAYER_TITLE_PLANETS = 4 # actually just a reference - animations take only numbers from animations_to_create.py
 
         # alarms setup
@@ -1068,7 +1070,9 @@ class MainEngine:
                     ship_mod.storage_slot_size[1]
                 ),
                 self.sprites["mod_slot_empty"],
-                storage_slot.modSprites.get_sprite("main")
+                storage_slot.modSprites.get_sprite("main"),
+                storage_slot.displayName,
+                ["dummy text", "also a dummy text", "chichichicha"]
             )
 
             slots.append(slot)
@@ -1308,6 +1312,7 @@ class MainEngine:
             button.update_hold_time(self.corrected_mouse_info)
 
         slot_panel:ShipModPanel = ship_mod.slot_panel
+        storage_panel:ShipModPanel = ship_mod.storage_panel
 
         # update mod slots
         for slot in slot_panel.get_current_page().get_slots():
@@ -1315,6 +1320,11 @@ class MainEngine:
                 print("selected slot", slot.title, "types", slot.allowedModTypes)
 
                 self.select_ship_mod_module_types(slot.allowedModTypes)
+
+        if storage_panel.get_current_page() and len(storage_panel.get_current_page().get_slots()) > 0:
+            for slot in storage_panel.get_current_page().get_slots():
+                if slot.activation_detection():
+                    print("selected", slot.title, "from storage")
 
     def ship_modification_render(self):
         ship_mod = self.scene_handler.getScene("ship_modification")

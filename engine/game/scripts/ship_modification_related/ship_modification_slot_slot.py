@@ -20,7 +20,10 @@ class ShipModInteractiveSlotSlot(ShipModInteractiveSlot):
 
     def render(self):
         # background
-        self.app.draw("rect", self.app.LAYER_UI_TOP, {"rect":self.corrected_rect, "color":roket_very_light_blue})
+        if not self.hovered:
+            self.app.draw("rect", self.app.LAYER_UI_TOP, {"rect":self.corrected_rect, "color":roket_very_light_blue})
+        else:
+            self.app.draw("rect", self.app.LAYER_UI_TOP, {"rect":self.corrected_rect, "color":roket_hover_very_light_blue})
         self.app.draw("rect", self.app.LAYER_UI_TOP, {"rect":self.corrected_rect, "color":roket_yellow, "width":self.app.to_scale_x(8)})
 
         # icon

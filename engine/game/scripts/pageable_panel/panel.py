@@ -16,7 +16,7 @@ class Panel:
                 print("mod page getter fail")
                 return None
         else:
-            print("mod page getter fail - no pages")
+            #print("mod page getter fail - no pages")
             return None
             
     def get_pages(self):

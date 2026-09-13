@@ -8,7 +8,7 @@
 
 ### params
 - spawn [ObjectName:str, position:tuple]
-- explode []
+- explode [params:tuple[position:tuple[float, float], radius:float, damage:int]]
 - heal [amount:int]
 - damage [amount:int]
 - param [paramName:str, value:any]

@@ -16,7 +16,7 @@ class ShipModInteractiveSlot:
         self.hovered = False
         self.clicked = False
 
-    def render(self):
+    def render(self): # overriden in slotslot
         # background
         self.app.draw("rect", self.app.LAYER_UI_TOP, {"rect":self.corrected_rect, "color":roket_very_light_blue})
         self.app.draw("rect", self.app.LAYER_UI_TOP, {"rect":self.corrected_rect, "color":roket_yellow, "width":self.app.to_scale_x(8)})
