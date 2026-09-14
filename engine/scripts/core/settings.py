@@ -9,6 +9,8 @@ HEIGHT = 1080
 RESOLUTION = (WIDTH, HEIGHT)
 IN_FULLSCREEN = False
 
+EXTENDED_DEBUG_ENABLED = False
+
 # rendering options
 FPS_LOGIC_LIMIT:int = 400#120           # limits UPS ## TBA
 FPS_RENDER_LIMIT:int = 0            # limits rendered FPS

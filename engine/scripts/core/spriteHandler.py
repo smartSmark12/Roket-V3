@@ -3,7 +3,7 @@ import os
 import csv
 from functools import lru_cache
 
-from scripts.core.settings import DEFAULT_SPRITE_PATH, DEFAULT_SPRITE_JSON_PATH, WIDTH, HEIGHT, MAX_CACHED_SIZE
+from scripts.core.settings import DEFAULT_SPRITE_PATH, DEFAULT_SPRITE_JSON_PATH, WIDTH, HEIGHT, MAX_CACHED_SIZE, EXTENDED_DEBUG_ENABLED
 from scripts.json_loader import JsonLoader
 
 class SpriteHandlerJSON:
@@ -15,7 +15,8 @@ class SpriteHandlerJSON:
         self.load_sprites()
 
     def load_sprite(self, spriteName:str, spriteFilePath:str, size:tuple, convert:str):
-        print(f"{__name__}: loading sprite...")
+        if EXTENDED_DEBUG_ENABLED:
+            print(f"{__name__}: loading sprite...")
 
         image = None
 
@@ -42,7 +43,8 @@ class SpriteHandlerJSON:
         
         self.app.sprites[spriteName] = image
 
-        print(f"{__name__}: loaded sprite {spriteName}")
+        if EXTENDED_DEBUG_ENABLED:
+            print(f"{__name__}: loaded sprite {spriteName}")
 
         return image
 
