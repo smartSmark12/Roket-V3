@@ -14,7 +14,7 @@ FPS_LOGIC_LIMIT:int = 400#120           # limits UPS ## TBA
 FPS_RENDER_LIMIT:int = 0            # limits rendered FPS
 SYNC_UPS_FPS:bool = 1               # should client synchronize UPS and FPS? (leads to better UPS-FPS ratio) - EXPERIMENTAL!!
 RENDER_LAYERS:int = 20              # set how many layers your game uses; start from 0, empty layers usually don't impact performance much
-MULTITHREADED_RENDERING:bool = True # use a newer multithreaded rendering method - EXPERIMENTAL
+MULTITHREADED_RENDERING:bool = False # use a newer multithreaded rendering method - EXPERIMENTAL
 
 OGL_ENABLED:bool = 0                # opengl implementation for shader support (currently resource heavy)
 DEFAULT_SHADER_PATH:str = "./engine/shaders/default" # adds '.vert' & '.frag' automatically

@@ -1558,7 +1558,8 @@ class MainEngine:
 
     def render_default_debug_overlay(self):
         self.draw("text", self.LAYER_UI_DEBUG, {"text":f"UPS: {str(int(self.clock.get_fps()))}", "rect":(10, 0, 0, 0), "font":self.debug_overlay_font, "no_bg":True, "color":green})
-        self.draw("text", self.LAYER_UI_DEBUG, {"text":f"FPS: {str(int(self.renderer.clock.get_fps()))}", "rect":(10, 50, 0, 0), "font":self.debug_overlay_font, "no_bg":True, "color":red})
+        if MULTITHREADED_RENDERING:
+            self.draw("text", self.LAYER_UI_DEBUG, {"text":f"FPS: {str(int(self.renderer.clock.get_fps()))}", "rect":(10, 50, 0, 0), "font":self.debug_overlay_font, "no_bg":True, "color":red})
 
     def render_debug_overlay(self):
         self.draw("text", self.LAYER_UI_DEBUG, {"text":f"F/U: {str(round(self.renderer.clock.get_fps() / self.clock.get_fps(), 3))}", "rect":(10, 100, 0, 0), "font":self.debug_overlay_font, "no_bg":True, "color":white})
