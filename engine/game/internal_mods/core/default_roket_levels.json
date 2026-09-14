@@ -1,0 +1,116 @@
+{
+    "levels":
+    {
+        "core_miranda_1":
+        {
+            "display_name":"Harsh landing",
+            "icon":"",
+            "stages":
+            {
+                "1":
+                {
+                    "stage_change_text":"0-1-1 // Harsh landing",
+                    "environment":"core_miranda",
+                    "events":
+                    {
+                        "random":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ]
+                        },
+                        "forced":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ],
+                            "unlock_action":
+                            [
+
+                            ],
+                            "dialogue":
+                            [
+
+                            ]
+                        }
+                    }
+                },
+                "2":
+                {
+                    "stage_change_text":"0-1-2 // ",
+                    "environment":"core_miranda",
+                    "events":
+                    {
+                        "random":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ]
+                        },
+                        "forced":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ],
+                            "unlock_action":
+                            [
+
+                            ],
+                            "dialogue":
+                            [
+                                
+                            ]
+                        }
+                    }
+                }
+            },
+            "requirements":
+            {
+                "beaten_levels":
+                [
+
+                ],
+                "selected_ships":
+                [
+
+                ],
+                "equipped_module_types":
+                [
+
+                ],
+                "equipped_modules":
+                [
+
+                ]
+            },
+            "allowed_ships":
+            [
+
+            ],
+            "disallowed_ships":
+            [
+
+            ]
+        }
+    }
+}
