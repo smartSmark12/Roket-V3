@@ -1,3 +1,10 @@
+# modified Nebula legacy renderer
+# for linux compatibility, the ThreadedGameRenderer is unused
+# also using the "render_old" version, as the newer one
+# is too unfinished to have any real benefit
+#
+# this will all be likely replaced by the NRS Nova eventually
+
 import pygame as pg
 import moderngl as mgl
 
@@ -98,7 +105,7 @@ class MainGameRender:
 
         self.current_log = []
 
-    def use_renderer(self, useNew:bool=True): # no longer in use
+    def use_renderer(self, useNew:bool=True): # no longer in use; look above
         if useNew: self.render = self.render_new
         else: self.render = self.render_old
 
