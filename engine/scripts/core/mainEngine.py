@@ -602,11 +602,16 @@ class MainEngine:
                 case "ships":
                     self.load_roket_bodies(featurePath)
                 case "environment_objects": pass
-                case "environments": pass
+                case "environments":
+                    self.load_environments(featurePath)
                 case "levels": pass
                 case "careers": pass
                 case "localization":
                     self.load_localization_resource(featurePath)
+
+        # SANITY mod check here; until then, load everything upon a promise
+        # only now will the mod references (level->environments->environment_objects) be checked
+        # cause else it just does fucking whatever it wants and its not good
 
     def load_internal_mods(self):
         self.load_localization()
@@ -667,6 +672,13 @@ class MainEngine:
 
         # debug
         print(f"{__name__}: loaded localization: {localization_res.get_code()} ({localization_res.get_name()})")
+
+    def load_environments(self, path:str):
+
+        loaded_environments = JsonLoader.load_from_file(path)
+
+        for environment_name, environment in self.load_environments["environments"]:
+            pass
 
     def load_spawnables(self, path:str):
 
