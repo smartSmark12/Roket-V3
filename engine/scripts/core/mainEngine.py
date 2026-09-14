@@ -47,8 +47,10 @@ from game.scripts.roket_body_related.roket_module import RoketModule # load modu
 from game.scripts.roket_body_related.roket_module_slot import RoketModuleSlot
 from engine.game.scripts.roket_spawnable_related.spawnable_object import SpawnableObject
 from engine.game.scripts.roket_spawnable_related.spawnable_prefab import SpawnablePrefab
+from engine.game.scripts.environment_related.environment import Environment
 from game.scripts.roket_spawnable_related.spawnable_navigator import Navigator
 from game.scripts.gamestate.gamestate_object import GameState
+from game.scripts.level_related.level import Level
 from game.scripts.ship_modification_related.ship_modification_panel import ShipModPanel
 from game.scripts.ship_modification_related.ship_modification_page import ShipModPage
 from engine.game.scripts.ship_modification_related.ship_modification_slot_slot import ShipModInteractiveSlotSlot
@@ -572,6 +574,9 @@ class MainEngine:
         self.localization_resources = []
         self.texts = {}
         self.roket_spawnables = {}
+        self.roket_environments = {}
+        self.roket_careers = {}
+        self.roket_levels = {}
         self.roket_module_types = []
         self.roket_modules = {}
         self.roket_bodies = {}
@@ -604,7 +609,8 @@ class MainEngine:
                 case "environment_objects": pass
                 case "environments":
                     self.load_environments(featurePath)
-                case "levels": pass
+                case "levels": 
+                    self.load_levels(featurePath)
                 case "careers": pass
                 case "localization":
                     self.load_localization_resource(featurePath)
@@ -677,8 +683,45 @@ class MainEngine:
 
         loaded_environments = JsonLoader.load_from_file(path)
 
-        for environment_name, environment in self.load_environments["environments"]:
-            pass
+        for environment_name, environment in loaded_environments["environments"].items():
+            env = Environment(
+                appInstance=self,
+                backgroundColor=environment["background_color"],
+                objectEvents=environment["environment_object_events"]
+            )
+
+            self.roket_environments[environment_name] = env
+
+        print("--------\nLoaded environments:\n")
+        
+        for environment_name, environment in self.roket_environments.items():
+            print(f"{environment_name}, with {len(environment.objectEvents["random"]) + len(environment.objectEvents["forced"])} events")
+
+        print("") # sep
+
+    def load_levels(self, path:str):
+
+        loaded_levels = JsonLoader.load_from_file(path)
+
+        for level_name, level in loaded_levels["levels"].items():
+            lev = Level(
+                appInstance=self,
+                displayName=level["display_name"],
+                icon=level["icon"], # needs to be loaded and scaled actually or use the image frame idk
+                stages=level["stages"],
+                requirements=level["requirements"],
+                allowedShips=level["allowed_ships"],
+                disallowedShips=level["disallowed_ships"]
+            )
+
+            self.roket_levels[level_name] = lev
+
+        print("--------\nLoaded levels:\n")
+
+        for level_name, level in self.roket_levels.items():
+            print(f"{level.displayName} ({level_name})")
+
+        print("") # sep
 
     def load_spawnables(self, path:str):
 
