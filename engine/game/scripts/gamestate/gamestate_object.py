@@ -1,8 +1,8 @@
-from game.scripts.roket_body_related.roket_body import RoketBody
-from game.scripts.roket_spawnable_related.spawnable_object import SpawnableObject
-from game.scripts.obstacle_related.obstacle import Obstacle
-from game.scripts.level_related.level import Level
-from game.scripts.environment_related.environment import Environment
+from engine.game.scripts.modloader.roket_body_related.roket_body import RoketBody
+from engine.game.scripts.modloader.roket_spawnable_related.spawnable_object import SpawnableObject
+from engine.game.scripts.modloader.obstacle_related.obstacle import Obstacle
+from engine.game.scripts.modloader.level_related.level import Level
+from engine.game.scripts.modloader.environment_related.environment import Environment
 
 class GameState:
     def __init__(self):

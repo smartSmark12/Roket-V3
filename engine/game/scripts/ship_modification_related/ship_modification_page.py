@@ -1,4 +1,4 @@
-from game.scripts.roket_body_related.roket_module_slot import RoketModuleSlot
+from engine.game.scripts.modloader.roket_body_related.roket_module_slot import RoketModuleSlot
 from engine.game.scripts.ship_modification_related.ship_modification_slot_slot import ShipModInteractiveSlot
 from game.scripts.pageable_panel.page import Page
 

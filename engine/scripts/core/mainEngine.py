@@ -39,18 +39,20 @@ from scripts.core.scenes.scene_handler import SceneHandler
 from scripts.core.scenes.scene import Scene
 from scripts.json_loader import JsonLoader
 from game.scripts.alarm import Alarm
+
 from game.scripts.ui_frame_builder import UIFrameBuilder
 from game.scripts.sprite_window import SpriteWindow
 from scripts.core.settings import GAME_NAME, DEFAULT_SCENE_NAME
-from game.scripts.roket_body_related.roket_body import RoketBody
-from game.scripts.roket_body_related.roket_module import RoketModule # load modules from json file configs
-from game.scripts.roket_body_related.roket_module_slot import RoketModuleSlot
-from engine.game.scripts.roket_spawnable_related.spawnable_object import SpawnableObject
-from engine.game.scripts.roket_spawnable_related.spawnable_prefab import SpawnablePrefab
-from engine.game.scripts.environment_related.environment import Environment
-from game.scripts.roket_spawnable_related.spawnable_navigator import Navigator
+from game.scripts.modloader.modloader import ModLoader
+from engine.game.scripts.modloader.roket_body_related.roket_body import RoketBody
+from engine.game.scripts.modloader.roket_body_related.roket_module import RoketModule # load modules from json file configs
+from engine.game.scripts.modloader.roket_body_related.roket_module_slot import RoketModuleSlot
+from engine.game.scripts.modloader.roket_spawnable_related.spawnable_object import SpawnableObject
+from engine.game.scripts.modloader.roket_spawnable_related.spawnable_prefab import SpawnablePrefab
+from engine.game.scripts.modloader.environment_related.environment import Environment
+from engine.game.scripts.modloader.roket_spawnable_related.spawnable_navigator import Navigator
 from game.scripts.gamestate.gamestate_object import GameState
-from game.scripts.level_related.level import Level
+from engine.game.scripts.modloader.level_related.level import Level
 from game.scripts.ship_modification_related.ship_modification_panel import ShipModPanel
 from game.scripts.ship_modification_related.ship_modification_page import ShipModPage
 from engine.game.scripts.ship_modification_related.ship_modification_slot_slot import ShipModInteractiveSlotSlot
@@ -60,7 +62,7 @@ from game.scripts.popup_windows.popup_info import PopupWindowInfo
 from game.scripts.popup_windows.popup_warning import PopupWindowWarning
 from game.scripts.popup_windows.popup_yes_no import PopupWindowYesNo
 from game.scripts.vuilib_extension.text_button import TextButton
-from game.scripts.localizationResource import LocalizationResource
+from engine.game.scripts.modloader.localization_related.localizationResource import LocalizationResource
 
 """ from game.game import MainGame """
 
@@ -274,11 +276,16 @@ class MainEngine:
         # default localization for mod loading errors etc
         self.load_default_localization()
 
+        # load modloader and all enabled mods (currently only internal)
+        self.modloader = ModLoader(self)
+
+        self.modloader.reload_mods()
+
         # load roket bodies and modules / mods (even internals) in general
-        self.load_core_mod()
+        #self.load_core_mod()
 
         # 'use' the selected (and now loaded) localization resources
-        self.load_localization()
+        #self.load_localization()
 
         # add all scenes
         self.scene_handler.addScene(Scene(self, "title"))               # the main game title

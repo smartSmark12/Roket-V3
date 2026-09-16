@@ -1,4 +1,4 @@
-from game.scripts.roket_body_related.roket_module import RoketModule
+from engine.game.scripts.modloader.roket_body_related.roket_module import RoketModule
 
 class RoketModuleSlot:
     def __init__(self, slotId:int, name:str, position:tuple, allowedModuleTypes:list[str], module:RoketModule|None=None):

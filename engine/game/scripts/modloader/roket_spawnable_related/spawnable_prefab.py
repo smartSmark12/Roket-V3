@@ -1,5 +1,5 @@
-from engine.game.scripts.roket_spawnable_related.spawnable_object import SpawnableObject
-from game.scripts.roket_spawnable_related.spawnable_navigator import Navigator
+from engine.game.scripts.modloader.roket_spawnable_related.spawnable_object import SpawnableObject
+from engine.game.scripts.modloader.roket_spawnable_related.spawnable_navigator import Navigator
 from vuilib.vui_flatpane import flatpane
 
 import pygame as pg
