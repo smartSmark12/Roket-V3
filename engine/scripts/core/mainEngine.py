@@ -271,15 +271,20 @@ class MainEngine:
         self.sprites["popup_overlay"].fill((0,0,0))
 
         # create content dicts
-        self.create_empty_content_dicts()
+        #self.create_empty_content_dicts()
 
         # default localization for mod loading errors etc
-        self.load_default_localization()
+        #self.load_default_localization()
 
         # load modloader and all enabled mods (currently only internal)
         self.modloader = ModLoader(self)
+        
+        self.texts = {}
+        
+        self.modloader._load_default_localization()
 
-        self.modloader.reload_mods()
+        self.load_core_mod() #reload_mods()
+        self.modloader.use_localization(self.localization_code)
 
         # load roket bodies and modules / mods (even internals) in general
         #self.load_core_mod()
@@ -634,7 +639,7 @@ class MainEngine:
         self.load_roket_bodies()
 
     def load_core_mod(self):
-        self.load_mod(DEFAULT_CORE_MOD_PATH)
+        self.modloader.load_mod(DEFAULT_CORE_MOD_PATH)
         
     def load_localization_resource(self, path:str|list[str]):
         paths = []
@@ -1183,7 +1188,7 @@ class MainEngine:
 
         self.displayed_storage_modules = []
 
-        for key, module in self.roket_modules.items():
+        for key, module in self.modloader.mod_modules.items():
             if module.modType in modTypes:
                 #print(module.modType)
                 self.displayed_storage_modules.append(module)
@@ -1192,7 +1197,7 @@ class MainEngine:
 
     def cycle_main_menu_ship(self, direction:bool):
         active_ship_name = self.active_ship_name
-        ship_names = list(self.roket_bodies.keys())
+        ship_names = list(self.modloader.mod_bodies.keys())
 
         active_ship_name_index = ship_names.index(active_ship_name)
 
@@ -1211,7 +1216,7 @@ class MainEngine:
         self.regenerate_ship_mod_slot_panel()
         
     def set_active_ship(self, shipName:str):
-        ship_names = list(self.roket_bodies.keys())
+        ship_names = list(self.modloader.mod_bodies.keys())
 
         if shipName not in ship_names:
             print("ship not found ig?")
@@ -1225,7 +1230,7 @@ class MainEngine:
             self.scene_handler.getScene("main_menu").ship_name_text = self.get_active_ship().get_property("displayName")
 
     def get_active_ship(self) -> RoketBody:
-        return self.roket_bodies.get(self.active_ship_name)
+        return self.modloader.mod_bodies.get(self.active_ship_name)
     
     def get_ingame_ship(self):
         return self.gamestate.get_roket_body()

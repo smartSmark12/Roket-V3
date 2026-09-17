@@ -1,5 +1,5 @@
 {
-    "ship_module_types":
+    "module_types":
     {
         "EngineModuleType":null,
         "HullModuleType":null,
