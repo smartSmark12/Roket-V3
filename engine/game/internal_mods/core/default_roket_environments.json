@@ -1,0 +1,33 @@
+{
+    "environments":
+    {
+        "core_miranda":
+        {
+            "background_color":[255,255,0],
+            "environment_object_events":{
+                "random":
+                [
+
+                ],
+                "forced":
+                [
+
+                ]
+            }
+        },
+        "core_miranda_test":
+        {
+            "background_color":[255,255,0],
+            "environment_object_events":{
+                "random":
+                [
+
+                ],
+                "forced":
+                [
+
+                ]
+            }
+        }
+    }
+}

@@ -39,16 +39,20 @@ from scripts.core.scenes.scene_handler import SceneHandler
 from scripts.core.scenes.scene import Scene
 from scripts.json_loader import JsonLoader
 from game.scripts.alarm import Alarm
+
 from game.scripts.ui_frame_builder import UIFrameBuilder
 from game.scripts.sprite_window import SpriteWindow
 from scripts.core.settings import GAME_NAME, DEFAULT_SCENE_NAME
-from game.scripts.roket_body_related.roket_body import RoketBody
-from game.scripts.roket_body_related.roket_module import RoketModule # load modules from json file configs
-from game.scripts.roket_body_related.roket_module_slot import RoketModuleSlot
-from engine.game.scripts.roket_spawnable_related.spawnable_object import SpawnableObject
-from engine.game.scripts.roket_spawnable_related.spawnable_prefab import SpawnablePrefab
-from game.scripts.roket_spawnable_related.spawnable_navigator import Navigator
+from game.scripts.modloader.modloader import ModLoader
+from engine.game.scripts.modloader.roket_body_related.roket_body import RoketBody
+from engine.game.scripts.modloader.roket_body_related.roket_module import RoketModule # load modules from json file configs
+from engine.game.scripts.modloader.roket_body_related.roket_module_slot import RoketModuleSlot
+from engine.game.scripts.modloader.roket_spawnable_related.spawnable_object import SpawnableObject
+from engine.game.scripts.modloader.roket_spawnable_related.spawnable_prefab import SpawnablePrefab
+from engine.game.scripts.modloader.environment_related.environment import Environment
+from engine.game.scripts.modloader.roket_spawnable_related.spawnable_navigator import Navigator
 from game.scripts.gamestate.gamestate_object import GameState
+from engine.game.scripts.modloader.level_related.level import Level
 from game.scripts.ship_modification_related.ship_modification_panel import ShipModPanel
 from game.scripts.ship_modification_related.ship_modification_page import ShipModPage
 from engine.game.scripts.ship_modification_related.ship_modification_slot_slot import ShipModInteractiveSlotSlot
@@ -58,7 +62,7 @@ from game.scripts.popup_windows.popup_info import PopupWindowInfo
 from game.scripts.popup_windows.popup_warning import PopupWindowWarning
 from game.scripts.popup_windows.popup_yes_no import PopupWindowYesNo
 from game.scripts.vuilib_extension.text_button import TextButton
-from game.scripts.localizationResource import LocalizationResource
+from engine.game.scripts.modloader.localization_related.localizationResource import LocalizationResource
 
 """ from game.game import MainGame """
 
@@ -267,16 +271,26 @@ class MainEngine:
         self.sprites["popup_overlay"].fill((0,0,0))
 
         # create content dicts
-        self.create_empty_content_dicts()
+        #self.create_empty_content_dicts()
 
         # default localization for mod loading errors etc
-        self.load_default_localization()
+        #self.load_default_localization()
+
+        # load modloader and all enabled mods (currently only internal)
+        self.modloader = ModLoader(self)
+        
+        self.texts = {}
+        
+        self.modloader._load_default_localization()
+
+        self.load_core_mod() #reload_mods()
+        self.modloader.use_localization(self.localization_code)
 
         # load roket bodies and modules / mods (even internals) in general
-        self.load_core_mod()
+        #self.load_core_mod()
 
         # 'use' the selected (and now loaded) localization resources
-        self.load_localization()
+        #self.load_localization()
 
         # add all scenes
         self.scene_handler.addScene(Scene(self, "title"))               # the main game title
@@ -572,6 +586,9 @@ class MainEngine:
         self.localization_resources = []
         self.texts = {}
         self.roket_spawnables = {}
+        self.roket_environments = {}
+        self.roket_careers = {}
+        self.roket_levels = {}
         self.roket_module_types = []
         self.roket_modules = {}
         self.roket_bodies = {}
@@ -602,11 +619,17 @@ class MainEngine:
                 case "ships":
                     self.load_roket_bodies(featurePath)
                 case "environment_objects": pass
-                case "environments": pass
-                case "levels": pass
+                case "environments":
+                    self.load_environments(featurePath)
+                case "levels": 
+                    self.load_levels(featurePath)
                 case "careers": pass
                 case "localization":
                     self.load_localization_resource(featurePath)
+
+        # SANITY mod check here; until then, load everything upon a promise
+        # only now will the mod references (level->environments->environment_objects) be checked
+        # cause else it just does fucking whatever it wants and its not good
 
     def load_internal_mods(self):
         self.load_localization()
@@ -616,7 +639,7 @@ class MainEngine:
         self.load_roket_bodies()
 
     def load_core_mod(self):
-        self.load_mod(DEFAULT_CORE_MOD_PATH)
+        self.modloader.load_mod(DEFAULT_CORE_MOD_PATH)
         
     def load_localization_resource(self, path:str|list[str]):
         paths = []
@@ -667,6 +690,50 @@ class MainEngine:
 
         # debug
         print(f"{__name__}: loaded localization: {localization_res.get_code()} ({localization_res.get_name()})")
+
+    def load_environments(self, path:str):
+
+        loaded_environments = JsonLoader.load_from_file(path)
+
+        for environment_name, environment in loaded_environments["environments"].items():
+            env = Environment(
+                appInstance=self,
+                backgroundColor=environment["background_color"],
+                objectEvents=environment["environment_object_events"]
+            )
+
+            self.roket_environments[environment_name] = env
+
+        print("--------\nLoaded environments:\n")
+        
+        for environment_name, environment in self.roket_environments.items():
+            print(f"{environment_name}, with {len(environment.objectEvents["random"]) + len(environment.objectEvents["forced"])} events")
+
+        print("") # sep
+
+    def load_levels(self, path:str):
+
+        loaded_levels = JsonLoader.load_from_file(path)
+
+        for level_name, level in loaded_levels["levels"].items():
+            lev = Level(
+                appInstance=self,
+                displayName=level["display_name"],
+                icon=level["icon"], # needs to be loaded and scaled actually or use the image frame idk
+                stages=level["stages"],
+                requirements=level["requirements"],
+                allowedShips=level["allowed_ships"],
+                disallowedShips=level["disallowed_ships"]
+            )
+
+            self.roket_levels[level_name] = lev
+
+        print("--------\nLoaded levels:\n")
+
+        for level_name, level in self.roket_levels.items():
+            print(f"{level.displayName} ({level_name})")
+
+        print("") # sep
 
     def load_spawnables(self, path:str):
 
@@ -1121,7 +1188,7 @@ class MainEngine:
 
         self.displayed_storage_modules = []
 
-        for key, module in self.roket_modules.items():
+        for key, module in self.modloader.mod_modules.items():
             if module.modType in modTypes:
                 #print(module.modType)
                 self.displayed_storage_modules.append(module)
@@ -1130,7 +1197,7 @@ class MainEngine:
 
     def cycle_main_menu_ship(self, direction:bool):
         active_ship_name = self.active_ship_name
-        ship_names = list(self.roket_bodies.keys())
+        ship_names = list(self.modloader.mod_bodies.keys())
 
         active_ship_name_index = ship_names.index(active_ship_name)
 
@@ -1149,7 +1216,7 @@ class MainEngine:
         self.regenerate_ship_mod_slot_panel()
         
     def set_active_ship(self, shipName:str):
-        ship_names = list(self.roket_bodies.keys())
+        ship_names = list(self.modloader.mod_bodies.keys())
 
         if shipName not in ship_names:
             print("ship not found ig?")
@@ -1163,7 +1230,7 @@ class MainEngine:
             self.scene_handler.getScene("main_menu").ship_name_text = self.get_active_ship().get_property("displayName")
 
     def get_active_ship(self) -> RoketBody:
-        return self.roket_bodies.get(self.active_ship_name)
+        return self.modloader.mod_bodies.get(self.active_ship_name)
     
     def get_ingame_ship(self):
         return self.gamestate.get_roket_body()
@@ -1558,7 +1625,8 @@ class MainEngine:
 
     def render_default_debug_overlay(self):
         self.draw("text", self.LAYER_UI_DEBUG, {"text":f"UPS: {str(int(self.clock.get_fps()))}", "rect":(10, 0, 0, 0), "font":self.debug_overlay_font, "no_bg":True, "color":green})
-        self.draw("text", self.LAYER_UI_DEBUG, {"text":f"FPS: {str(int(self.renderer.clock.get_fps()))}", "rect":(10, 50, 0, 0), "font":self.debug_overlay_font, "no_bg":True, "color":red})
+        if MULTITHREADED_RENDERING:
+            self.draw("text", self.LAYER_UI_DEBUG, {"text":f"FPS: {str(int(self.renderer.clock.get_fps()))}", "rect":(10, 50, 0, 0), "font":self.debug_overlay_font, "no_bg":True, "color":red})
 
     def render_debug_overlay(self):
         self.draw("text", self.LAYER_UI_DEBUG, {"text":f"F/U: {str(round(self.renderer.clock.get_fps() / self.clock.get_fps(), 3))}", "rect":(10, 100, 0, 0), "font":self.debug_overlay_font, "no_bg":True, "color":white})

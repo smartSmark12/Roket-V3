@@ -1,4 +1,4 @@
-from game.scripts.roket_body_related.roket_module_type import RoketModuleType
+from engine.game.scripts.modloader.roket_body_related.roket_module_type import RoketModuleType
 from vuilib.vui_flatpane import flatpane
 
 class RoketModule:

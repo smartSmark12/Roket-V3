@@ -1,3 +1,10 @@
+# modified Nebula legacy renderer
+# for linux compatibility, the ThreadedGameRenderer is unused
+# also using the "render_old" version, as the newer one
+# is too unfinished to have any real benefit
+#
+# this will all be likely replaced by the NRS Nova eventually
+
 import pygame as pg
 import moderngl as mgl
 
@@ -98,7 +105,7 @@ class MainGameRender:
 
         self.current_log = []
 
-    def use_renderer(self, useNew:bool=True): # no longer in use
+    def use_renderer(self, useNew:bool=True): # no longer in use; look above
         if useNew: self.render = self.render_new
         else: self.render = self.render_old
 
@@ -126,8 +133,12 @@ class MainGameRender:
                     case "circle":
                         pg.draw.circle(self.window, item.metadata["color"], item.metadata["center"], item.metadata["radius"], item.metadata["width"])
                     case "text":
-                        if "no_bg" in item.metadata: self.window.blit(item.metadata["font"].render(item.metadata["text"], item.metadata["antialias"], item.metadata["color"]), item.metadata["rect"])
-                        else: self.window.blit(item.metadata["font"].render(item.metadata["text"], item.metadata["antialias"], item.metadata["color"], item.metadata["bgcolor"]), item.metadata["rect"])
+                        if "center" in item.metadata:
+                            item.center_rect = item.metadata["font"].render(item.metadata["text"], False, (0, 0, 0)).get_rect()
+                            item.metadata["rect"] = item.center_rect
+                            item.metadata["rect"].center = item.metadata["center"]
+                        if "no_bg" in item.metadata: self.window_drawing.blit(item.metadata["font"].render(item.metadata["text"], item.metadata["antialias"], item.metadata["color"]), item.metadata["rect"])
+                        else: self.window_drawing.blit(item.metadata["font"].render(item.metadata["text"], item.metadata["antialias"], item.metadata["color"], item.metadata["bgcolor"]), item.metadata["rect"])
                     case "poly":
                         pg.draw.polygon(self.window, item.metadata["color"], item.metadata["points"], item.metadata["width"])
             except Exception as e:
@@ -167,6 +178,10 @@ class MainGameRender:
                             case "circle":
                                 pg.draw.circle(self.window, item.metadata["color"], item.metadata["center"], item.metadata["radius"], item.metadata["width"])
                             case "text":
+                                if "center" in item.metadata:
+                                    item.center_rect = item.metadata["font"].render(item.metadata["text"], False, (0, 0, 0)).get_rect()
+                                    item.metadata["rect"] = item.center_rect
+                                    item.metadata["rect"].center = item.metadata["center"]
                                 if "no_bg" in item.metadata: self.window.blit(item.metadata["font"].render(item.metadata["text"], item.metadata["antialias"], item.metadata["color"]), item.metadata["rect"])
                                 else: self.window.blit(item.metadata["font"].render(item.metadata["text"], item.metadata["antialias"], item.metadata["color"], item.metadata["bgcolor"]), item.metadata["rect"])
                             case "poly":

@@ -9,12 +9,14 @@ HEIGHT = 1080
 RESOLUTION = (WIDTH, HEIGHT)
 IN_FULLSCREEN = False
 
+EXTENDED_DEBUG_ENABLED = False
+
 # rendering options
 FPS_LOGIC_LIMIT:int = 400#120           # limits UPS ## TBA
 FPS_RENDER_LIMIT:int = 0            # limits rendered FPS
 SYNC_UPS_FPS:bool = 1               # should client synchronize UPS and FPS? (leads to better UPS-FPS ratio) - EXPERIMENTAL!!
 RENDER_LAYERS:int = 20              # set how many layers your game uses; start from 0, empty layers usually don't impact performance much
-MULTITHREADED_RENDERING:bool = True # use a newer multithreaded rendering method - EXPERIMENTAL
+MULTITHREADED_RENDERING:bool = False # use a newer multithreaded rendering method - EXPERIMENTAL
 
 OGL_ENABLED:bool = 0                # opengl implementation for shader support (currently resource heavy)
 DEFAULT_SHADER_PATH:str = "./engine/shaders/default" # adds '.vert' & '.frag' automatically
@@ -27,9 +29,9 @@ DEFAULT_ANIMATION_PATH:str = "./engine/scripts/animations_to_create.py"
 DEFAULT_SCENE_NAME = "main_menu"         # the default rendered/active scene
 
 DEBUG_OVERLAY_UPDATE_TIMEOUT = 0.25
-MAX_CACHED_SIZE = 360*4
+MAX_CACHED_SIZE = 360*4                 # limit for sprite rotation caching ## will be replaced by the new renderer hopefully
 
-## game settings cause me be lazy :33
+## game default settings cause me be lazy :33
 DEFAULT_LOCALIZATION_CODE = "en"
 DEFAULT_LOCALIZATION_PATH = "engine/game/internal_mods/core/en.json"
 LOCALIZATION_PATH = "./engine/game/localization/"
@@ -55,13 +57,7 @@ DEFAULT_ROKET_SPAWNABLE_PATH = "engine/game/roket_configs/roket_spawnables/defau
 INTERNAL_SPRITE_PATH = "engine/game/assets/"
 EXTERNAL_SPRITE_PATH = "mods/"
 
-BUTTON_FONT_SIZE = 36                 # all font sizes are gamespace; rescaled to fit the active res
-H1_FONT_SIZE = 160
-VERSION_FONT_SIZE = 20
-GAMEMODE_FONT_SIZE = 50
-SCENE_LABEL_FONT_SIZE = 60
-SHIP_MODIFICATION_SLOT_FONT_SIZE = 28
-
+# UI settings
 SLOTS_IN_SHIP_MOD_PAGE = 4
 SLOTS_IN_SHIP_MOD_STORAGE_PAGE = [4, 6]
 MOD_SLOT_TITLE_LENGTH = 15
@@ -71,6 +67,14 @@ TITLE_PLANET_SPAWNING_ANICHANCE = 5 # its more like 1/antichance is the chance, 
 
 POPUP_WINDOW_SIZE = [640, 400]
 POPUP_WINDOW_TEXT_LENGTH = 32
+
+# font settings
+BUTTON_FONT_SIZE = 36                 # all font sizes are gamespace; rescaled to fit the active res
+H1_FONT_SIZE = 160
+VERSION_FONT_SIZE = 20
+GAMEMODE_FONT_SIZE = 50
+SCENE_LABEL_FONT_SIZE = 60
+SHIP_MODIFICATION_SLOT_FONT_SIZE = 28
 
 # server settings
 SERVER_CONNECTIONS:int = 4          # max connections the server will expect at start

@@ -1,7 +1,7 @@
 """ from game.scripts.roket_module_type import RoketModuleType """
-from game.scripts.roket_body_related.roket_module import RoketModule
-from game.scripts.roket_body_related.roket_module_slot import RoketModuleSlot
-from game.scripts.roket_body_related.roket_module_action import RoketModuleAction
+from engine.game.scripts.modloader.roket_body_related.roket_module import RoketModule
+from engine.game.scripts.modloader.roket_body_related.roket_module_slot import RoketModuleSlot
+from engine.game.scripts.modloader.roket_body_related.roket_module_action import RoketModuleAction
 from vuilib.vui_flatpane import flatpane
 
 import copy

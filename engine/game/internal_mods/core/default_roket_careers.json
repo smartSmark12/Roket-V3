@@ -1,0 +1,33 @@
+{
+    "careers":
+    {
+        "core_salvadoran":
+        {
+            "display_name":"Salvadoran career",
+            "icon":"",
+            "levels":
+            [
+                "core_miranda_1"
+            ],
+            "requirements":
+            {
+                "beaten_levels":
+                [
+
+                ],
+                "beaten_careers":
+                [
+
+                ]
+            },
+            "allowed_ships":
+            [
+
+            ],
+            "disallowed_ships":
+            [
+
+            ]
+        }
+    }
+}
