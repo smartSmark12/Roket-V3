@@ -19,22 +19,22 @@
             {
                 "1":{
                     "name":"Front weapon",
-                    "position":[10,10],
+                    "position":[0,-0.9],
                     "allowed_module_types":["WeaponModuleType"]
                 },
                 "2":{
                     "name":"Core hull",
-                    "position":[10,20],
+                    "position":[0,0.1],
                     "allowed_module_types":["HullModuleType"]
                 },
                 "3":{
                     "name":"Main engine",
-                    "position":[10,30],
+                    "position":[0,0.6],
                     "allowed_module_types":["EngineModuleType"]
                 },
                 "4":{
                     "name":"Extra special fucker",
-                    "position":[20,10],
+                    "position":[0,-0.2],
                     "allowed_module_types":["WeaponModuleType", "EngineModuleType", "HullModuleType", "AbilityModuleType"]
                 }
             }
@@ -57,42 +57,42 @@
             {
                 "1":{
                     "name":"Main weapon",
-                    "position":[10,10],
+                    "position":[0,0.1],
                     "allowed_module_types":["WeaponModuleType"]
                 },
                 "2":{
                     "name":"Fusion core",
-                    "position":[10,20],
+                    "position":[0,0.2],
                     "allowed_module_types":["HullModuleType"]
                 },
                 "3":{
                     "name":"Twin engine",
-                    "position":[10,30],
+                    "position":[0,0.7],
                     "allowed_module_types":["EngineModuleType"]
                 },
                 "4":{
                     "name":"Universal slot",
-                    "position":[20,10],
+                    "position":[0,0.1],
                     "allowed_module_types":["WeaponModuleType", "EngineModuleType", "HullModuleType", "AbilityModuleType"]
                 },
                 "5":{
                     "name":"Duplicate slot first",
-                    "position":[10,30],
+                    "position":[0.1,0.3],
                     "allowed_module_types":["EngineModuleType"]
                 },
                 "6":{
                     "name":"Duplicate slot",
-                    "position":[10,30],
+                    "position":[0.2,0.3],
                     "allowed_module_types":["EngineModuleType"]
                 },
                 "7":{
                     "name":"Duplicate slot",
-                    "position":[10,30],
+                    "position":[0.3,0.3],
                     "allowed_module_types":["EngineModuleType"]
                 },
                 "8":{
                     "name":"Duplicate slot last",
-                    "position":[10,30],
+                    "position":[0.4,0.3],
                     "allowed_module_types":["EngineModuleType"]
                 }
             }

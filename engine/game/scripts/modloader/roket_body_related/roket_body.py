@@ -1,8 +1,7 @@
-""" from game.scripts.roket_module_type import RoketModuleType """
-from engine.game.scripts.modloader.roket_body_related.roket_module import RoketModule
-from engine.game.scripts.modloader.roket_body_related.roket_module_slot import RoketModuleSlot
-from engine.game.scripts.modloader.roket_body_related.roket_module_action import RoketModuleAction
-from vuilib.vui_flatpane import flatpane
+from engine.game.scripts.modloader.roket_body_related.roket_module          import RoketModule
+from engine.game.scripts.modloader.roket_body_related.roket_module_slot     import RoketModuleSlot
+from engine.game.scripts.modloader.roket_body_related.roket_module_action   import RoketModuleAction
+from vuilib.vui_flatpane                                                    import flatpane
 
 import copy
 import pygame as pg
@@ -11,7 +10,6 @@ class RoketBody:
     def __init__(self, name:str, displayName:str, baseLives:int, baseSprites:flatpane, position:tuple[int|float], size:tuple[int], collisionRect:pg.Rect, moduleSlots:dict[int, RoketModuleSlot], lives=None):
         self.name = name
         self.sprites = baseSprites
-        """ self.pos = position """
         self.moduleSlots = moduleSlots
 
         self.properties = {
@@ -26,7 +24,7 @@ class RoketBody:
             "module_actions":None, # dict gets created dynamically
         }
 
-        # format
+        # format:
         # "module_actions":{
         # actionId-int: slot-RoketModuleSlot
         # }
@@ -66,6 +64,9 @@ class RoketBody:
 
     def get_pos(self):
         return self.get_property("position")
+    
+    def get_sprites(self):
+        return self.sprites
 
     def update_anim(self, dt:float):
         pass

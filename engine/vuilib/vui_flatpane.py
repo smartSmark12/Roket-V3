@@ -3,6 +3,9 @@ from scripts.colors import *
 """ from scripts.datablock import Datablock """
 
 # help???? what the actual fuck is this shit :cry: how ami supposed to work with this inside buttons
+# i swear to god this is the most hated script in the entire engine architecture
+# AND RIGHTFULLY SO, BUT REWRITING THIS WOULD MEAN A FKIN ENGINE REWRITE TOO
+# so be happy with what you got, okay?
 
 class flatpane: # just for displaying images or colors; for backgrounds/graphics/buttons of vui
     def __init__(self, dtype: str, sprite_list: dict, **kwargs): # display type (color, image), dictionary, from where sprites should be referenced, keyword args for sprite name/color

@@ -38,3 +38,6 @@ class RoketModuleSlot:
         
     def trigger_module(self, triggerName:str):
         return self.module.trigger(triggerName)
+    
+    def get_pos(self):
+        return self.pos

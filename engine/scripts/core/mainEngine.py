@@ -1,5 +1,6 @@
 # Nebula Game Framework prototype v0.0.4s (29. 11. 2025) [so much shis istg + s for scenes]
 # NGFp designed by VaclavK - not for commercial use - only experiments and silly stuff >:)
+# built for: 3.13t
 
 ## DO NOT USE mainEngine.py AS AN ENTRY POINT
 ## LOCATE THE EXECUTABLE IN THE TOP PARENT DIRECTORY
@@ -57,6 +58,7 @@ from game.scripts.ship_modification_related.ship_modification_panel import ShipM
 from game.scripts.ship_modification_related.ship_modification_page import ShipModPage
 from engine.game.scripts.ship_modification_related.ship_modification_slot_slot import ShipModInteractiveSlotSlot
 from engine.game.scripts.ship_modification_related.ship_modification_slot_storage import ShipModInteractiveSlotStorage
+from game.scripts.ship_modification_related.ship_modification_pedestal import ShipModInteractivePedestal
 from game.scripts.popup_windows.popup import PopupWindow
 from game.scripts.popup_windows.popup_info import PopupWindowInfo
 from game.scripts.popup_windows.popup_warning import PopupWindowWarning
@@ -189,6 +191,7 @@ class MainEngine:
         self.LAYER_UI_BOTTOM = 7
         self.LAYER_UI_TOP_BOTTOM = self.LAYER_UI_TOP + 1
         self.LAYER_UI_TOP_TOP = self.LAYER_UI_TOP_BOTTOM + 1
+        self.LAYER_UI_TOP_TOP_TOP = self.LAYER_UI_TOP_TOP + 1 # increment resplonsibly, kids
         self.LAYER_TITLE_PLANETS = 4 # actually just a reference - animations take only numbers from animations_to_create.py
 
         # alarms setup
@@ -460,6 +463,10 @@ class MainEngine:
         ship_mod_scene.ship_slot_margin = 20
 
         ship_mod_slot_button_size = 100
+        
+        ### ship mod pedestal
+        ship_mod_scene.pedestal_pos = (730, 400) # this is kinda stupid, no?
+        ship_mod_scene.pedestal_size = (400, 400)
 
         # eh idk just resize the fking button
         self.sprites["button_template_square_smaller"] = self.sprite_handler.real_scale_sprite(self.sprites["button_template_square"], (ship_mod_slot_button_size, ship_mod_slot_button_size))
@@ -523,6 +530,14 @@ class MainEngine:
         ship_mod_scene.return_button_text = "<" # yes, this is hardcoded. judge me.
 
         ship_mod_scene.buttons["return"] = button(flatpane("sprite", {"main":self.sprites["button_template_square"], "hover":self.sprites["button_template_square_dark"]}, sprite="main"), pg.Rect(self.to_scale((ship_mod_background_frame_pos[0] + ship_mod_return_button_margin, ship_mod_background_frame_pos[1] + ship_mod_return_button_margin)), self.to_scale((ship_mod_return_button_size, ship_mod_return_button_size))), 0, None, partial(self.scene_handler.setActiveScene, "main_menu"), None, self)
+
+        ### ship mod pedestal
+        ship_mod_scene.pedestal = ShipModInteractivePedestal(
+            self,
+            self.get_active_ship(),
+            ship_mod_scene.pedestal_pos,
+            ship_mod_scene.pedestal_size
+        )
 
         self.show_choice_yes_no_popup("Are you sure whatever you're doing is worth it? This is a very long dummy text that is utterly useless for anything else :33")
 
@@ -1169,6 +1184,9 @@ class MainEngine:
 
         #print(len(storage_panel.get_page(0).get_slots()))
 
+    def update_modification_pedestal(self):
+        self.scene_handler.getScene("ship_modification").pedestal.set_ship(self.get_active_ship()) # what a lovely syntax
+
     def change_gamemode(self, gameModeName:str):
         self.selected_mode = gameModeName
 
@@ -1214,6 +1232,7 @@ class MainEngine:
         self.set_active_ship(ship_names[active_ship_name_index])
 
         self.regenerate_ship_mod_slot_panel()
+        self.update_modification_pedestal()
         
     def set_active_ship(self, shipName:str):
         ship_names = list(self.modloader.mod_bodies.keys())
@@ -1382,11 +1401,16 @@ class MainEngine:
         storage_panel:ShipModPanel = ship_mod.storage_panel
 
         # update mod slots
+        ship_mod.pedestal.set_module_slot_hovered(slot=None) # reset the slot_panel <-> pedestal.slot line display
+        
         for slot in slot_panel.get_current_page().get_slots():
             if slot.activation_detection():
                 print("selected slot", slot.title, "types", slot.allowedModTypes)
 
                 self.select_ship_mod_module_types(slot.allowedModTypes)
+                
+            if slot.is_hovered():
+                ship_mod.pedestal.set_module_slot_hovered(slot)
 
         if storage_panel.get_current_page() and len(storage_panel.get_current_page().get_slots()) > 0:
             for slot in storage_panel.get_current_page().get_slots():
@@ -1429,21 +1453,6 @@ class MainEngine:
         # draw ship storage panel
         self.draw("sprite", self.LAYER_UI_BOTTOM, {"sprite":ship_mod.storage_panel_background, "rect":ship_mod.storage_panel_rect})
 
-        # draw buttons
-        """ for button in ship_mod.buttons:
-            if button not in ["slot_page_left", "slot_page_right"]:
-                ship_mod.buttons[button].render()
-
-        # draw page buttons
-        if len(ship_mod.slot_panel.get_pages()) > 1:
-            for button in ["slot_page_left", "slot_page_right"]:
-                ship_mod.buttons[button].render() """
-
-
-        """ if len(ship_mod.slot_panel.get_pages()) > 1:
-            self.draw_button_text(ship_mod.page_button_left_text, ship_mod.buttons["slot_page_left"])
-            self.draw_button_text(ship_mod.page_button_right_text, ship_mod.buttons["slot_page_right"]) """
-
         # draw ship slot panel content
         if len(ship_mod.storage_panel.get_pages()) > 0:
             for interactiveSlot in ship_mod.storage_panel.get_current_page().get_slots():
@@ -1451,6 +1460,9 @@ class MainEngine:
 
         else:
             self.draw("text", self.LAYER_UI_TOP, {"text":self.texts["ship_hangar_select_slot"], "rect":(0,0,0,0), "center":self.to_scale((ship_mod.storage_panel_pos[0] + ship_mod.storage_panel_size[0] / 2, ship_mod.storage_panel_pos[1] + ship_mod.storage_panel_size[1] / 2)), "no_bg":True, "color":roket_dark_blue, "font":self.ship_mod_slot_font})
+
+        # draw ship pedestal
+        ship_mod.pedestal.render()
 
     # INTERNAL RANDOM AHH HELPERS
 
@@ -1629,7 +1641,10 @@ class MainEngine:
             self.draw("text", self.LAYER_UI_DEBUG, {"text":f"FPS: {str(int(self.renderer.clock.get_fps()))}", "rect":(10, 50, 0, 0), "font":self.debug_overlay_font, "no_bg":True, "color":red})
 
     def render_debug_overlay(self):
-        self.draw("text", self.LAYER_UI_DEBUG, {"text":f"F/U: {str(round(self.renderer.clock.get_fps() / self.clock.get_fps(), 3))}", "rect":(10, 100, 0, 0), "font":self.debug_overlay_font, "no_bg":True, "color":white})
+        if MULTITHREADED_RENDERING:
+            self.draw("text", self.LAYER_UI_DEBUG, {"text":f"F/U: {str(round(self.renderer.clock.get_fps() / self.clock.get_fps(), 3))}", "rect":(10, 100, 0, 0), "font":self.debug_overlay_font, "no_bg":True, "color":white})
+        else:
+            self.draw("text", self.LAYER_UI_DEBUG, {"text":f"F/U: N/A", "rect":(10, 100, 0, 0), "font":self.debug_overlay_font, "no_bg":True, "color":white})
         self.draw("text", self.LAYER_UI_DEBUG, {"text":f"CPU: {self._debug_cpu_use} %", "rect":(10, 150, 0, 0), "font":self.debug_overlay_font, "no_bg":True, "color":white})
         self.draw("text", self.LAYER_UI_DEBUG, {"text":f"RAM: {self._debug_mem_used} MB", "rect":(10, 200, 0, 0), "font":self.debug_overlay_font, "no_bg":True})
 

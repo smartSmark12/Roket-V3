@@ -36,3 +36,7 @@ class ShipModInteractiveSlotSlot(ShipModInteractiveSlot):
 
     def get_slot_id(self):
         return self.slotID
+    
+    def get_ui_line_start(self):
+        # ! not scaled
+        return (self.rect.right + 10, self.rect.centery)

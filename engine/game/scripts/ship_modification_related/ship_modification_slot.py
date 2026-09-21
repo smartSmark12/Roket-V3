@@ -43,3 +43,6 @@ class ShipModInteractiveSlot:
             self.clicked = False
 
             return False
+        
+    def is_hovered(self):
+        return self.hovered

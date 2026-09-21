@@ -212,7 +212,12 @@
     "mod_slot_empty":[
         "engine/game/assets/img/menu/empty_modification_slot.png",
         [128,128],
-        "c"   
+        "c"
+    ],
+    "pedestal_ship_slot":[
+        "engine/game/assets/img/gui/pedestal_ship_slot.png",
+        [60,60],
+        "ca"
     ]
 
 }
