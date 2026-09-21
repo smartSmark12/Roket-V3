@@ -14,6 +14,9 @@ class RoketModuleSlot:
             else:
                 print(f"{__name__}: module {module.name} isn't allowed in module types ({[i for i in self.allowedModTypes]}) of slot {self.name} (id: {self.slotId})")
 
+    def has_module(self):
+        return self.module is not None
+
     def add_module(self, module:RoketModule) -> bool:
         if self.module is not None:
             print(f"{__name__}: module {module.name} cannot be added; slot already used")
@@ -35,6 +38,9 @@ class RoketModuleSlot:
             module = self.module
             self.module = None
             return module # this fuckery is funny
+
+    def get_module(self):
+        return self.module
         
     def trigger_module(self, triggerName:str):
         return self.module.trigger(triggerName)

@@ -18,7 +18,10 @@ class RoketModule:
         }
 
         # format
-        # "trigger_name": ["spawn", "registeredSpawnableName"]
+        # "triggerName": ["spawn", "registeredSpawnableName"]
+
+    def get_modifiers(self):
+        return self.modModifiers
 
     def trigger(self, triggerName:str):
         if triggerName in self.triggers:
