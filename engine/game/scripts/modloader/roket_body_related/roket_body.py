@@ -15,7 +15,7 @@ class RoketBody:
         self.properties = {
             "displayName":displayName,
             "position":position,
-            "baseLives":baseLives,
+            "baseLives":baseLives, # essentially max lives
             "move_speed":1,
             "size":size,
             "collider":collisionRect,
@@ -57,7 +57,42 @@ class RoketBody:
                 pass
 
     def update_module_stats(self):
-        pass
+        # reset current stats to the ship default
+        #
+        # go through every slot
+        # add its module's stats to the super properties if it has a module
+        #
+        # needs to be expanded to support modded modifiers in the future :cries:
+        # i sorta have to hardcode it rn to save time
+        # also, hello not!kerry :3
+
+        self.superProperties = copy.deepcopy(self.properties)
+
+        for moduleSlotKey, moduleSlot in self.moduleSlots.items():
+            if moduleSlot.has_module():
+                module = moduleSlot.get_module()
+
+                for modifierName, modifier in module.get_modifiers().items():
+                    # hardcoded section begins
+                    match modifierName:
+                        case "move_speed_mod":
+                            self.superProperties["move_speed"] += modifier
+                        case "boost_upgrade":
+                            pass
+                        case "laser_upgrade":
+                            pass
+                        case "hull_strength_mod":
+                            self.superProperties["baseLives"] += modifier # need to increment both max lives and actual lives
+                            self.superProperties["lives"] += modifier
+                        case "shield_upgrade":
+                            pass
+                        case "ghost_upgrade":
+                            pass
+                        case "heal_drone_upgrade":
+                            pass
+                        case _:
+                            pass
+
 
     def move(self, targetPos:tuple):
         pass
@@ -81,7 +116,7 @@ class RoketBody:
         if moduleID in self.moduleSlots.keys():
             return self.moduleSlots.get(moduleID)
         
-    def get_modules(self):
+    def get_module_slots(self):
         return self.moduleSlots
 
     def clear_modules(self):

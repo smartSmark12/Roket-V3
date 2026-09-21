@@ -1073,7 +1073,7 @@ class MainEngine:
         slots = []
         i = 0
 
-        for moduleSlotID, moduleSlot in self.get_active_ship().get_modules().items():
+        for moduleSlotID, moduleSlot in self.get_active_ship().get_module_slots().items():
             if i > SLOTS_IN_SHIP_MOD_PAGE - 1:
                 i = 0
 
