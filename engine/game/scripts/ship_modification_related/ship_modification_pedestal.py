@@ -48,8 +48,6 @@ class ShipModInteractivePedestal:
                     "rect":((slot.get_pos()[0] / 2) * self.app.to_scale_x(self.size[0]) + self.slot_offset[0], (slot.get_pos()[1] / 2) * self.app.to_scale_y(self.size[1]) + self.slot_offset[1], 0, 0)
                 }
             )
-
-            #print(slot_id, (slot.pos[0] * self.app.to_scale_x(self.size[0]) + self.slot_offset[0], slot.pos[1] * self.app.to_scale_y(self.size[1]) + self.slot_offset[1]))
     
     def _render_connection_line(self):
         module = self.ship.get_module(self.hovered_slot.get_slot_id())

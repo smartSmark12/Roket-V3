@@ -16,55 +16,56 @@ import moderngl as mgl
 from array import array
 from threading import Lock
 import _thread
-from scripts.core.render import MainGameRender, ThreadedGameRenderer # local renderer library
-from scripts.renderItem import RenderItem # local class library serving as the base for every object rendering to the screen
-from scripts.functions import * # local universal functions library
-from scripts.core.settings import * # local system settings
-from scripts.colors import * # local library containing basic colors
-from vuilib.vuilib import * # local ui QoL library
-from vuilib.vui_flatpane import flatpane
-from vuilib.vui_flatpane_autoconvert import convert_to_flatpane
-from vuilib.vui_button import button
-from vuilib.vui_interactive import InteractiveVUI
-from scripts.vanimlib.val_animatedTexture import AnimatedTexture # local library for easier work with image sequences and video frames
-from scripts.runtimeLogHandler import LogHandler # local library for terminal and log handling
-from scripts.core.fileManager import FileManager
-from scripts.mplib.multiplayerClient import mpClient # client+network from multiplayerlib for multiplayer data handling
-from scripts.tileScripts.VTileGen import VTileGenerator # useful for generating custom size maps with set content using VR (Vaclav-Random XD) distribution
-from scripts.tileScripts.VTIleTerrainGen import VTileTerrainGenerator # used to generate terrain based on weights
-from scripts.core.spriteHandler import SpriteHandler, SpriteHandlerJSON # local library used to handle sprite importing and rescaling
-from scripts.core.animationHandler import AnimationHandler # local library used to create animations from imported sprites
-from scripts.core.keyHandler import KeyHandler # local library used to handle key input changes
-from scripts.core.openglHandler import OGLHandler # local library for shader support (experimental!)
-from scripts.core.scenes.scene_handler import SceneHandler
-from scripts.core.scenes.scene import Scene
-from scripts.json_loader import JsonLoader
-from game.scripts.alarm import Alarm
 
-from game.scripts.ui_frame_builder import UIFrameBuilder
-from game.scripts.sprite_window import SpriteWindow
-from scripts.core.settings import GAME_NAME, DEFAULT_SCENE_NAME
-from game.scripts.modloader.modloader import ModLoader
-from engine.game.scripts.modloader.roket_body_related.roket_body import RoketBody
-from engine.game.scripts.modloader.roket_body_related.roket_module import RoketModule # load modules from json file configs
-from engine.game.scripts.modloader.roket_body_related.roket_module_slot import RoketModuleSlot
-from engine.game.scripts.modloader.roket_spawnable_related.spawnable_object import SpawnableObject
-from engine.game.scripts.modloader.roket_spawnable_related.spawnable_prefab import SpawnablePrefab
-from engine.game.scripts.modloader.environment_related.environment import Environment
-from engine.game.scripts.modloader.roket_spawnable_related.spawnable_navigator import Navigator
-from game.scripts.gamestate.gamestate_object import GameState
-from engine.game.scripts.modloader.level_related.level import Level
-from game.scripts.ship_modification_related.ship_modification_panel import ShipModPanel
-from game.scripts.ship_modification_related.ship_modification_page import ShipModPage
-from engine.game.scripts.ship_modification_related.ship_modification_slot_slot import ShipModInteractiveSlotSlot
-from engine.game.scripts.ship_modification_related.ship_modification_slot_storage import ShipModInteractiveSlotStorage
-from game.scripts.ship_modification_related.ship_modification_pedestal import ShipModInteractivePedestal
-from game.scripts.popup_windows.popup import PopupWindow
-from game.scripts.popup_windows.popup_info import PopupWindowInfo
-from game.scripts.popup_windows.popup_warning import PopupWindowWarning
-from game.scripts.popup_windows.popup_yes_no import PopupWindowYesNo
-from game.scripts.vuilib_extension.text_button import TextButton
-from engine.game.scripts.modloader.localization_related.localizationResource import LocalizationResource
+from scripts.core.render                                                            import MainGameRender, ThreadedGameRenderer # local renderer library
+from scripts.renderItem                                                             import RenderItem # local class library serving as the base for every object rendering to the screen
+from scripts.functions                                                              import * # local universal functions library
+from scripts.core.settings                                                          import * # local system settings
+from scripts.colors                                                                 import * # local library containing basic colors
+from vuilib.vuilib                                                                  import * # local ui QoL library
+from vuilib.vui_flatpane                                                            import flatpane
+from vuilib.vui_flatpane_autoconvert                                                import convert_to_flatpane
+from vuilib.vui_button                                                              import button
+from vuilib.vui_interactive                                                         import InteractiveVUI
+from scripts.vanimlib.val_animatedTexture                                           import AnimatedTexture # local library for easier work with image sequences and video frames
+from scripts.runtimeLogHandler                                                      import LogHandler # local library for terminal and log handling
+from scripts.core.fileManager                                                       import FileManager
+from scripts.mplib.multiplayerClient                                                import mpClient # client+network from multiplayerlib for multiplayer data handling
+from scripts.tileScripts.VTileGen                                                   import VTileGenerator # useful for generating custom size maps with set content using VR (Vaclav-Random XD) distribution
+from scripts.tileScripts.VTIleTerrainGen                                            import VTileTerrainGenerator # used to generate terrain based on weights
+from scripts.core.spriteHandler                                                     import SpriteHandler, SpriteHandlerJSON # local library used to handle sprite importing and rescaling
+from scripts.core.animationHandler                                                  import AnimationHandler # local library used to create animations from imported sprites
+from scripts.core.keyHandler                                                        import KeyHandler # local library used to handle key input changes
+from scripts.core.openglHandler                                                     import OGLHandler # local library for shader support (experimental!)
+from scripts.core.scenes.scene_handler                                              import SceneHandler
+from scripts.core.scenes.scene                                                      import Scene
+from scripts.json_loader                                                            import JsonLoader
+from game.scripts.alarm                                                             import Alarm
+
+from game.scripts.ui_frame_builder                                                  import UIFrameBuilder
+from game.scripts.sprite_window                                                     import SpriteWindow
+from scripts.core.settings                                                          import GAME_NAME, DEFAULT_SCENE_NAME
+from game.scripts.modloader.modloader                                               import ModLoader
+from engine.game.scripts.modloader.roket_body_related.roket_body                    import RoketBody
+from engine.game.scripts.modloader.roket_body_related.roket_module                  import RoketModule # load modules from json file configs
+from engine.game.scripts.modloader.roket_body_related.roket_module_slot             import RoketModuleSlot
+from engine.game.scripts.modloader.roket_spawnable_related.spawnable_object         import SpawnableObject
+from engine.game.scripts.modloader.roket_spawnable_related.spawnable_prefab         import SpawnablePrefab
+from engine.game.scripts.modloader.environment_related.environment                  import Environment
+from engine.game.scripts.modloader.roket_spawnable_related.spawnable_navigator      import Navigator
+from game.scripts.gamestate.gamestate_object                                        import GameState
+from engine.game.scripts.modloader.level_related.level                              import Level
+from game.scripts.ship_modification_related.ship_modification_panel                 import ShipModPanel
+from game.scripts.ship_modification_related.ship_modification_page                  import ShipModPage
+from engine.game.scripts.ship_modification_related.ship_modification_slot_slot      import ShipModInteractiveSlotSlot
+from engine.game.scripts.ship_modification_related.ship_modification_slot_storage   import ShipModInteractiveSlotStorage
+from game.scripts.ship_modification_related.ship_modification_pedestal              import ShipModInteractivePedestal
+from game.scripts.popup_windows.popup                                               import PopupWindow
+from game.scripts.popup_windows.popup_info                                          import PopupWindowInfo
+from game.scripts.popup_windows.popup_warning                                       import PopupWindowWarning
+from game.scripts.popup_windows.popup_yes_no                                        import PopupWindowYesNo
+from game.scripts.vuilib_extension.text_button                                      import TextButton
+from engine.game.scripts.modloader.localization_related.localizationResource        import LocalizationResource
 
 """ from game.game import MainGame """
 
@@ -72,9 +73,9 @@ from engine.game.scripts.modloader.localization_related.localizationResource imp
 from scripts.tileScripts.baseBiomeWeights import baseBiomeWeights
 
 import psutil
-from functools import lru_cache
-from functools import partial
-from copy import deepcopy
+from functools      import lru_cache
+from functools      import partial
+from copy           import deepcopy
 
 # something like from engine.scripts import * using https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwi46Of9hr-GAxVQhf0HHXmICu4QFnoECCYQAQ&url=https%3A%2F%2Fstackoverflow.com%2Fquestions%2F1057431%2Fhow-to-load-all-modules-in-a-folder&usg=AOvVaw3vlcgC_pzadT7glu9LmH2n&cshid=1717404751563860&opi=89978449
 # need to make a crash handler (official python function??)
