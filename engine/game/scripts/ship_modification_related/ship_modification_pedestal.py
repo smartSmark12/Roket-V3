@@ -39,7 +39,7 @@ class ShipModInteractivePedestal:
         self.hovered_slot = slot
 
     def _render_slots(self):
-        for slot_id, slot in self.ship.get_modules().items():
+        for slot_id, slot in self.ship.get_module_slots().items():
             self.app.draw(
                 "sprite",
                 self.app.LAYER_UI_TOP_TOP,
