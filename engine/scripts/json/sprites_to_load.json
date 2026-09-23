@@ -214,6 +214,31 @@
         [128,128],
         "c"
     ],
+    "module_template_ability":[
+        "engine/game/assets/img/modules/templates/template_ability.png",
+        [60,60],
+        "c"
+    ],
+    "module_template_engine":[
+        "engine/game/assets/img/modules/templates/template_engine.png",
+        [60,60],
+        "c"
+    ],
+    "module_template_hull":[
+        "engine/game/assets/img/modules/templates/template_hull.png",
+        [60,60],
+        "c"
+    ],
+    "module_template_weapon":[
+        "engine/game/assets/img/modules/templates/template_weapon.png",
+        [60,60],
+        "c"
+    ],
+    "module_template_misc":[
+        "engine/game/assets/img/modules/templates/template_misc.png",
+        [60,60],
+        "c"
+    ],
     "pedestal_ship_slot":[
         "engine/game/assets/img/gui/pedestal_ship_slot.png",
         [60,60],

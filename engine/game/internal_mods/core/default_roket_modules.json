@@ -6,7 +6,7 @@
             "display_name":"Basic engine",
             "module_type":"EngineModuleType",
             "sprite_source":"internal",
-            "sprite":"img/else/lajf_buff.png",
+            "sprite":"img/modules/templates/template_engine.png",
             "modifiers":
             {
                 "move_speed_mod":2
@@ -19,7 +19,7 @@
             "display_name":"Debug healing device",
             "module_type":"AbilityModuleType",
             "sprite_source":"internal",
-            "sprite":"img/else/inv_buff.png",
+            "sprite":"img/modules/templates/template_ability.png",
             "modifiers":
             {
                 "hull_strength_mod":1
@@ -27,6 +27,36 @@
             "actions":
             {
                 "on_activation":["heal", [1]]
+            }
+        },
+        "placeholder_hull":
+        {
+            "display_name":"Placeholder hull",
+            "module_type":"HullModuleType",
+            "sprite_source":"internal",
+            "sprite":"img/modules/templates/template_hull.png",
+            "modifiers":
+            {
+                "hull_strength_mod":1
+            },
+            "actions":
+            {
+                
+            }
+        },
+        "placeholder_weapon":
+        {
+            "display_name":"Placeholder weapon",
+            "module_type":"WeaponModuleType",
+            "sprite_source":"internal",
+            "sprite":"img/modules/templates/template_weapon.png",
+            "modifiers":
+            {
+                
+            },
+            "actions":
+            {
+                
             }
         }
     }
