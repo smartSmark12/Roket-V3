@@ -17,8 +17,8 @@ class RoketModuleSlot:
     def has_module(self):
         return self.module is not None
 
-    def add_module(self, module:RoketModule) -> bool:
-        if self.module is not None:
+    def add_module(self, module:RoketModule, force:bool=False) -> bool:
+        if self.module is not None and not force:
             print(f"{__name__}: module {module.name} cannot be added; slot already used")
             return False
         elif module.modType not in self.allowedModTypes:

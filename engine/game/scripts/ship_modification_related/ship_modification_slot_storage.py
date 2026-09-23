@@ -1,17 +1,23 @@
 import pygame as pg
 
-from game.scripts.ship_modification_related.ship_modification_slot import ShipModInteractiveSlot
+from game.scripts.ship_modification_related.ship_modification_slot      import ShipModInteractiveSlot
+from game.scripts.modloader.roket_body_related.roket_module             import RoketModule
 
-from scripts.colors import *
+from scripts.colors                             import *
 
 class ShipModInteractiveSlotStorage(ShipModInteractiveSlot):
-    def __init__(self, appInstance, rect:pg.Rect, icon:pg.Surface, iconTop:pg.Surface|None, title:str, paramTexts:list[str]):
+    def __init__(self, appInstance, rect:pg.Rect, icon:pg.Surface, iconTop:pg.Surface|None, title:str, paramTexts:list[str], module:RoketModule):
         super().__init__(appInstance, rect, icon)
 
         self.title = title
         self.texts = paramTexts
 
         self.iconTop = self.app.sprite_handler.rescale_sprite(iconTop, (self.app.to_scale_x(rect.height), self.app.to_scale_y(rect.height)))
+
+        self.module = module
+
+    def get_module(self):
+        return self.module
 
     def render(self):
         # background

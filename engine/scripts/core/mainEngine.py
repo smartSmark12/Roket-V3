@@ -527,6 +527,8 @@ class MainEngine:
 
         ship_mod_scene.storage_panel_rect = pg.Rect(self.to_scale(ship_mod_scene.storage_panel_pos), self.to_scale(ship_mod_scene.storage_panel_size))
 
+        ship_mod_scene.active_ship_module = None
+
         ### ship mod buttons
         ship_mod_scene.return_button_text = "<" # yes, this is hardcoded. judge me.
 
@@ -1155,7 +1157,8 @@ class MainEngine:
                 self.sprites["mod_slot_empty"],
                 storage_slot.modSprites.get_sprite("main"),
                 storage_slot.displayName,
-                ["dummy text", "also a dummy text", "chichichicha"]
+                ["dummy text", "also a dummy text", "chichichicha"],
+                storage_slot
             )
 
             slots.append(slot)
@@ -1202,8 +1205,12 @@ class MainEngine:
             case "mode_dummy":
                 print("dummy launch!")
 
-    def select_ship_mod_module_types(self, modTypes:list[str]):
-        #ship_mod_scene = self.scene_handler.getScene("ship_modification")
+    def set_ship_mod_module_active(self, slot:ShipModInteractiveSlotSlot):
+        ship_mod_scene = self.scene_handler.getScene("ship_modification")
+
+        modTypes = slot.allowedModTypes
+
+        ship_mod_scene.active_ship_module = slot
 
         self.displayed_storage_modules = []
 
@@ -1408,7 +1415,7 @@ class MainEngine:
             if slot.activation_detection():
                 print("selected slot", slot.title, "types", slot.allowedModTypes)
 
-                self.select_ship_mod_module_types(slot.allowedModTypes)
+                self.set_ship_mod_module_active(slot)
                 
             if slot.is_hovered():
                 ship_mod.pedestal.set_module_slot_hovered(slot)
@@ -1417,6 +1424,10 @@ class MainEngine:
             for slot in storage_panel.get_current_page().get_slots():
                 if slot.activation_detection():
                     print("selected", slot.title, "from storage")
+
+                    self.get_active_ship().get_module(ship_mod.active_ship_module.get_slot_id()).add_module(slot.get_module(), force=True)
+
+
 
     def ship_modification_render(self):
         ship_mod = self.scene_handler.getScene("ship_modification")

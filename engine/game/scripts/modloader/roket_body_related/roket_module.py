@@ -23,6 +23,9 @@ class RoketModule:
     def get_modifiers(self):
         return self.modModifiers
 
+    def get_sprites(self):
+        return self.modSprites
+
     def trigger(self, triggerName:str):
         if triggerName in self.triggers:
             if self.triggers[triggerName] is not None:

@@ -40,6 +40,7 @@ class ShipModInteractivePedestal:
 
     def _render_slots(self):
         for slot_id, slot in self.ship.get_module_slots().items():
+            # draw slot background
             self.app.draw(
                 "sprite",
                 self.app.LAYER_UI_TOP_TOP,
@@ -48,6 +49,20 @@ class ShipModInteractivePedestal:
                     "rect":((slot.get_pos()[0] / 2) * self.app.to_scale_x(self.size[0]) + self.slot_offset[0], (slot.get_pos()[1] / 2) * self.app.to_scale_y(self.size[1]) + self.slot_offset[1], 0, 0)
                 }
             )
+
+            # draw slot module
+            if slot.has_module():
+                sprite = slot.get_module().get_sprites().get_active_sprite()
+
+                self.app.draw(
+                    "sprite",
+                    self.app.LAYER_UI_TOP_TOP,
+                    {
+                        "sprite":sprite, # omfg hello future debugging me
+                        "rect":((slot.get_pos()[0] / 2) * self.app.to_scale_x(self.size[0]) + self.line_slot_offset[0] - sprite.get_width() / 2, (slot.get_pos()[1] / 2) * self.app.to_scale_y(self.size[1]) + self.line_slot_offset[1] - sprite.get_height() / 2, 0, 0)
+                    }
+                )
+
     
     def _render_connection_line(self):
         module = self.ship.get_module(self.hovered_slot.get_slot_id())
