@@ -54,7 +54,7 @@ class ModLoader:
         
         for feature in features:
             if type(features[feature]) == str:
-                featurePath = modPath + features[feature]
+                featurePath = [modPath + features[feature]]
             elif type(features[feature]) == list:
                 featurePath = [modPath + i for i in features[feature]]
 
@@ -81,8 +81,8 @@ class ModLoader:
                 case md.MOD_FEATURE_LEVEL: 
                     self._load_levels(featurePath)
                     
-                case md.MOD_FEATURE_CAREER: 
-                    pass
+                case md.MOD_FEATURE_CAREER:
+                    self._load_careers(featurePath)
                 
                 case md.MOD_FEATURE_LOCALIZATION:
                     self._load_localization_resource(featurePath)
@@ -96,94 +96,95 @@ class ModLoader:
         # only now will the mod references (level->environments->environment_objects) be checked
         # cause else it just does fucking whatever it wants and its not good
 
-    def _load_bodies(self, source:str):
-        data = JsonLoader.load_from_file(source)
-        
-        for body_name in data[md.MOD_FEATURE_SHIP]:
-            body = data[md.MOD_FEATURE_SHIP][body_name]
+    def _load_bodies(self, source:list):
 
-            # prepare sprites
-            loaded_sprite_paths = body["animation_sprites"]
+        for single_source in source:
+            data = JsonLoader.load_from_file(single_source)
+            for body_name in data[md.MOD_FEATURE_SHIP]:
+                body = data[md.MOD_FEATURE_SHIP][body_name]
 
-            # prepare prefix
-            sprite_path_prefix = None
+                # prepare sprites
+                loaded_sprite_paths = body["animation_sprites"]
 
-            if body["sprite_source"] == "internal":
-                sprite_path_prefix = INTERNAL_SPRITE_PATH
-            elif body["sprite_source"] == "external":
-                sprite_path_prefix = EXTERNAL_SPRITE_PATH
-            else:
-                sprite_path_prefix = "" # when using fully custom paths
+                # prepare prefix
+                sprite_path_prefix = None
 
-            # output sprite dict
-            sprite_dict = {}
+                if body["sprite_source"] == "internal":
+                    sprite_path_prefix = INTERNAL_SPRITE_PATH
+                elif body["sprite_source"] == "external":
+                    sprite_path_prefix = EXTERNAL_SPRITE_PATH
+                else:
+                    sprite_path_prefix = "" # when using fully custom paths
 
-            # load sprites
-            for sprite_index in range(len(loaded_sprite_paths)):
-                sprite_path = sprite_path_prefix + loaded_sprite_paths[sprite_index]
+                # output sprite dict
+                sprite_dict = {}
 
-                # generate sprite name
-                sprite_name = f"{body_name}_anim_{sprite_index}"
+                # load sprites
+                for sprite_index in range(len(loaded_sprite_paths)):
+                    sprite_path = sprite_path_prefix + loaded_sprite_paths[sprite_index]
 
-                sprite_dict[sprite_index] = self.app.sprite_handler.load_sprite(sprite_name, sprite_path, body["size"], "ca")
+                    # generate sprite name
+                    sprite_name = f"{body_name}_anim_{sprite_index}"
+
+                    sprite_dict[sprite_index] = self.app.sprite_handler.load_sprite(sprite_name, sprite_path, body["size"], "ca")
 
 
-            # create final flatpane
-            body_sprite = flatpane("sprite", sprite_dict, sprite=0)
+                # create final flatpane
+                body_sprite = flatpane("sprite", sprite_dict, sprite=0)
 
-            # load module slots
-            loaded_slots = body["module_slots"]
+                # load module slots
+                loaded_slots = body["module_slots"]
 
-            # prepare module slots
-            module_slots = {}
+                # prepare module slots
+                module_slots = {}
 
-            # create modules
-            for slot_id_str in loaded_slots:
-                loaded_slot = loaded_slots[slot_id_str]
-                slot_id = None
-                try:
-                    slot_id = int(slot_id_str)
-                except:
-                    print("smula ig")
-                    continue
-                
-                slot = None
-
-                try:
-                    slot = RoketModuleSlot(
-                                            slotId=slot_id,
-                                            name=loaded_slot["name"],
-                                            position=loaded_slot["position"],
-                                            allowedModuleTypes=loaded_slot["allowed_module_types"]
-                                        ) # modules have to be loaded later from a save
+                # create modules
+                for slot_id_str in loaded_slots:
+                    loaded_slot = loaded_slots[slot_id_str]
+                    slot_id = None
+                    try:
+                        slot_id = int(slot_id_str)
+                    except:
+                        print("smula ig")
+                        continue
                     
-                    module_slots[slot_id] = slot
+                    slot = None
 
-                except:
-                    print("bad luck ~ Yoru")
-                    continue
+                    try:
+                        slot = RoketModuleSlot(
+                                                slotId=slot_id,
+                                                name=loaded_slot["name"],
+                                                position=loaded_slot["position"],
+                                                allowedModuleTypes=loaded_slot["allowed_module_types"]
+                                            ) # modules have to be loaded later from a save
+                        
+                        module_slots[slot_id] = slot
 
-            # create collider
-            collision_rect = pg.Rect(
-                0,
-                0,
-                body["collider_size"][0],
-                body["collider_size"][1]
-            )
+                    except:
+                        print("bad luck ~ Yoru")
+                        continue
 
-            collision_rect.center = body["collider_offset"]
+                # create collider
+                collision_rect = pg.Rect(
+                    0,
+                    0,
+                    body["collider_size"][0],
+                    body["collider_size"][1]
+                )
 
-            # build final ship body ## BODIES DO NOT EXPLICITLY SAVE ACTIVE MODULES IN SLOTS - saved in game/hangar saves
-            self.mod_bodies[body_name] = RoketBody(
-                                                    name=body_name,
-                                                    displayName=body["display_name"],
-                                                    baseLives=body["base_lives"],
-                                                    baseSprites=body_sprite,
-                                                    position=(0, 0),
-                                                    size=body["size"],
-                                                    collisionRect=collision_rect,
-                                                    moduleSlots=module_slots
-                                                    )
+                collision_rect.center = body["collider_offset"]
+
+                # build final ship body ## BODIES DO NOT EXPLICITLY SAVE ACTIVE MODULES IN SLOTS - saved in game/hangar saves
+                self.mod_bodies[body_name] = RoketBody(
+                                                        name=body_name,
+                                                        displayName=body["display_name"],
+                                                        baseLives=body["base_lives"],
+                                                        baseSprites=body_sprite,
+                                                        position=(0, 0),
+                                                        size=body["size"],
+                                                        collisionRect=collision_rect,
+                                                        moduleSlots=module_slots
+                                                        )
 
         # debug
         print("--------\nLoaded ships:\n")
@@ -193,14 +194,15 @@ class ModLoader:
 
         print("")
     
-    def _load_module_types(self, source:str):
-        data = JsonLoader.load_from_file(source)
-        
-        for module_type in data[md.MOD_FEATURE_MODULE_TYPE]:
-            if module_type not in self.mod_module_types:
-                self.mod_module_types.append(module_type)
-            else:
-                print(f"{__name__}:module_type_loader: module type {module_type} already loaded; skipping")
+    def _load_module_types(self, source:list):
+
+        for single_souce in source:
+            data = JsonLoader.load_from_file(single_souce)
+            for module_type in data[md.MOD_FEATURE_MODULE_TYPE]:
+                if module_type not in self.mod_module_types:
+                    self.mod_module_types.append(module_type)
+                else:
+                    print(f"{__name__}:module_type_loader: module type {module_type} already loaded; skipping")
 
         # debug
         print("--------\nLoaded module types:\n")
@@ -210,42 +212,43 @@ class ModLoader:
 
         print("")
     
-    def _load_modules(self, source:str):
-        data = JsonLoader.load_from_file(source)
-        
-        for module_name, module in data[md.MOD_FEATURE_MODULE].items():
+    def _load_modules(self, source:list):
+    
+        for single_source in source:
+            data = JsonLoader.load_from_file(single_source)
+            for module_name, module in data[md.MOD_FEATURE_MODULE].items():
 
-            # prepare sprites
-            loaded_sprite_path = module["sprite"]
+                # prepare sprites
+                loaded_sprite_path = module["sprite"]
 
-            # prepare prefix
-            sprite_path_prefix = None
+                # prepare prefix
+                sprite_path_prefix = None
 
-            if module["sprite_source"] == "internal":
-                sprite_path_prefix = INTERNAL_SPRITE_PATH
-            elif module["sprite_source"] == "external":
-                sprite_path_prefix = EXTERNAL_SPRITE_PATH
-            else:
-                sprite_path_prefix = "" # when using fully custom paths
+                if module["sprite_source"] == "internal":
+                    sprite_path_prefix = INTERNAL_SPRITE_PATH
+                elif module["sprite_source"] == "external":
+                    sprite_path_prefix = EXTERNAL_SPRITE_PATH
+                else:
+                    sprite_path_prefix = "" # when using fully custom paths
 
-            sprite_path = sprite_path_prefix + loaded_sprite_path
+                sprite_path = sprite_path_prefix + loaded_sprite_path
 
-            # generate sprite name
-            sprite_name = f"{module_name}_module"
+                # generate sprite name
+                sprite_name = f"{module_name}_module"
 
-            sprite = self.app.sprite_handler.load_sprite(sprite_name, sprite_path, (100,100), "ca")
+                sprite = self.app.sprite_handler.load_sprite(sprite_name, sprite_path, (100,100), "ca")
 
-            module_sprite = flatpane("sprite", {"main":sprite}, sprite="main")
+                module_sprite = flatpane("sprite", {"main":sprite}, sprite="main")
 
-            self.mod_modules[module_name] = RoketModule(
-                                                            module_name,
-                                                            module["display_name"],
-                                                            module["module_type"],
-                                                            1,
-                                                            1,
-                                                            module["modifiers"],
-                                                            module_sprite
-                                                        )
+                self.mod_modules[module_name] = RoketModule(
+                                                                module_name,
+                                                                module["display_name"],
+                                                                module["module_type"],
+                                                                1,
+                                                                1,
+                                                                module["modifiers"],
+                                                                module_sprite
+                                                            )
             
         # debug
         print("--------\nLoaded modules:\n")
@@ -255,61 +258,62 @@ class ModLoader:
 
         print("")
 
-    def _load_spawnables(self, source:str):
-        data = JsonLoader.load_from_file(source)
-        
-        for spawnable_name, spawnable in data[md.MOD_FEATURE_SPAWNABLE].items():
+    def _load_spawnables(self, source:list):
+    
+        for single_source in source:
+            data = JsonLoader.load_from_file(single_source)
+            for spawnable_name, spawnable in data[md.MOD_FEATURE_SPAWNABLE].items():
 
-            # prepare sprites
-            loaded_sprite_paths = spawnable["animation_sprites"]
+                # prepare sprites
+                loaded_sprite_paths = spawnable["animation_sprites"]
 
-            # prepare prefix
-            sprite_path_prefix = None
+                # prepare prefix
+                sprite_path_prefix = None
 
-            if spawnable["sprite_source"] == "internal":
-                sprite_path_prefix = INTERNAL_SPRITE_PATH
-            elif spawnable["sprite_source"] == "external":
-                sprite_path_prefix = EXTERNAL_SPRITE_PATH
-            else:
-                sprite_path_prefix = "" # when using fully custom paths
+                if spawnable["sprite_source"] == "internal":
+                    sprite_path_prefix = INTERNAL_SPRITE_PATH
+                elif spawnable["sprite_source"] == "external":
+                    sprite_path_prefix = EXTERNAL_SPRITE_PATH
+                else:
+                    sprite_path_prefix = "" # when using fully custom paths
 
-            # output sprite dict
-            sprite_dict = {}
+                # output sprite dict
+                sprite_dict = {}
 
-            # load sprites
-            for sprite_index in range(len(loaded_sprite_paths)):
-                sprite_path = sprite_path_prefix + loaded_sprite_paths[sprite_index]
+                # load sprites
+                for sprite_index in range(len(loaded_sprite_paths)):
+                    sprite_path = sprite_path_prefix + loaded_sprite_paths[sprite_index]
 
-                # generate sprite name
-                sprite_name = f"{spawnable_name}_anim_{sprite_index}"
+                    # generate sprite name
+                    sprite_name = f"{spawnable_name}_anim_{sprite_index}"
 
-                sprite_dict[sprite_index] = self.app.sprite_handler.load_sprite(sprite_name, sprite_path, (100,100), "ca")
+                    sprite_dict[sprite_index] = self.app.sprite_handler.load_sprite(sprite_name, sprite_path, (100,100), "ca")
 
 
-            # create final flatpane
-            spawnable_sprite = flatpane("sprite", sprite_dict, sprite=0)
+                # create final flatpane
+                spawnable_sprite = flatpane("sprite", sprite_dict, sprite=0)
 
-            # collider
-            collision_rect = pg.Rect(
-                0,
-                0,
-                spawnable["collider_size"][0],
-                spawnable["collider_size"][1]
-            )
+                # collider
+                collision_rect = pg.Rect(
+                    0,
+                    0,
+                    spawnable["collider_size"][0],
+                    spawnable["collider_size"][1]
+                )
 
-            navigator = Navigator(self, spawnable["navigator"])
+                navigator = Navigator(self, spawnable["navigator"])
 
-            # spawnable
-            self.mod_spawnables[spawnable_name] = SpawnablePrefab( # the spawnable prefab is used ## yeah its late 
-                appInstance=self.app,
-                name=spawnable_name,
-                displayName=spawnable["display_name"],
-                collider=collision_rect,
-                sprites=spawnable_sprite,
-                navigator=navigator,
-                actions=spawnable["actions"],
-                moveSpeed=spawnable["speed"]
-            )
+                # spawnable
+                self.mod_spawnables[spawnable_name] = SpawnablePrefab( # the spawnable prefab is used ## yeah its late 
+                    appInstance=self.app,
+                    name=spawnable_name,
+                    displayName=spawnable["display_name"],
+                    collider=collision_rect,
+                    sprites=spawnable_sprite,
+                    navigator=navigator,
+                    actions=spawnable["actions"],
+                    moveSpeed=spawnable["speed"]
+                )
 
         # debug
         print("--------\nLoaded spawnables:\n")
@@ -319,17 +323,18 @@ class ModLoader:
 
         print("")
 
-    def _load_environments(self, source:str):
-        data = JsonLoader.load_from_file(source)
-        
-        for environment_name, environment in data[md.MOD_FEATURE_ENV].items():
-            env = Environment(
-                appInstance=self.app,
-                backgroundColor=environment["background_color"],
-                objectEvents=environment["environment_object_events"]
-            )
+    def _load_environments(self, source:list):
 
-            self.mod_environments[environment_name] = env
+        for single_source in source:
+            data = JsonLoader.load_from_file(single_source)
+            for environment_name, environment in data[md.MOD_FEATURE_ENV].items():
+                env = Environment(
+                    appInstance=self.app,
+                    backgroundColor=environment["background_color"],
+                    objectEvents=environment["environment_object_events"]
+                )
+
+                self.mod_environments[environment_name] = env
 
         # debug
         print("--------\nLoaded environments:\n")
@@ -339,27 +344,54 @@ class ModLoader:
 
         print("") # sep
 
-    def _load_levels(self, source:str):
-        data = JsonLoader.load_from_file(source)
+    def _load_levels(self, source:list):
         
-        for level_name, level in data[md.MOD_FEATURE_LEVEL].items():
-            lev = Level(
-                appInstance=self.app,
-                displayName=level["display_name"],
-                icon=level["icon"], # needs to be loaded and scaled actually or use the image frame idk
-                stages=level["stages"],
-                requirements=level["requirements"],
-                allowedShips=level["allowed_ships"],
-                disallowedShips=level["disallowed_ships"]
-            )
+        for single_source in source:
+            data = JsonLoader.load_from_file(single_source)
+            for level_name, level in data[md.MOD_FEATURE_LEVEL].items():
+                lev = Level(
+                    appInstance=self.app,
+                    displayName=level["display_name"],
+                    icon=level["icon"], # needs to be loaded and scaled actually or use the image frame idk
+                    stages=level["stages"],
+                    requirements=level["requirements"],
+                    allowedShips=level["allowed_ships"],
+                    disallowedShips=level["disallowed_ships"]
+                )
 
-            self.mod_levels[level_name] = lev
+                self.mod_levels[level_name] = lev
 
         # debug
         print("--------\nLoaded levels:\n")
 
         for level_name, level in self.mod_levels.items():
             print(f"{level.displayName} ({level_name})")
+
+        print("") # sep
+
+    def _load_careers(self, source:list):
+
+        for single_source in source:
+            data = JsonLoader.load_from_file(single_source)
+            for career_name, career_data in data[md.MOD_FEATURE_CAREER].items():
+                career = Career(
+                    appInstance         =self.app,
+                    displayName         =career_data["display_name"],
+                    icon                =career_data["icon"], # needs to be loaded and scaled actually or use the image frame idk
+                    levels              =career_data["levels"],
+                    reqBeatenLevels     =career_data["requirements"]["beaten_levels"],
+                    reqBeatenCareers    =career_data["requirements"]["beaten_careers"],
+                    allowedShips        =career_data["allowed_ships"],
+                    disallowedShips     =career_data["disallowed_ships"]
+                )
+
+                self.mod_careers[career_name] = career
+
+        # debug
+        print("--------\nLoaded careers:\n")
+
+        for career_name, career in self.mod_careers.items():
+            print(f"{career.displayName} ({career_name})")
 
         print("") # sep
 

@@ -542,7 +542,7 @@ class MainEngine:
             ship_mod_scene.pedestal_size
         )
 
-        self.show_choice_yes_no_popup("Are you sure whatever you're doing is worth it? This is a very long dummy text that is utterly useless for anything else :33")
+        #self.show_choice_yes_no_popup("Are you sure whatever you're doing is worth it? This is a very long dummy text that is utterly useless for anything else :33")
 
     # VIRTUAL DISPLAY PREP
 
