@@ -322,11 +322,13 @@ class MainEngine:
         title_scene.update = self.title_update
         main_menu_scene.update = self.main_menu_update
         ship_mod_scene.update = self.ship_modification_update
+        career_scene.update = self.career_update
 
         # override scene renders
         title_scene.render = self.title_render
         main_menu_scene.render = self.main_menu_render
         ship_mod_scene.render = self.ship_modification_render
+        career_scene.render = self.career_render
 
         # override scene shis
 
@@ -358,7 +360,7 @@ class MainEngine:
         main_menu_mode_frame_x = main_menu_ship_frame_x + main_menu_ship_frame_width + 2 * main_menu_background_frame_margin
         main_menu_news_frame_x = main_menu_mode_frame_x + main_menu_mode_frame_width + 2 * main_menu_background_frame_margin
 
-        ## title
+        ## TITLE
 
         title_scene.main_text = self.texts["title_title"]
         title_scene.version_text = "v" + GAME_VERSION + " - " + GAME_VERSION_HINT
@@ -375,7 +377,7 @@ class MainEngine:
         title_scene.buttons["achievements"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_leaderboard_button"], "hover":self.sprites["mainmenu_leaderboard_button_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_square_button_size) / 2 + title_side_button_x_distance), self.to_scale_y((HEIGHT - title_square_button_size) / 2 + title_button_y_offset), self.to_scale_x(title_square_button_size), self.to_scale_y(title_square_button_size)), 0, None, partial(self.show_warning_popup, "achievements pressed"), None, self)
 
 
-        ## main_menu
+        ## MAIN MENU
         main_menu_scene.launch_text = self.texts["main_menu_launch"] + " " + self.get_keybind_keycode_name_in_square_brackets("ui_forward")
         main_menu_scene.return_text = self.texts["main_menu_return"] + " " + self.get_keybind_keycode_name_in_square_brackets("ui_back")
         main_menu_scene.background_frame = UIFrameBuilder.get_ui_frame(self.to_scale_x(main_menu_background_frame_width), self.to_scale_y(main_menu_background_frame_height), self.sprites)
@@ -431,7 +433,7 @@ class MainEngine:
 
         main_menu_scene.mode_button_names = ["mode_career", "mode_infinite", "mode_dummy"]
 
-        ## ship modification
+        ## SHIP MODIFICATION
         ship_mod_scene.buttons = {}
 
         ship_mod_background_frame_size = (1600, 900)
@@ -541,6 +543,73 @@ class MainEngine:
             ship_mod_scene.pedestal_pos,
             ship_mod_scene.pedestal_size
         )
+
+        ## CAREER
+        career_scene.buttons = {}
+
+        career_background_frame_size = (1600, 900)
+        career_background_frame_pos = (
+            (WIDTH - career_background_frame_size[0]) / 2,
+            (HEIGHT - career_background_frame_size[1]) / 2
+        )
+
+        career_return_button_margin = 25
+        career_return_button_size = 128
+
+        career_scene.background_frame = UIFrameBuilder.get_ui_frame(
+            self.to_scale_x(career_background_frame_size[0]),
+            self.to_scale_y(career_background_frame_size[1]),
+            self.sprites
+        )
+        career_scene.background_frame_rect = pg.Rect(self.to_scale(career_background_frame_pos), self.to_scale(career_background_frame_size))
+
+        career_scene.return_button_text = "<" # also hardcoded xd
+        career_scene.buttons["return"] = button(flatpane("sprite", {"main":self.sprites["button_template_square"], "hover":self.sprites["button_template_square_dark"]}, sprite="main"), pg.Rect(self.to_scale((career_background_frame_pos[0] + career_return_button_margin, career_background_frame_pos[1] + career_return_button_margin)), self.to_scale((career_return_button_size, career_return_button_size))), 0, None, partial(self.scene_handler.setActiveScene, "main_menu"), None, self)
+
+        ### career choice
+        career_selector_element_margin  = 25
+        career_selector_element_height  = 128 # also the button size
+        career_selector_display_width   = 500
+
+        career_scene.selector_button_left_text = "<"
+        career_scene.selector_button_right_text = ">"
+
+        career_scene.career_selector_starting_position = (
+            career_background_frame_pos[0] + career_selector_element_margin + career_scene.buttons["return"].rect.right,
+            career_background_frame_pos[1] + career_selector_element_margin
+        )
+
+        career_scene.buttons["career_selector_left"] = button(
+                flatpane("sprite", {"main":self.sprites["button_template_square"], "hover":self.sprites["button_template_square_dark"]}, sprite="main"),
+                pg.Rect(self.to_scale((career_scene.career_selector_starting_position[0], career_scene.career_selector_starting_position[1])), self.to_scale((career_return_button_size, career_return_button_size))),
+                0,
+                None,
+                partial(print, "selected_left"),
+                None,
+                self
+            )
+
+        career_scene.buttons["career_selector_right"] = button(
+                flatpane("sprite", {"main":self.sprites["button_template_square"], "hover":self.sprites["button_template_square_dark"]}, sprite="main"),
+                pg.Rect(self.to_scale((career_scene.career_selector_starting_position[0] + career_selector_display_width + career_selector_element_height + 2 * career_selector_element_margin, career_scene.career_selector_starting_position[1])), self.to_scale((career_return_button_size, career_return_button_size))),
+                0,
+                None,
+                partial(print, "selected_left"),
+                None,
+                self
+            )
+
+        career_scene.selector_display = UIFrameBuilder.get_ui_frame(
+                self.to_scale_x(career_selector_display_width),
+                self.to_scale_y(career_selector_element_height),
+                self.sprites
+            )
+
+        career_scene.selector_display_rect = pg.Rect(
+            self.to_scale((career_scene.career_selector_starting_position[0] + career_selector_element_height + career_selector_element_margin, career_scene.career_selector_starting_position[1])),
+            self.to_scale((career_selector_display_width, career_selector_element_height))
+        )
+
 
         #self.show_choice_yes_no_popup("Are you sure whatever you're doing is worth it? This is a very long dummy text that is utterly useless for anything else :33")
 
@@ -1427,8 +1496,6 @@ class MainEngine:
 
                     self.get_active_ship().get_module(ship_mod.active_ship_module.get_slot_id()).add_module(slot.get_module(), force=True)
 
-
-
     def ship_modification_render(self):
         ship_mod = self.scene_handler.getScene("ship_modification")
         
@@ -1475,6 +1542,33 @@ class MainEngine:
 
         # draw ship pedestal
         ship_mod.pedestal.render()
+
+    def career_update(self):
+        career = self.scene_handler.getScene("career")
+
+        # update all buttons
+        for button_index in career.buttons:
+            button = career.buttons[button_index]
+            button.activation_detection(self.corrected_mouse_info)
+            button.update_hold_time(self.corrected_mouse_info)
+
+    def career_render(self):
+        career = self.scene_handler.getScene("career")
+
+        # draw background frame
+        self.draw("sprite", self.LAYER_UI_BOTTOM, {"sprite":career.background_frame, "rect":career.background_frame_rect})
+
+        # draw selector display background (frame)
+        self.draw("sprite", self.LAYER_UI_TOP, {"sprite":career.selector_display, "rect":career.selector_display_rect})
+
+        # draw buttons
+        for button in career.buttons:
+            career.buttons[button].render()
+
+        # draw button texts
+        self.draw_button_text(career.return_button_text, career.buttons["return"])
+        self.draw_button_text(career.selector_button_left_text, career.buttons["career_selector_left"])
+        self.draw_button_text(career.selector_button_right_text, career.buttons["career_selector_right"])
 
     # INTERNAL RANDOM AHH HELPERS
 
