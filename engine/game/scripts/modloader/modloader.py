@@ -25,14 +25,38 @@ class ModLoader:
         self.app = appInstance
 
         # feature memory
-        self.mod_bodies         :dict[RoketBody]            = {}
+        self.mod_bodies         :dict[str,RoketBody]        = {}
         self.mod_module_types   :list[RoketModuleType]      = [] # !list
-        self.mod_modules        :dict[RoketModule]          = {}
-        self.mod_spawnables     :dict[SpawnablePrefab]      = {}
-        self.mod_careers        :dict[Career]               = {}
-        self.mod_levels         :dict[Level]                = {}
-        self.mod_environments   :dict[Environment]          = {}
+        self.mod_modules        :dict[str,RoketModule]      = {}
+        self.mod_spawnables     :dict[str,SpawnablePrefab]  = {}
+        self.mod_careers        :dict[str,Career]           = {}
+        self.mod_levels         :dict[str,Level]            = {}
+        self.mod_environments   :dict[str,Environment]      = {}
         self.mod_localizations  :list[LocalizationResource] = [] # !list
+
+    def get_roket_bodies(self):
+        return self.mod_bodies
+
+    def get_module_types(self):
+        return self.mod_module_types
+
+    def get_modules(self):
+        return self.mod_modules
+
+    def get_spawnables(self):
+        return self.mod_spawnables
+
+    def get_careers(self):
+        return self.mod_careers
+
+    def get_levels(self):
+        return self.mod_levels
+
+    def get_environments(self):
+        return self.mod_environments
+
+    def get_localizations(self):
+        return self.mod_localizations
 
     def reload_mods(self):
         pass

@@ -54,6 +54,7 @@ from engine.game.scripts.modloader.roket_spawnable_related.spawnable_prefab     
 from engine.game.scripts.modloader.environment_related.environment                  import Environment
 from engine.game.scripts.modloader.roket_spawnable_related.spawnable_navigator      import Navigator
 from game.scripts.gamestate.gamestate_object                                        import GameState
+from game.scripts.modloader.career_related.career                                   import Career
 from engine.game.scripts.modloader.level_related.level                              import Level
 from game.scripts.ship_modification_related.ship_modification_panel                 import ShipModPanel
 from game.scripts.ship_modification_related.ship_modification_page                  import ShipModPage
@@ -65,6 +66,8 @@ from game.scripts.popup_windows.popup_info                                      
 from game.scripts.popup_windows.popup_warning                                       import PopupWindowWarning
 from game.scripts.popup_windows.popup_yes_no                                        import PopupWindowYesNo
 from game.scripts.vuilib_extension.text_button                                      import TextButton
+from game.scripts.vuilib_extension.scrollable_window                                import ScrollableWindow
+from game.scripts.vuilib_extension.scrollbar                                        import Scrollbar
 from engine.game.scripts.modloader.localization_related.localizationResource        import LocalizationResource
 
 """ from game.game import MainGame """
@@ -73,6 +76,7 @@ from engine.game.scripts.modloader.localization_related.localizationResource    
 from scripts.tileScripts.baseBiomeWeights import baseBiomeWeights
 
 import psutil
+
 from functools      import lru_cache
 from functools      import partial
 from copy           import deepcopy
@@ -263,6 +267,9 @@ class MainEngine:
         # active ship
         self.active_ship_name = "legacy" # will be replaced by loading a save perhaps?
 
+        # active career
+        self.active_career_name = None
+
         # rocket config select
         #self.selected_roket_body = self.roket_bodies["legacy"]
 
@@ -309,26 +316,26 @@ class MainEngine:
         # set main scene
         self.scene_handler.setActiveScene("title")
 
-        title_scene = self.scene_handler.getScene("title")
-        main_menu_scene = self.scene_handler.getScene("main_menu")
-        ship_mod_scene = self.scene_handler.getScene("ship_modification")
-        game_scene = self.scene_handler.getScene("game")
-        career_scene = self.scene_handler.getScene("career")
-        infinite_setup_scene = self.scene_handler.getScene("infinite_setup")
-        achievements_scene = self.scene_handler.getScene("achievements")
-        settings_scene = self.scene_handler.getScene("settings")
+        title_scene             = self.scene_handler.getScene("title")
+        main_menu_scene         = self.scene_handler.getScene("main_menu")
+        ship_mod_scene          = self.scene_handler.getScene("ship_modification")
+        game_scene              = self.scene_handler.getScene("game")
+        career_scene            = self.scene_handler.getScene("career")
+        infinite_setup_scene    = self.scene_handler.getScene("infinite_setup")
+        achievements_scene      = self.scene_handler.getScene("achievements")
+        settings_scene          = self.scene_handler.getScene("settings")
 
         # override scene updates
-        title_scene.update = self.title_update
-        main_menu_scene.update = self.main_menu_update
-        ship_mod_scene.update = self.ship_modification_update
-        career_scene.update = self.career_update
+        title_scene.update          = self.title_update
+        main_menu_scene.update      = self.main_menu_update
+        ship_mod_scene.update       = self.ship_modification_update
+        career_scene.update         = self.career_update
 
         # override scene renders
-        title_scene.render = self.title_render
-        main_menu_scene.render = self.main_menu_render
-        ship_mod_scene.render = self.ship_modification_render
-        career_scene.render = self.career_render
+        title_scene.render          = self.title_render
+        main_menu_scene.render      = self.main_menu_render
+        ship_mod_scene.render       = self.ship_modification_render
+        career_scene.render         = self.career_render
 
         # override scene shis
 
@@ -569,7 +576,7 @@ class MainEngine:
         ### career choice
         career_selector_element_margin  = 25
         career_selector_element_height  = 128 # also the button size
-        career_selector_display_width   = 500
+        career_selector_display_width   = 700
 
         career_scene.selector_button_left_text = "<"
         career_scene.selector_button_right_text = ">"
@@ -584,7 +591,7 @@ class MainEngine:
                 pg.Rect(self.to_scale((career_scene.career_selector_starting_position[0], career_scene.career_selector_starting_position[1])), self.to_scale((career_return_button_size, career_return_button_size))),
                 0,
                 None,
-                partial(print, "selected_left"),
+                partial(self.cycle_career, False),
                 None,
                 self
             )
@@ -594,7 +601,7 @@ class MainEngine:
                 pg.Rect(self.to_scale((career_scene.career_selector_starting_position[0] + career_selector_display_width + career_selector_element_height + 2 * career_selector_element_margin, career_scene.career_selector_starting_position[1])), self.to_scale((career_return_button_size, career_return_button_size))),
                 0,
                 None,
-                partial(print, "selected_left"),
+                partial(self.cycle_career, True),
                 None,
                 self
             )
@@ -609,6 +616,8 @@ class MainEngine:
             self.to_scale((career_scene.career_selector_starting_position[0] + career_selector_element_height + career_selector_element_margin, career_scene.career_selector_starting_position[1])),
             self.to_scale((career_selector_display_width, career_selector_element_height))
         )
+
+        career_scene.selector_display_text = "No career selected" # you should never see this XD
 
 
         #self.show_choice_yes_no_popup("Are you sure whatever you're doing is worth it? This is a very long dummy text that is utterly useless for anything else :33")
@@ -1331,6 +1340,43 @@ class MainEngine:
     def get_ingame_ship(self):
         return self.gamestate.get_roket_body()
 
+    def cycle_career(self, direction:bool):
+        # default if first cycle
+        if not self.active_career_name:
+            self.active_career_name = list(self.modloader.get_careers().keys())[0] # select the first available ## later through a save load
+
+        career_names = list(self.modloader.get_careers().keys())
+
+        active_career_index = career_names.index(self.active_career_name)
+
+        if direction:
+            active_career_index += 1
+        else:
+            active_career_index -= 1
+
+        if active_career_index < 0:
+            active_career_index = len(career_names) - 1
+        elif active_career_index > len(career_names) - 1:
+            active_career_index = 0
+
+        self.set_active_career(career_names[active_career_index])
+
+        self.regenerate_career_panel()
+
+    def set_active_career(self, careerName:str):
+        if careerName not in self.modloader.get_careers().keys():
+            print("absolute garbage")
+            return
+
+        self.active_career_name = careerName
+
+        print(f"\nselected career: {careerName}")
+
+    def regenerate_career_panel(self):
+        career = self.scene_handler.getScene("career")
+
+        career.selector_display_text = f"{self.modloader.get_careers().get(self.active_career_name).get_display_name()} [{list(self.modloader.get_careers().keys()).index(self.active_career_name) + 1}/{len(list(self.modloader.get_careers().keys()))}]" # java got nothin on me! >:3
+
     def spawn_spawnable(self, spawnableName:str, spawnableTargetPos:tuple):
         if spawnableName in self.roket_spawnables:
             spawnablePrefab:SpawnablePrefab = self.roket_spawnables.get(spawnableName)
@@ -1569,6 +1615,9 @@ class MainEngine:
         self.draw_button_text(career.return_button_text, career.buttons["return"])
         self.draw_button_text(career.selector_button_left_text, career.buttons["career_selector_left"])
         self.draw_button_text(career.selector_button_right_text, career.buttons["career_selector_right"])
+
+        # draw selector display text
+        self.draw("text", self.LAYER_UI_TOP, {"text":career.selector_display_text, "font":self.button_font, "center":career.selector_display_rect.center, "no_bg":True, "rect":pg.Rect(0,0,0,0), "color":black}) # idk maybe white
 
     # INTERNAL RANDOM AHH HELPERS
 

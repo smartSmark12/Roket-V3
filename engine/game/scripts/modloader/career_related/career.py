@@ -28,3 +28,6 @@ class Career:
 
     def get_icon(self):
         return self.icon
+
+    def get_display_name(self):
+        return self.displayName

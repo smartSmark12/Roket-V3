@@ -14,7 +14,7 @@ class SpriteHandlerJSON:
         print(f"{__name__}: Starting initial sprite loading (using SpriteHandlerJSON)...\n")
         self.load_sprites()
 
-    def load_sprite(self, spriteName:str, spriteFilePath:str, size:tuple, convert:str):
+    def load_sprite(self, spriteName:str, spriteFilePath:str, size:tuple, convert:str, realscale:bool=True):
         if EXTENDED_DEBUG_ENABLED:
             print(f"{__name__}: loading sprite...")
 
@@ -27,9 +27,12 @@ class SpriteHandlerJSON:
             return
         
         try:
-            image = self.real_scale_sprite(image, size)
+            if realscale:
+                image = self.real_scale_sprite(image, size)
+            else:
+                image = self.rescale_sprite(image, size)
         except:
-            print(f"can't scale {spriteName} to size {float(size[0])}:{float(size[1])}")
+            print(f"can't scale {spriteName} to size {float(size[0])}:{float(size[1])} (realscale: {realscale})")
             return
 
         try:

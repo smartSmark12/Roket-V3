@@ -28,6 +28,34 @@
             [
 
             ]
+        },
+        "debug_career1":
+        {
+            "display_name":"Debug career",
+            "icon":"",
+            "levels":
+            [
+                "core_miranda_1"
+            ],
+            "requirements":
+            {
+                "beaten_levels":
+                [
+
+                ],
+                "beaten_careers":
+                [
+
+                ]
+            },
+            "allowed_ships":
+            [
+
+            ],
+            "disallowed_ships":
+            [
+
+            ]
         }
     }
 }
