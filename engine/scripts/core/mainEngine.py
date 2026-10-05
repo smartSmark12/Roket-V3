@@ -190,6 +190,9 @@ class MainEngine:
         ## mouse last pressed status?? Why here?
         self.mouse_last = 0
 
+        # watch this shit
+        self._mouse_scroll = (0,0)
+
     # write your game on_init here
     def game_on_init(self):
         # set render layers
@@ -581,6 +584,12 @@ class MainEngine:
         career_scene.selector_button_left_text = "<"
         career_scene.selector_button_right_text = ">"
 
+        career_level_window_size = (career_background_frame_size[0] - 200, career_background_frame_size[1] - 300)
+        career_level_window_pos = (
+            career_background_frame_pos[0] + (career_background_frame_size[0] - career_level_window_size[0]) / 2,
+            career_background_frame_pos[1] + (career_background_frame_size[1] - career_level_window_size[1]) / 2 + 100
+        )
+
         career_scene.career_selector_starting_position = (
             career_background_frame_pos[0] + career_selector_element_margin + career_scene.buttons["return"].rect.right,
             career_background_frame_pos[1] + career_selector_element_margin
@@ -619,6 +628,13 @@ class MainEngine:
 
         career_scene.selector_display_text = "No career selected" # you should never see this XD
 
+        career_scene.level_scroll_window = ScrollableWindow(
+            appInstance     =self,
+            pos             =career_level_window_pos,
+            size            =career_level_window_size,
+            scrollbar       =Scrollbar(self, (career_level_window_pos[0] + career_level_window_size[0] + 20, career_level_window_pos[1]), (30, career_level_window_size[1]), (255, 0, 0), 60, self.sprite_handler.load_sprite("scrollbar_floater", "engine/game/assets/img/menu/scrollbar_floater.png", (30, 60), "c", False)),
+            backgroundColor =(0, 0, 255)
+        )
 
         #self.show_choice_yes_no_popup("Are you sure whatever you're doing is worth it? This is a very long dummy text that is utterly useless for anything else :33")
 
@@ -1592,6 +1608,9 @@ class MainEngine:
     def career_update(self):
         career = self.scene_handler.getScene("career")
 
+        # update level window
+        career.level_scroll_window.update()
+
         # update all buttons
         for button_index in career.buttons:
             button = career.buttons[button_index]
@@ -1618,6 +1637,9 @@ class MainEngine:
 
         # draw selector display text
         self.draw("text", self.LAYER_UI_TOP, {"text":career.selector_display_text, "font":self.button_font, "center":career.selector_display_rect.center, "no_bg":True, "rect":pg.Rect(0,0,0,0), "color":black}) # idk maybe white
+
+        # draw level window
+        career.level_scroll_window.render()
 
     # INTERNAL RANDOM AHH HELPERS
 
@@ -1967,6 +1989,9 @@ class MainEngine:
             if event.type == pg.QUIT:
                 self.is_running = False
 
+            if event.type == pg.MOUSEWHEEL:
+                self._mouse_scroll = (event.x, event.y)
+
         self.keyhandler.update_keys()
 
     def update(self):
@@ -1982,10 +2007,10 @@ class MainEngine:
 
         self.mouse_last = left_pressed
 
-        self.mouse_info = (pg.mouse.get_pos(), left_pressed, mouse_changed)
+        self.mouse_info = (pg.mouse.get_pos(), left_pressed, mouse_changed, self._mouse_scroll)
 
         ## correct mouse information for different resolutions
-        self.corrected_mouse_info = (self.screen_to_game_coords(pg.mouse.get_pos()), left_pressed, mouse_changed)
+        self.corrected_mouse_info = (self.screen_to_game_coords(pg.mouse.get_pos()), left_pressed, mouse_changed, self._mouse_scroll)
 
         #self.draw("circle", 9, {"center":self.corrected_mouse_info[0]})
 

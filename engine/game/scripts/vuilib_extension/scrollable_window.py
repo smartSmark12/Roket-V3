@@ -3,21 +3,34 @@ import pygame as pg
 from game.scripts.vuilib_extension.scrollbar import Scrollbar
 
 class ScrollableWindow:
-    def __init__(self, size:tuple[float,float], scrollbar:Scrollbar, backgroundColor=None):
+    def __init__(self, appInstance, pos:tuple[float,float], size:tuple[float,float], scrollbar:Scrollbar, backgroundColor=None, layer:int|None=None):
+        self.app = appInstance
+        self.pos = pos
         self.size = size
         self.scrollbar = scrollbar
         self.backgroundCol = backgroundColor
 
+        self.layer = layer if layer is not None else self.app.LAYER_UI_TOP
+
         self.rect = pg.Rect(
-            0,
-            0,
+            self.pos[0],
+            self.pos[1],
             self.size[0],
             self.size[1]
+        )
+
+        self.render_rect = pg.Rect(
+            self.app.to_scale_x(self.pos[0]),
+            self.app.to_scale_y(self.pos[1]),
+            0,
+            0
         )
 
         self.render_surface = pg.Surface(
             self.size
         )
+
+        self.content_sprite = None
 
         self.get_scroll_pos = self.scrollbar.get_scroll_pos
 
@@ -27,6 +40,10 @@ class ScrollableWindow:
     def set_content(self, contentSprite:pg.Surface): # have to provide a pre_rendered surface to be scrolled
         self.content_sprite = contentSprite
 
+    def update(self):
+        if self.rect.collidepoint(self.app.corrected_mouse_info[0]):
+            self.set_scroll_pos(self.get_scroll_pos() - self.app.corrected_mouse_info[3][1] / self.size[1])
+
     def _render(self):
 
         # background
@@ -34,16 +51,25 @@ class ScrollableWindow:
             self.render_surface.fill(self.backgroundCol)
 
         # content
-        self.render_surface.blit(
-            self.content_sprite,
-            (
-                0,
-                - self.get_scroll_pos() * self.size[1]
+        if self.content_sprite:
+            self.render_surface.blit(
+                self.content_sprite,
+                (
+                    0,
+                    - self.get_scroll_pos() * self.size[1]
+                )
             )
-        )
 
-    def get_scroll_offset(self): # <pixels-y> scroll offset for interaction ## dont forget to check if the click is within the scrollable window itself as to not click on invisible objects!
+    def render(self):
+        self._render()
+        self.scrollbar.render()
+        self.app.draw("sprite", self.layer, {"sprite":self.app.sprite_handler.real_scale_sprite(self.render_surface, self.size), "rect":self.render_rect})
+
+    def _get_scroll_offset(self): # <pixels-y> scroll offset for interaction ## dont forget to check if the click is within the scrollable window itself as to not click on invisible objects!
         return self.size[1] * self.get_scroll_pos()
+
+    def get_scroll_corrected_pos(self, pos:tuple[float|float]):
+        return (pos[0], pos[1] + self._get_scroll_offset())
 
     def get_surface(self, update:bool=True):
         if update:
