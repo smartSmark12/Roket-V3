@@ -3,12 +3,13 @@ import pygame as pg
 from game.scripts.vuilib_extension.scrollbar import Scrollbar
 
 class ScrollableWindow:
-    def __init__(self, appInstance, pos:tuple[float,float], size:tuple[float,float], scrollbar:Scrollbar, backgroundColor=None, layer:int|None=None):
+    def __init__(self, appInstance, pos:tuple[float,float], size:tuple[float,float], scrollbar:Scrollbar, backgroundColor=None, layer:int|None=None, scrollSpeedMultiplier:float=1.):
         self.app = appInstance
         self.pos = pos
         self.size = size
         self.scrollbar = scrollbar
         self.backgroundCol = backgroundColor
+        self.scrollSpeed = scrollSpeedMultiplier
 
         self.layer = layer if layer is not None else self.app.LAYER_UI_TOP
 
@@ -42,7 +43,7 @@ class ScrollableWindow:
 
     def update(self):
         if self.rect.collidepoint(self.app.corrected_mouse_info[0]):
-            self.set_scroll_pos(self.get_scroll_pos() - self.app.corrected_mouse_info[3][1] / self.size[1])
+            self.set_scroll_pos(self.get_scroll_pos() - (self.app.corrected_mouse_info[3][1] / self.size[1]) * self.scrollSpeed)
 
     def _render(self):
 
