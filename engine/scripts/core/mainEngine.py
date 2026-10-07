@@ -8,7 +8,9 @@
 import pygame as pg # pygame; the game library this GF is built on
 import random # used for generating random numbers
 import sys # used for handling script access
+
 sys.path.append('../engine')
+
 import csv # used for saving and loading data into and from .csv files
 import os # used for handling file access and system calls
 import math # math
@@ -632,10 +634,22 @@ class MainEngine:
             appInstance             =self,
             pos                     =career_level_window_pos,
             size                    =career_level_window_size,
-            scrollbar               =Scrollbar(self, (career_level_window_pos[0] + career_level_window_size[0] + 20, career_level_window_pos[1]), (30, career_level_window_size[1]), roket_dark_orange, 60, self.sprite_handler.load_sprite("scrollbar_floater", "engine/game/assets/img/menu/scrollbar_floater.png", (30, 60), "c", False)),
+            scrollbar               =Scrollbar(
+                                            appInstance         =self,
+                                            pos                 =(career_level_window_pos[0] + career_level_window_size[0] + 20, career_level_window_pos[1]),
+                                            size                =(30, career_level_window_size[1]),
+                                            windowHeight        =career_level_window_size[1],
+                                            backgroundColor     =roket_dark_orange,
+                                            floaterHeight       =60,
+                                            floaterSprite       =self.sprite_handler.load_sprite("scrollbar_floater", "engine/game/assets/img/menu/scrollbar_floater.png", (30, 60), "c", False)
+                                        ),
             backgroundColor         =roket_light_blue,
-            scrollSpeedMultiplier   =3
+            scrollSpeedMultiplier   =50
         )
+
+        
+
+        career_scene.level_scroll_window.set_content(self.sprites["atmo_notScaled"])
 
         #self.show_choice_yes_no_popup("Are you sure whatever you're doing is worth it? This is a very long dummy text that is utterly useless for anything else :33")
 

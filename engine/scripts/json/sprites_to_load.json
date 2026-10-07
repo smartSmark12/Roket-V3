@@ -243,6 +243,11 @@
         "engine/game/assets/img/gui/pedestal_ship_slot.png",
         [60,60],
         "ca"
+    ],
+    "level_icon_default":[
+        "engine/game/assets/img/menu/level_icon_1.png",
+        [100,100],
+        "c"
     ]
 
 }

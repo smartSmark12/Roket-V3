@@ -1,13 +1,16 @@
 import pygame as pg
 import math
 
+from game.scripts.helper import Helper
+
 class Scrollbar:
-    def __init__(self, appInstance, pos:tuple[float|float], size:tuple[float,float], backgroundColor, floaterHeight:float, floaterSprite:pg.Surface, layer:int|None=None):
-        self.app = appInstance
-        self.pos = pos
-        self.size = size
-        self.backgroundCol = backgroundColor
-        self.floaterSprite = floaterSprite
+    def __init__(self, appInstance, pos:tuple[float|float], size:tuple[float,float], windowHeight:float, backgroundColor, floaterHeight:float, floaterSprite:pg.Surface, layer:int|None=None):
+        self.app            = appInstance
+        self.pos            = pos
+        self.size           = size
+        self.windowHeight   = windowHeight
+        self.backgroundCol  = backgroundColor
+        self.floaterSprite  = floaterSprite
 
         self.layer = layer if layer is not None else self.app.LAYER_UI_TOP
 
@@ -41,16 +44,14 @@ class Scrollbar:
 
         self.render_surface = pg.Surface(self.size)
 
-    @staticmethod
-    def _remap(val, min1, max1, min2, max2):
-        return min2 + (float(val - min1) / float(max1 - min1) * (max2 - min2))
+        self.content_height = 0
 
     def _render(self):
         # background
         self.render_surface.fill(self.backgroundCol)
 
         # floater
-        self.floater_render_rect.y = self._remap(self.floaterRect.y, 0, self.size[1], 0, self.size[1] - self.floaterRect.height)
+        self.floater_render_rect.y = Helper.remap(self.floaterRect.y, 0, self.size[1], 0, self.size[1] - self.floaterRect.height)
 
         self.render_surface.blit(self.floaterSprite, self.floater_render_rect)
 
@@ -61,8 +62,11 @@ class Scrollbar:
         self._render()
         self.app.draw("sprite", self.layer, {"sprite":self.app.sprite_handler.real_scale_sprite(self.render_surface, self.size), "rect":self.render_rect})
 
+    def set_content_height(self, height:float):
+        self.content_height = height
+
     def _set_scroll_pos(self, pos:float): # <0-1>
-        self.floaterRect.y = max(0, min(pos * self.size[1], self.size[1])) # cause python doesnt have a clamp function ofc how smart
+        self.floaterRect.y = Helper.clamp(pos * self.size[1], 0, self.size[1]) # cause python doesnt have a clamp function ofc how smart
 
     def get_scroll_pos(self): # <0-1>
         return self.floaterRect.y / self.size[1]
