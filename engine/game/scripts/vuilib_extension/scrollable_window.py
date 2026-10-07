@@ -61,13 +61,28 @@ class ScrollableWindow:
 
         # content
         if self.content_sprite:
-            self.render_surface.blit(
-                self.content_sprite,
-                (
-                    0,
-                    - self.get_scroll_pos() * (self.content_height - self.size[1])
-                )
+            self.app.renderer.render([
+                self.app.draw(
+                    "sprite",
+                    1,
+                    {
+                        "sprite":self.content_sprite,
+                        "rect":(0,- self.get_scroll_pos() * (self.content_height - self.size[1]), 0, 0)
+                    },
+                    True
+                )],
+                self.render_surface
             )
+            
+
+        #if self.content_sprite:
+        #    self.render_surface.blit(
+        #        self.content_sprite,
+        #        (
+        #            0,
+        #            - self.get_scroll_pos() * (self.content_height - self.size[1])
+        #        )
+        #    )
 
     def render(self):
         self._render()

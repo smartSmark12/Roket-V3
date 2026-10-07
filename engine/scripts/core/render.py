@@ -158,49 +158,58 @@ class MainGameRender:
             self.app.ogl_handler.frame_tex.release()
             
 
-    def render_old(self, to_render):
+    def render_old(self, to_render, target:pg.Surface=None):
         self.to_render = to_render
-        self.window.fill((0, 0, 0))
 
+        targetWindow = self.window
+
+        if target is not None:
+            targetWindow = target
+
+        else:
+            targetWindow.fill((0, 0, 0))
+        
         for layer in range(self.layers): # goes through every layer; set number of layers at the top in "engine default variables - layers_current"
             for item in self.to_render: # sprite, rect, line, aaline, circle, text
                 if item.layer == layer: # checks if current item is at the set layer, else skips it
                     try:
                         match item.item_type:
                             case "sprite":
-                                self.window.blit(item.metadata["sprite"], item.metadata["rect"])
+                                targetWindow.blit(item.metadata["sprite"], item.metadata["rect"])
                             case "rect":
-                                pg.draw.rect(self.window, item.metadata["color"], item.metadata["rect"], item.metadata["width"], item.metadata["radius"])
+                                pg.draw.rect(targetWindow, item.metadata["color"], item.metadata["rect"], item.metadata["width"], item.metadata["radius"])
                             case "line":
-                                pg.draw.line(self.window, item.metadata["color"], item.metadata["start"], item.metadata["end"], item.metadata["width"])
+                                pg.draw.line(targetWindow, item.metadata["color"], item.metadata["start"], item.metadata["end"], item.metadata["width"])
                             case "aaline":
-                                pg.draw.aaline(self.window, item.metadata["color"], item.metadata["start"], item.metadata["end"])
+                                pg.draw.aaline(targetWindow, item.metadata["color"], item.metadata["start"], item.metadata["end"])
                             case "circle":
-                                pg.draw.circle(self.window, item.metadata["color"], item.metadata["center"], item.metadata["radius"], item.metadata["width"])
+                                pg.draw.circle(targetWindow, item.metadata["color"], item.metadata["center"], item.metadata["radius"], item.metadata["width"])
                             case "text":
                                 if "center" in item.metadata:
                                     item.center_rect = item.metadata["font"].render(item.metadata["text"], False, (0, 0, 0)).get_rect()
                                     item.metadata["rect"] = item.center_rect
                                     item.metadata["rect"].center = item.metadata["center"]
-                                if "no_bg" in item.metadata: self.window.blit(item.metadata["font"].render(item.metadata["text"], item.metadata["antialias"], item.metadata["color"]), item.metadata["rect"])
-                                else: self.window.blit(item.metadata["font"].render(item.metadata["text"], item.metadata["antialias"], item.metadata["color"], item.metadata["bgcolor"]), item.metadata["rect"])
+                                if "no_bg" in item.metadata: targetWindow.blit(item.metadata["font"].render(item.metadata["text"], item.metadata["antialias"], item.metadata["color"]), item.metadata["rect"])
+                                else: targetWindow.blit(item.metadata["font"].render(item.metadata["text"], item.metadata["antialias"], item.metadata["color"], item.metadata["bgcolor"]), item.metadata["rect"])
                             case "poly":
-                                pg.draw.polygon(self.window, item.metadata["color"], item.metadata["points"], item.metadata["width"])
+                                pg.draw.polygon(targetWindow, item.metadata["color"], item.metadata["points"], item.metadata["width"])
                     except:
                         self.current_log.append(f"{__name__}: Item '{item.item_type}' in layer {item.layer} couldn't be rendered; check metadata parameters")
 
-        if OGL_ENABLED:
-        
-            self.app.ogl_handler.frame_tex = self.surf_to_tex(self.window)
-            self.app.ogl_handler.frame_tex.use(0)
-            self.app.ogl_handler.program["tex"] = 0
-            self.app.ogl_handler.render_object.render(mode=mgl.TRIANGLE_STRIP)
-        
-        else:
-            self.window = self.window #????
-        
-        pg.display.flip()
+        # only runs when rendering to the main window
+        if target is None:
+            if OGL_ENABLED:
+            
+                self.app.ogl_handler.frame_tex = self.surf_to_tex(self.window)
+                self.app.ogl_handler.frame_tex.use(0)
+                self.app.ogl_handler.program["tex"] = 0
+                self.app.ogl_handler.render_object.render(mode=mgl.TRIANGLE_STRIP)
+            
+            else:
+                self.window = self.window #????
+            
+            pg.display.flip()
 
-        if OGL_ENABLED:
+            if OGL_ENABLED:
 
-            self.app.ogl_handler.frame_tex.release()
+                self.app.ogl_handler.frame_tex.release()

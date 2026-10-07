@@ -1996,8 +1996,13 @@ class MainEngine:
 
             self.renderer.render(self.to_render)
 
-    def draw(self, itemType:str, layer:int, metadata:dict):
-        self.to_render.append(RenderItem(itemType, layer, metadata)) # autotransfers metadata into ## haha idk what was supposed to be here
+    def draw(self, itemType:str, layer:int, metadata:dict, external=False):
+        item = RenderItem(itemType, layer, metadata)
+        
+        if external:
+            return item
+        else:
+            self.to_render.append(item) # autotransfers metadata into ## haha idk what was supposed to be here
 
     def handle_events(self):
         # reset scroll

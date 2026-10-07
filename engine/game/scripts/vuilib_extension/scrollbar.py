@@ -53,7 +53,7 @@ class Scrollbar:
         # floater
         self.floater_render_rect.y = Helper.remap(self.floaterRect.y, 0, self.size[1], 0, self.size[1] - self.floaterRect.height)
 
-        self.render_surface.blit(self.floaterSprite, self.floater_render_rect)
+        self.render_surface.blit(self.floaterSprite, self.floater_render_rect) # could use the engine renderer, but its too simple
 
     def update(self):
         pass # scroll handling
