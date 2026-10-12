@@ -6,6 +6,8 @@ class UIFrameBuilder:
     @staticmethod
     def get_ui_frame(width:int, height:int, main_engine_sprite_dict:dict, side_left=True, side_top=True, side_right=True, side_bottom=True, alpha=False) -> pg.Surface:
         surf = pg.Surface((width, height)) # dont forget to ca
+        surf = surf.convert_alpha()
+        surf.fill((0,0,0,0))
 
         if not UIFrameBuilder.check_for_min_size(width, height, main_engine_sprite_dict):
             print(f"{UIFrameBuilder.__name__}: specified size ({width}, {height}) is too small to be rendered right; returning white square have fun")

@@ -111,6 +111,450 @@
             [
 
             ]
+        },
+        "core_debug_1":
+        {
+            "display_name":"Debug 1",
+            "icon":"",
+            "stages":
+            {
+                "1":
+                {
+                    "stage_change_text":"0-1-1 // Harsh landing",
+                    "environment":"core_miranda",
+                    "events":
+                    {
+                        "random":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ]
+                        },
+                        "forced":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ],
+                            "unlock_action":
+                            [
+
+                            ],
+                            "dialogue":
+                            [
+
+                            ]
+                        }
+                    }
+                },
+                "2":
+                {
+                    "stage_change_text":"0-1-2 // ",
+                    "environment":"core_miranda",
+                    "events":
+                    {
+                        "random":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ]
+                        },
+                        "forced":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ],
+                            "unlock_action":
+                            [
+
+                            ],
+                            "dialogue":
+                            [
+                                
+                            ]
+                        }
+                    }
+                }
+            },
+            "requirements":
+            {
+                "beaten_levels":
+                [
+
+                ],
+                "selected_ships":
+                [
+
+                ],
+                "equipped_module_types":
+                [
+
+                ],
+                "equipped_modules":
+                [
+
+                ]
+            },
+            "allowed_ships":
+            [
+
+            ],
+            "disallowed_ships":
+            [
+
+            ]
+        },
+        "core_debug_2":
+        {
+            "display_name":"Debug 2",
+            "icon":"",
+            "stages":
+            {
+                "1":
+                {
+                    "stage_change_text":"0-1-1 // Harsh landing",
+                    "environment":"core_miranda",
+                    "events":
+                    {
+                        "random":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ]
+                        },
+                        "forced":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ],
+                            "unlock_action":
+                            [
+
+                            ],
+                            "dialogue":
+                            [
+
+                            ]
+                        }
+                    }
+                },
+                "2":
+                {
+                    "stage_change_text":"0-1-2 // ",
+                    "environment":"core_miranda",
+                    "events":
+                    {
+                        "random":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ]
+                        },
+                        "forced":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ],
+                            "unlock_action":
+                            [
+
+                            ],
+                            "dialogue":
+                            [
+                                
+                            ]
+                        }
+                    }
+                }
+            },
+            "requirements":
+            {
+                "beaten_levels":
+                [
+
+                ],
+                "selected_ships":
+                [
+
+                ],
+                "equipped_module_types":
+                [
+
+                ],
+                "equipped_modules":
+                [
+
+                ]
+            },
+            "allowed_ships":
+            [
+
+            ],
+            "disallowed_ships":
+            [
+
+            ]
+        },
+        "core_debug_3":
+        {
+            "display_name":"DDEbubUFAHFUn 3",
+            "icon":"",
+            "stages":
+            {
+                "1":
+                {
+                    "stage_change_text":"0-1-1 // Harsh landing",
+                    "environment":"core_miranda",
+                    "events":
+                    {
+                        "random":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ]
+                        },
+                        "forced":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ],
+                            "unlock_action":
+                            [
+
+                            ],
+                            "dialogue":
+                            [
+
+                            ]
+                        }
+                    }
+                },
+                "2":
+                {
+                    "stage_change_text":"0-1-2 // ",
+                    "environment":"core_miranda",
+                    "events":
+                    {
+                        "random":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ]
+                        },
+                        "forced":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ],
+                            "unlock_action":
+                            [
+
+                            ],
+                            "dialogue":
+                            [
+                                
+                            ]
+                        }
+                    }
+                }
+            },
+            "requirements":
+            {
+                "beaten_levels":
+                [
+
+                ],
+                "selected_ships":
+                [
+
+                ],
+                "equipped_module_types":
+                [
+
+                ],
+                "equipped_modules":
+                [
+
+                ]
+            },
+            "allowed_ships":
+            [
+
+            ],
+            "disallowed_ships":
+            [
+
+            ]
+        },
+        "core_debug_4":
+        {
+            "display_name":"Gradim Briňák",
+            "icon":"",
+            "stages":
+            {
+                "1":
+                {
+                    "stage_change_text":"0-1-1 // Harsh landing",
+                    "environment":"core_miranda",
+                    "events":
+                    {
+                        "random":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ]
+                        },
+                        "forced":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ],
+                            "unlock_action":
+                            [
+
+                            ],
+                            "dialogue":
+                            [
+
+                            ]
+                        }
+                    }
+                },
+                "2":
+                {
+                    "stage_change_text":"0-1-2 // ",
+                    "environment":"core_miranda",
+                    "events":
+                    {
+                        "random":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ]
+                        },
+                        "forced":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ],
+                            "unlock_action":
+                            [
+
+                            ],
+                            "dialogue":
+                            [
+                                
+                            ]
+                        }
+                    }
+                }
+            },
+            "requirements":
+            {
+                "beaten_levels":
+                [
+
+                ],
+                "selected_ships":
+                [
+
+                ],
+                "equipped_module_types":
+                [
+
+                ],
+                "equipped_modules":
+                [
+
+                ]
+            },
+            "allowed_ships":
+            [
+
+            ],
+            "disallowed_ships":
+            [
+
+            ]
         }
     }
 }

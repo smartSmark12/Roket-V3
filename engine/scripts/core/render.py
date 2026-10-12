@@ -1,5 +1,6 @@
 # modified Nebula legacy renderer
 # for linux compatibility, the ThreadedGameRenderer is unused
+#
 # also using the "render_old" version, as the newer one
 # is too unfinished to have any real benefit
 #
@@ -112,51 +113,7 @@ class MainGameRender:
     def render_get_log(self):
         send_log = self.current_log.copy()
         self.current_log.clear()
-        return send_log
-    
-    def render_new(self, to_render):
-        self.window.fill((0, 0, 0))
-
-        renderitems_sorted = sorted(to_render, key=lambda item: item.layer)
-
-        for item in renderitems_sorted:
-            try:
-                match item.item_type:
-                    case "sprite":
-                        self.window.blit(item.metadata["sprite"], item.metadata["rect"])
-                    case "rect":
-                        pg.draw.rect(self.window, item.metadata["color"], item.metadata["rect"], item.metadata["width"], item.metadata["radius"])
-                    case "line":
-                        pg.draw.line(self.window, item.metadata["color"], item.metadata["start"], item.metadata["end"], item.metadata["width"])
-                    case "aaline":
-                        pg.draw.aaline(self.window, item.metadata["color"], item.metadata["start"], item.metadata["end"])
-                    case "circle":
-                        pg.draw.circle(self.window, item.metadata["color"], item.metadata["center"], item.metadata["radius"], item.metadata["width"])
-                    case "text":
-                        if "center" in item.metadata:
-                            item.center_rect = item.metadata["font"].render(item.metadata["text"], False, (0, 0, 0)).get_rect()
-                            item.metadata["rect"] = item.center_rect
-                            item.metadata["rect"].center = item.metadata["center"]
-                        if "no_bg" in item.metadata: self.window_drawing.blit(item.metadata["font"].render(item.metadata["text"], item.metadata["antialias"], item.metadata["color"]), item.metadata["rect"])
-                        else: self.window_drawing.blit(item.metadata["font"].render(item.metadata["text"], item.metadata["antialias"], item.metadata["color"], item.metadata["bgcolor"]), item.metadata["rect"])
-                    case "poly":
-                        pg.draw.polygon(self.window, item.metadata["color"], item.metadata["points"], item.metadata["width"])
-            except Exception as e:
-                self.current_log.append(f"{__name__}: Item '{item.item_type}' in layer {item.layer} couldn't be rendered; check metadata parameters; (full stack: {e})")
-
-        if OGL_ENABLED:
-        
-            self.app.ogl_handler.frame_tex = self.surf_to_tex(self.window)
-            self.app.ogl_handler.frame_tex.use(0)
-            self.app.ogl_handler.program["tex"] = 0
-            self.app.ogl_handler.render_object.render(mode=mgl.TRIANGLE_STRIP)
-        
-        pg.display.flip()
-
-        if OGL_ENABLED:
-
-            self.app.ogl_handler.frame_tex.release()
-            
+        return send_log       
 
     def render_old(self, to_render, target:pg.Surface=None):
         self.to_render = to_render

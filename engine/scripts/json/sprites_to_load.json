@@ -248,6 +248,11 @@
         "engine/game/assets/img/menu/level_icon_1.png",
         [100,100],
         "c"
+    ],
+    "scaling_tester":[
+        "engine/game/assets/img/else/scaling_tester.png",
+        [160,1280],
+        "ca"
     ]
 
 }

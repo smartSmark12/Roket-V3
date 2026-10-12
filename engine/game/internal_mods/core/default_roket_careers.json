@@ -35,7 +35,11 @@
             "icon":"",
             "levels":
             [
-                "core_miranda_1"
+                "core_miranda_1",
+                "core_debug_1",
+                "core_debug_2",
+                "core_debug_3",
+                "core_debug_4"
             ],
             "requirements":
             {

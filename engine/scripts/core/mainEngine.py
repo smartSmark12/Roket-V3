@@ -68,6 +68,7 @@ from game.scripts.popup_windows.popup_info                                      
 from game.scripts.popup_windows.popup_warning                                       import PopupWindowWarning
 from game.scripts.popup_windows.popup_yes_no                                        import PopupWindowYesNo
 from game.scripts.vuilib_extension.text_button                                      import TextButton
+from game.scripts.vuilib_extension.level_button                                     import LevelButton
 from game.scripts.vuilib_extension.scrollable_window                                import ScrollableWindow
 from game.scripts.vuilib_extension.scrollbar                                        import Scrollbar
 from engine.game.scripts.modloader.localization_related.localizationResource        import LocalizationResource
@@ -597,6 +598,10 @@ class MainEngine:
             career_background_frame_pos[1] + career_selector_element_margin
         )
 
+        career_scene.career_level_button_width = career_level_window_size[0]
+        career_scene.career_level_button_height = 100
+        career_scene.career_level_button_offset = 40
+
         career_scene.buttons["career_selector_left"] = button(
                 flatpane("sprite", {"main":self.sprites["button_template_square"], "hover":self.sprites["button_template_square_dark"]}, sprite="main"),
                 pg.Rect(self.to_scale((career_scene.career_selector_starting_position[0], career_scene.career_selector_starting_position[1])), self.to_scale((career_return_button_size, career_return_button_size))),
@@ -647,9 +652,20 @@ class MainEngine:
             scrollSpeedMultiplier   =50
         )
 
-        
+        level_button_frame = UIFrameBuilder.get_ui_frame(
+            career_scene.career_level_button_width,
+            career_scene.career_level_button_height,
+            self.sprites,
+            alpha=True
+        )
 
-        career_scene.level_scroll_window.set_content(self.sprites["atmo_notScaled"])
+        self.sprites["level_button_frame"] = level_button_frame#self.sprite_handler.real_scale_sprite(level_button_frame)
+
+        career_scene.level_buttons = {}
+
+        career_scene.level_scroll_window.set_content(self.sprites["scaling_tester"]) # self.sprites["scaling_tester"]
+
+        career_scene.button_render_surface = None
 
         #self.show_choice_yes_no_popup("Are you sure whatever you're doing is worth it? This is a very long dummy text that is utterly useless for anything else :33")
 
@@ -1403,6 +1419,42 @@ class MainEngine:
 
         print(f"\nselected career: {careerName}")
 
+        # level loading
+        career = self.modloader.get_careers().get(self.active_career_name)
+        career_scene = self.scene_handler.getScene("career")
+
+        total_content_height = 0
+
+        if len(career.get_levels()):
+
+            for index in range(len(career.get_levels())):
+                level_name = career.get_levels()[index]
+                level:Level = self.modloader.get_levels().get(level_name)
+
+                career_scene.level_buttons[level_name] = LevelButton(
+                        flatpane("sprite", {"main":self.sprites["level_button_frame"]}, sprite="main"),
+                        pg.Rect(0, (career_scene.career_level_button_height + career_scene.career_level_button_offset) * index, career_scene.career_level_button_width, career_scene.career_level_button_height),
+                        0,
+                        None,
+                        partial(print, level_name),
+                        None,
+                        self,
+                        level.displayName,
+                        level.icon,
+                        career_scene.button_render_surface,
+                        self.LAYER_UI_TOP_TOP
+                    )
+
+            # recreate render surface
+            for level_button_name, level_button in career_scene.level_buttons.items():
+                total_content_height += level_button.rect.height + career_scene.career_level_button_offset
+
+        if total_content_height > 0:
+            career_scene.button_render_surface = pg.Surface((career_scene.level_scroll_window.rect.width, total_content_height))
+            career_scene.level_scroll_window.set_content(career_scene.button_render_surface)
+        else:
+            career_scene.level_scroll_window.set_content(self.sprites["scaling_tester"])
+
     def regenerate_career_panel(self):
         career = self.scene_handler.getScene("career")
 
@@ -1652,6 +1704,17 @@ class MainEngine:
 
         # draw selector display text
         self.draw("text", self.LAYER_UI_TOP, {"text":career.selector_display_text, "font":self.button_font, "center":career.selector_display_rect.center, "no_bg":True, "rect":pg.Rect(0,0,0,0), "color":black}) # idk maybe white
+
+        # draw level buttons
+        if len(career.level_buttons.keys()) > 0:
+            _level_render_data = []
+
+            for level_button_name, level_button in career.level_buttons.items():
+                _level_render_data.extend(level_button.render())
+
+            #print(_level_render_data)
+
+            self.renderer.render(_level_render_data, career.button_render_surface)
 
         # draw level window
         career.level_scroll_window.render()

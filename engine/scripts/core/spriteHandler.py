@@ -112,8 +112,8 @@ class SpriteHandlerJSON:
     def rescale_sprite(self, spriteToRescale:pg.Surface, size:tuple|list) -> pg.Surface:
         return pg.transform.scale(spriteToRescale, (size[0], size[1]))
     
-    def real_scale_sprite(self, spriteToRescale:pg.Surface, size:tuple|list) -> pg.Surface:
-        return self.rescale_sprite(spriteToRescale, (self.to_scalex(size[0]), self.to_scaley(size[1])))
+    def real_scale_sprite(self, spriteToRescale:pg.Surface, size:tuple|list=None) -> pg.Surface:
+        return self.rescale_sprite(spriteToRescale, (self.to_scalex(size[0] if size is not None else spriteToRescale.width), self.to_scaley(size[1] if size is not None else spriteToRescale.height)))
     
     def real_scale_sprites(self, spritesToRescale:dict[str, pg.Surface], sizes:dict[str, [int, int]]): # type: ignore
         rescaled_sprites = {}
