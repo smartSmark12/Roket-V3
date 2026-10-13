@@ -101,6 +101,7 @@ class MainGameRender:
         self.layers = self.app.render_layers
         self.to_render = app.to_render
         self.surf_to_tex = app.ogl_handler.surf_to_tex
+        self.window_drawing = self.app.draw_window #pg.Surface(RESOLUTION)
 
         self.render = self.render_old
 
@@ -118,7 +119,7 @@ class MainGameRender:
     def render_old(self, to_render, target:pg.Surface=None):
         self.to_render = to_render
 
-        targetWindow = self.window
+        targetWindow = self.window_drawing
 
         if target is not None:
             targetWindow = target
@@ -163,9 +164,8 @@ class MainGameRender:
                 self.app.ogl_handler.render_object.render(mode=mgl.TRIANGLE_STRIP)
             
             else:
-                self.window = self.window #????
-            
-            pg.display.flip()
+                self.app.window.blit(self.window_drawing, pg.Rect(self.app.blackbar_x_size_aka_renderer_blit_x_offset, self.app.blackbar_y_size_aka_renderer_blit_y_offset, self.app.width, self.app.height))
+                pg.display.flip()
 
             if OGL_ENABLED:
 
