@@ -673,10 +673,11 @@ class MainEngine:
             pg.Surface.fill(self.sprites[dark_name], BUTTON_COLOR_SUBTRACT_COLOR, special_flags=pg.BLEND_SUB)
 
         career_scene.level_buttons = {}
-
         career_scene.level_scroll_window.set_content(self.sprites["scaling_tester"]) # self.sprites["scaling_tester"]
-
         career_scene.button_render_surface = None
+
+        self.cycle_career(True)
+        self.cycle_career(False) # shenanigans really; used to get it to the second career and then to the first
 
         #self.show_choice_yes_no_popup("Are you sure whatever you're doing is worth it? This is a very long dummy text that is utterly useless for anything else :33")
 
