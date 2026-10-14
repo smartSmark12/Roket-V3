@@ -187,6 +187,10 @@ class MainEngine:
         self.to_scale_y = self.sprite_handler.to_scaley
         self.to_scale = self.sprite_handler.to_scale
 
+        self.unscale_x = self.sprite_handler.unscale_x
+        self.unscale_y = self.sprite_handler.unscale_y
+        self.unscale = self.sprite_handler.unscale
+
         # logger setup
         self.create_runtime_logger()
 
@@ -600,7 +604,7 @@ class MainEngine:
 
         career_scene.career_level_button_width = career_level_window_size[0]
         career_scene.career_level_button_height = 100
-        career_scene.career_level_button_offset = 40
+        career_scene.career_level_button_offset = 10
 
         career_scene.buttons["career_selector_left"] = button(
                 flatpane("sprite", {"main":self.sprites["button_template_square"], "hover":self.sprites["button_template_square_dark"]}, sprite="main"),
@@ -656,10 +660,17 @@ class MainEngine:
             career_scene.career_level_button_width,
             career_scene.career_level_button_height,
             self.sprites,
+            background_sprite="ui_builder_background_light",
             alpha=True
         )
 
-        self.sprites["level_button_frame"] = level_button_frame#self.sprite_handler.real_scale_sprite(level_button_frame)
+        self.sprites["level_button_frame"] = self.sprite_handler.real_scale_sprite(level_button_frame, level_button_frame.size)
+
+        # create darker button variants
+        for sprite in ["level_button_frame"]:
+            dark_name = sprite+"_dark"
+            self.sprites[dark_name] = self.sprites[sprite].copy()
+            pg.Surface.fill(self.sprites[dark_name], BUTTON_COLOR_SUBTRACT_COLOR, special_flags=pg.BLEND_SUB)
 
         career_scene.level_buttons = {}
 
@@ -1316,6 +1327,8 @@ class MainEngine:
     def update_modification_pedestal(self):
         self.scene_handler.getScene("ship_modification").pedestal.set_ship(self.get_active_ship()) # what a lovely syntax
 
+    # main menu
+
     def change_gamemode(self, gameModeName:str):
         self.selected_mode = gameModeName
 
@@ -1387,8 +1400,10 @@ class MainEngine:
     def get_ingame_ship(self):
         return self.gamestate.get_roket_body()
 
+    # career
+
     def cycle_career(self, direction:bool):
-        # default if first cycle
+        # default if first cycle ## this doesnt work btw
         if not self.active_career_name:
             self.active_career_name = list(self.modloader.get_careers().keys())[0] # select the first available ## later through a save load
 
@@ -1425,6 +1440,8 @@ class MainEngine:
 
         total_content_height = 0
 
+        career_scene.level_buttons.clear()
+
         if len(career.get_levels()):
 
             for index in range(len(career.get_levels())):
@@ -1432,8 +1449,8 @@ class MainEngine:
                 level:Level = self.modloader.get_levels().get(level_name)
 
                 career_scene.level_buttons[level_name] = LevelButton(
-                        flatpane("sprite", {"main":self.sprites["level_button_frame"]}, sprite="main"),
-                        pg.Rect(0, (career_scene.career_level_button_height + career_scene.career_level_button_offset) * index, career_scene.career_level_button_width, career_scene.career_level_button_height),
+                        flatpane("sprite", {"main":self.sprites["level_button_frame"], "hover":self.sprites["level_button_frame_dark"]}, sprite="main"),
+                        pg.Rect(self.to_scale((0, (career_scene.career_level_button_height + career_scene.career_level_button_offset) * index)), self.to_scale((career_scene.career_level_button_width, career_scene.career_level_button_height))),
                         0,
                         None,
                         partial(print, level_name),
@@ -1447,18 +1464,23 @@ class MainEngine:
 
             # recreate render surface
             for level_button_name, level_button in career_scene.level_buttons.items():
-                total_content_height += level_button.rect.height + career_scene.career_level_button_offset
+                total_content_height += level_button.rect.height + self.to_scale_y(career_scene.career_level_button_offset)
+
+            total_content_height -= self.to_scale_y(career_scene.career_level_button_offset) # account for the last button's offset
 
         if total_content_height > 0:
             career_scene.button_render_surface = pg.Surface((career_scene.level_scroll_window.rect.width, total_content_height))
+            career_scene.button_render_surface.fill(roket_light_blue)
             career_scene.level_scroll_window.set_content(career_scene.button_render_surface)
         else:
-            career_scene.level_scroll_window.set_content(self.sprites["scaling_tester"])
+            career_scene.level_scroll_window.set_content(self.sprite_handler.real_scale_sprite(self.sprites["scaling_tester"], self.sprites["scaling_tester"].size))
 
     def regenerate_career_panel(self):
         career = self.scene_handler.getScene("career")
 
         career.selector_display_text = f"{self.modloader.get_careers().get(self.active_career_name).get_display_name()} [{list(self.modloader.get_careers().keys()).index(self.active_career_name) + 1}/{len(list(self.modloader.get_careers().keys()))}]" # java got nothin on me! >:3
+
+    # game
 
     def spawn_spawnable(self, spawnableName:str, spawnableTargetPos:tuple):
         if spawnableName in self.roket_spawnables:
@@ -1684,6 +1706,20 @@ class MainEngine:
             button.activation_detection(self.corrected_mouse_info)
             button.update_hold_time(self.corrected_mouse_info)
 
+        # update level window
+        if len(career.level_buttons.keys()) > 0:
+
+            scroll_corrected_mouse_info = (
+                career.level_scroll_window.get_scroll_corrected_pos(self.corrected_mouse_info[0]),
+                self.corrected_mouse_info[1],
+                self.corrected_mouse_info[2],
+                self.corrected_mouse_info[3] # unchanged
+            )
+
+            for level_button_name, level_button in career.level_buttons.items():
+                level_button.activation_detection(scroll_corrected_mouse_info)
+                level_button.update_hold_time(scroll_corrected_mouse_info)
+
     def career_render(self):
         career = self.scene_handler.getScene("career")
 
@@ -1711,8 +1747,6 @@ class MainEngine:
 
             for level_button_name, level_button in career.level_buttons.items():
                 _level_render_data.extend(level_button.render())
-
-            #print(_level_render_data)
 
             self.renderer.render(_level_render_data, career.button_render_surface)
 

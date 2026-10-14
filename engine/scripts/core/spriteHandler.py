@@ -141,6 +141,20 @@ class SpriteHandlerJSON:
             return (self.to_scalex(point[0], True), self.to_scaley(point[1], True))
         else:
             return (self.to_scalex(point[0], False), self.to_scaley(point[1], False))
+
+    def unscale_x(self, number: float | int, round_num: bool = True):
+        if round_num: return round(number / self.app.screen_scale[0])
+        else: return number / self.app.screen_scale[0]
+    
+    def unscale_y(self, number: float | int, round_num: bool = True):
+        if round_num: return round(number / self.app.screen_scale[1])
+        else: return number / self.app.screen_scale[1]
+
+    def unscale(self, point:tuple[float|int], round_num:bool=True):
+        if round_num:
+            return (self.unscale_x(point[0], True), self.unscale_y(point[1], True))
+        else:
+            return (self.unscale_x(point[0], False), self.unscale_y(point[1], False))
         
     @lru_cache(maxsize=MAX_CACHED_SIZE)
     def cached_rotate(self, sprite:pg.Surface, degrees:int|float):

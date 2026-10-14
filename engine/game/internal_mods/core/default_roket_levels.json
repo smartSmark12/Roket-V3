@@ -555,6 +555,339 @@
             [
 
             ]
+        },
+        "core_debug_5":
+        {
+            "display_name":"Gradim Briňák2",
+            "icon":"",
+            "stages":
+            {
+                "1":
+                {
+                    "stage_change_text":"0-1-1 // Harsh landing",
+                    "environment":"core_miranda",
+                    "events":
+                    {
+                        "random":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ]
+                        },
+                        "forced":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ],
+                            "unlock_action":
+                            [
+
+                            ],
+                            "dialogue":
+                            [
+
+                            ]
+                        }
+                    }
+                },
+                "2":
+                {
+                    "stage_change_text":"0-1-2 // ",
+                    "environment":"core_miranda",
+                    "events":
+                    {
+                        "random":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ]
+                        },
+                        "forced":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ],
+                            "unlock_action":
+                            [
+
+                            ],
+                            "dialogue":
+                            [
+                                
+                            ]
+                        }
+                    }
+                }
+            },
+            "requirements":
+            {
+                "beaten_levels":
+                [
+
+                ],
+                "selected_ships":
+                [
+
+                ],
+                "equipped_module_types":
+                [
+
+                ],
+                "equipped_modules":
+                [
+
+                ]
+            },
+            "allowed_ships":
+            [
+
+            ],
+            "disallowed_ships":
+            [
+
+            ]
+        },
+        "core_debug_6":
+        {
+            "display_name":"Gradim Briňák3",
+            "icon":"",
+            "stages":
+            {
+                "1":
+                {
+                    "stage_change_text":"0-1-1 // Harsh landing",
+                    "environment":"core_miranda",
+                    "events":
+                    {
+                        "random":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ]
+                        },
+                        "forced":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ],
+                            "unlock_action":
+                            [
+
+                            ],
+                            "dialogue":
+                            [
+
+                            ]
+                        }
+                    }
+                },
+                "2":
+                {
+                    "stage_change_text":"0-1-2 // ",
+                    "environment":"core_miranda",
+                    "events":
+                    {
+                        "random":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ]
+                        },
+                        "forced":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ],
+                            "unlock_action":
+                            [
+
+                            ],
+                            "dialogue":
+                            [
+                                
+                            ]
+                        }
+                    }
+                }
+            },
+            "requirements":
+            {
+                "beaten_levels":
+                [
+
+                ],
+                "selected_ships":
+                [
+
+                ],
+                "equipped_module_types":
+                [
+
+                ],
+                "equipped_modules":
+                [
+
+                ]
+            },
+            "allowed_ships":
+            [
+
+            ],
+            "disallowed_ships":
+            [
+
+            ]
+        },
+        "core_debug_7":
+        {
+            "display_name":"Gradim Briňák4",
+            "icon":"",
+            "stages":
+            {
+                "1":
+                {
+                    "stage_change_text":"0-1-1 // Harsh landing",
+                    "environment":"core_miranda",
+                    "events":
+                    {
+                        "random":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ]
+                        },
+                        "forced":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ],
+                            "unlock_action":
+                            [
+
+                            ],
+                            "dialogue":
+                            [
+
+                            ]
+                        }
+                    }
+                },
+                "2":
+                {
+                    "stage_change_text":"0-1-2 // ",
+                    "environment":"core_miranda",
+                    "events":
+                    {
+                        "random":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ]
+                        },
+                        "forced":
+                        {
+                            "spawnables":
+                            [
+
+                            ],
+                            "ship_action":
+                            [
+
+                            ],
+                            "unlock_action":
+                            [
+
+                            ],
+                            "dialogue":
+                            [
+                                
+                            ]
+                        }
+                    }
+                }
+            },
+            "requirements":
+            {
+                "beaten_levels":
+                [
+
+                ],
+                "selected_ships":
+                [
+
+                ],
+                "equipped_module_types":
+                [
+
+                ],
+                "equipped_modules":
+                [
+
+                ]
+            },
+            "allowed_ships":
+            [
+
+            ],
+            "disallowed_ships":
+            [
+
+            ]
         }
     }
 }

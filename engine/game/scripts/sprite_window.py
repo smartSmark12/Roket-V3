@@ -1,7 +1,7 @@
 import pygame as pg
 
 class SpriteWindow:
-    def __init__(self, appInstance, sprite:pg.Surface, pos:tuple[int|float], size:tuple[int|float], renderLayer:int, rescaleSprite:bool=True):
+    def __init__(self, appInstance, sprite:pg.Surface, pos:tuple[int|float], size:tuple[int|float], renderLayer:int, rescaleSprite:bool=True, external:bool=False):
         self.app = appInstance
         self.sourceSprite = sprite
         self.sprite = None # created later
@@ -9,11 +9,16 @@ class SpriteWindow:
         self.width = size[0]
         self.height = size[1]
         self.layer = renderLayer
+        self.external = external
 
-        self._rescale_sprite()
+        if rescaleSprite:
+            self._rescale_sprite(realScale=not self.external)
 
-    def _rescale_sprite(self):
-        self.sprite = pg.transform.scale(self.sourceSprite, (self.app.to_scale_x(self.width), self.app.to_scale_y(self.height)))
+    def _rescale_sprite(self, realScale):
+        if realScale:
+            self.sprite = pg.transform.scale(self.sourceSprite, (self.app.to_scale_x(self.width), self.app.to_scale_y(self.height)))
+        else:
+            self.sprite = pg.transform.scale(self.sourceSprite, (self.width, self.height))
 
     def set_sprite(self, sprite:pg.Surface, rescaleSprite:bool=True):
         self.sourceSprite = sprite
@@ -32,4 +37,8 @@ class SpriteWindow:
 
     def render(self, renderLayer:int|None=None):
         if not renderLayer: renderLayer = self.layer
-        self.app.draw("sprite", renderLayer, {"sprite":self.sprite, "rect":(self.app.to_scale_x(self.pos[0]), self.app.to_scale_y(self.pos[1]), self.width, self.height)})
+
+        if self.external:
+            return self.app.draw("sprite", renderLayer, {"sprite":self.sprite, "rect":(self.pos[0], self.pos[1], self.width, self.height)}, external=True)
+        else:
+            self.app.draw("sprite", renderLayer, {"sprite":self.sprite, "rect":(self.app.to_scale_x(self.pos[0]), self.app.to_scale_y(self.pos[1]), self.width, self.height)})

@@ -4,7 +4,7 @@ from engine.scripts.colors import white
 
 class UIFrameBuilder:
     @staticmethod
-    def get_ui_frame(width:int, height:int, main_engine_sprite_dict:dict, side_left=True, side_top=True, side_right=True, side_bottom=True, alpha=False) -> pg.Surface:
+    def get_ui_frame(width:int, height:int, main_engine_sprite_dict:dict, side_left=True, side_top=True, side_right=True, side_bottom=True, corner_sprite_prefix="ui_builder_corner", edge_sprite_prefix="ui_builder", background_sprite="ui_builder_background", alpha=False) -> pg.Surface:
         surf = pg.Surface((width, height)) # dont forget to ca
         surf = surf.convert_alpha()
         surf.fill((0,0,0,0))
@@ -18,20 +18,20 @@ class UIFrameBuilder:
         ## draw onto the surf
         # load sprites for easier access aka there goes my ram xd
         corners = [
-            main_engine_sprite_dict["ui_builder_corner_top_left"],
-            main_engine_sprite_dict["ui_builder_corner_top_right"],
-            main_engine_sprite_dict["ui_builder_corner_bottom_right"],
-            main_engine_sprite_dict["ui_builder_corner_bottom_left"],
+            main_engine_sprite_dict[corner_sprite_prefix + "_top_left"],
+            main_engine_sprite_dict[corner_sprite_prefix + "_top_right"],
+            main_engine_sprite_dict[corner_sprite_prefix + "_bottom_right"],
+            main_engine_sprite_dict[corner_sprite_prefix + "_bottom_left"],
         ]
 
         edges = [
-            main_engine_sprite_dict["ui_builder_left"],
-            main_engine_sprite_dict["ui_builder_top"],
-            main_engine_sprite_dict["ui_builder_right"],
-            main_engine_sprite_dict["ui_builder_bottom"],
+            main_engine_sprite_dict[edge_sprite_prefix + "_left"],
+            main_engine_sprite_dict[edge_sprite_prefix + "_top"],
+            main_engine_sprite_dict[edge_sprite_prefix + "_right"],
+            main_engine_sprite_dict[edge_sprite_prefix + "_bottom"],
         ]
 
-        background:pg.Surface = main_engine_sprite_dict["ui_builder_background"]
+        background:pg.Surface = main_engine_sprite_dict[background_sprite]
 
         # rescale
         edges[0] = pg.transform.scale(edges[0], (edges[0].width, height-corners[0].height-corners[3].height))

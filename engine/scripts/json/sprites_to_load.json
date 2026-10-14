@@ -204,6 +204,11 @@
         [100,100],
         "c"
     ],
+    "ui_builder_background_light":[
+        "engine/game/assets/img/ui_builder/background_light.png",
+        [100,100],
+        "c"
+    ],
     "cursor":[
         "engine/game/assets/img/else/custom_cursor.png",
         [30,30],

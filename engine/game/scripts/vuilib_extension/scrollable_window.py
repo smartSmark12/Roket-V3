@@ -21,14 +21,12 @@ class ScrollableWindow:
         )
 
         self.render_rect = pg.Rect( # also for mouse collision
-            self.app.to_scale_x(self.pos[0]),
-            self.app.to_scale_y(self.pos[1]),
-            self.app.to_scale_x(self.size[0]),
-            self.app.to_scale_y(self.size[1])
+            self.app.to_scale(self.pos),
+            self.app.to_scale(self.size)
         )
 
         self.render_surface = pg.Surface(
-            self.size
+            self.app.to_scale(self.size)
         )
 
         self.content_sprite = None
@@ -45,8 +43,10 @@ class ScrollableWindow:
     def set_content(self, contentSprite:pg.Surface): # have to provide a pre_rendered surface to be scrolled
         self.content_sprite = contentSprite
 
-        self.content_height = self.content_sprite.height
-        self.scrollbar.set_content_height(self.content_sprite.height)
+        self.content_sprite.fill((0,0,0))
+
+        self.content_height = self.app.unscale_y(self.content_sprite.height)
+        self.scrollbar.set_content_height(self.app.unscale_y(self.content_sprite.height))
 
     def update(self):
         if self.is_scrollable():
@@ -67,22 +67,12 @@ class ScrollableWindow:
                     1,
                     {
                         "sprite":self.content_sprite,
-                        "rect":(0,- self.get_scroll_pos() * (self.content_height - self.size[1]), 0, 0)
+                        "rect":(0,- self.get_scroll_pos() * self.app.to_scale_y(self.content_height - self.size[1]), 0, 0) # this whole scaling thing is some proper bullshis
                     },
                     True
                 )],
                 self.render_surface
             )
-            
-
-        #if self.content_sprite:
-        #    self.render_surface.blit(
-        #        self.content_sprite,
-        #        (
-        #            0,
-        #            - self.get_scroll_pos() * (self.content_height - self.size[1])
-        #        )
-        #    )
 
     def render(self):
         self._render()
@@ -91,13 +81,13 @@ class ScrollableWindow:
         if self.is_scrollable():
             self.scrollbar.render()
 
-        self.app.draw("sprite", self.layer, {"sprite":self.app.sprite_handler.real_scale_sprite(self.render_surface, self.size), "rect":self.render_rect})
+        self.app.draw("sprite", self.layer, {"sprite":self.render_surface, "rect":self.render_rect}) # self.app.sprite_handler.real_scale_sprite(self.render_surface, self.size)
 
     def _get_scroll_offset(self): # <pixels-y> scroll offset for interaction ## dont forget to check if the click is within the scrollable window itself as to not click on invisible objects!
-        return self.size[1] * self.get_scroll_pos()
+        return (self.content_height - self.size[1]) * self.get_scroll_pos()
 
     def get_scroll_corrected_pos(self, pos:tuple[float|float]):
-        return (pos[0], pos[1] + self._get_scroll_offset())
+        return (pos[0] - self.render_rect.x, pos[1] - self.render_rect.y + self._get_scroll_offset())
 
     def get_surface(self, update:bool=True):
         if update:
