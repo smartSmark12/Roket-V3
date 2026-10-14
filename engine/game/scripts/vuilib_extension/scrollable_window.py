@@ -43,10 +43,8 @@ class ScrollableWindow:
     def set_content(self, contentSprite:pg.Surface): # have to provide a pre_rendered surface to be scrolled
         self.content_sprite = contentSprite
 
-        self.content_sprite.fill((0,0,0))
-
-        self.content_height = self.app.unscale_y(self.content_sprite.height)
-        self.scrollbar.set_content_height(self.app.unscale_y(self.content_sprite.height))
+        self.content_height = self.app.unscale_y(self.content_sprite.height, round_num=False)
+        self.scrollbar.set_content_height(self.app.unscale_y(self.content_sprite.height, round_num=False))
 
     def update(self):
         if self.is_scrollable():
@@ -87,7 +85,9 @@ class ScrollableWindow:
         return (self.content_height - self.size[1]) * self.get_scroll_pos()
 
     def get_scroll_corrected_pos(self, pos:tuple[float|float]):
-        return (pos[0] - self.render_rect.x, pos[1] - self.render_rect.y + self._get_scroll_offset())
+        corrected = (pos[0] - self.render_rect.x, pos[1] - self.render_rect.y + self.app.to_scale_y(self._get_scroll_offset()))
+
+        return corrected
 
     def get_surface(self, update:bool=True):
         if update:
