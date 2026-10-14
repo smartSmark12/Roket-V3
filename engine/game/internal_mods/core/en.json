@@ -16,6 +16,7 @@
         "main_menu_mode_dummy":"DUMMY",
         "ship_hangar_hangar_text":"HANGAR",
         "ship_hangar_select_slot":"No available modules",
+        "career_selector_no_career_loaded":"No career loaded",
         "popup_window_info_dismiss":"DISMISS",
         "popup_window_warning_dismiss":"I'M AWARE",
         "popup_window_choice_accept":"YES",

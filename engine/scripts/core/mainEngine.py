@@ -637,7 +637,7 @@ class MainEngine:
             self.to_scale((career_selector_display_width, career_selector_element_height))
         )
 
-        career_scene.selector_display_text = "No career selected" # you should never see this XD
+        career_scene.selector_display_text = self.texts["career_selector_no_career_loaded"] # you should never see this XD
 
         career_scene.level_scroll_window = ScrollableWindow(
             appInstance             =self,

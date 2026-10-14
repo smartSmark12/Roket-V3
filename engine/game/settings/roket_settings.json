@@ -1,6 +1,6 @@
 {
     "version":"3.0.1",
-    "localization":"en",
+    "localization":"cz",
     "resolution":[1600,900],
     "resolution_index":0,
     "fps_limit":400,

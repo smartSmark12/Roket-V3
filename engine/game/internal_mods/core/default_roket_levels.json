@@ -4,7 +4,7 @@
         "core_miranda_1":
         {
             "display_name":"Harsh landing",
-            "icon":"",
+            "icon":"engine/game/assets/img/menu/level_icons/level_icon_1.png",
             "stages":
             {
                 "1":
@@ -115,7 +115,7 @@
         "core_debug_1":
         {
             "display_name":"Debug 1",
-            "icon":"",
+            "icon":"engine/game/assets/img/menu/level_icons/level_icon_2.png",
             "stages":
             {
                 "1":
@@ -226,7 +226,7 @@
         "core_debug_2":
         {
             "display_name":"Debug 2",
-            "icon":"",
+            "icon":"engine/game/assets/img/menu/level_icons/level_icon_3png",
             "stages":
             {
                 "1":
@@ -337,7 +337,7 @@
         "core_debug_3":
         {
             "display_name":"DDEbubUFAHFUn 3",
-            "icon":"",
+            "icon":"engine/game/assets/img/menu/level_icons/level_icon_4.png",
             "stages":
             {
                 "1":

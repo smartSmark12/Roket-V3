@@ -375,8 +375,9 @@ class ModLoader:
             for level_name, level in data[md.MOD_FEATURE_LEVEL].items():
                 lev = Level(
                     appInstance=self.app,
+                    name=level_name,
                     displayName=level["display_name"],
-                    icon=level["icon"], # needs to be loaded and scaled actually or use the image frame idk
+                    icon=level["icon"], # needs to be loaded and scaled actually or use the image frame idk ## using sprite window ('image frame') in level selector
                     stages=level["stages"],
                     requirements=level["requirements"],
                     allowedShips=level["allowed_ships"],
