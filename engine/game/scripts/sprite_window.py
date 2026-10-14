@@ -14,7 +14,7 @@ class SpriteWindow:
         if rescaleSprite:
             self._rescale_sprite(realScale=not self.external)
 
-    def _rescale_sprite(self, realScale):
+    def _rescale_sprite(self, realScale=True):
         if realScale:
             self.sprite = pg.transform.scale(self.sourceSprite, (self.app.to_scale_x(self.width), self.app.to_scale_y(self.height)))
         else:
