@@ -83,6 +83,7 @@ import psutil
 from functools      import lru_cache
 from functools      import partial
 from copy           import deepcopy
+from time           import time
 
 # something like from engine.scripts import * using https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwi46Of9hr-GAxVQhf0HHXmICu4QFnoECCYQAQ&url=https%3A%2F%2Fstackoverflow.com%2Fquestions%2F1057431%2Fhow-to-load-all-modules-in-a-folder&usg=AOvVaw3vlcgC_pzadT7glu9LmH2n&cshid=1717404751563860&opi=89978449
 # need to make a crash handler (official python function??)
@@ -208,6 +209,11 @@ class MainEngine:
         self.LAYER_UI_TOP_TOP = self.LAYER_UI_TOP_BOTTOM + 1
         self.LAYER_UI_TOP_TOP_TOP = self.LAYER_UI_TOP_TOP + 1 # increment resplonsibly, kids
         self.LAYER_TITLE_PLANETS = 4 # actually just a reference - animations take only numbers from animations_to_create.py
+
+        self._start_time = time() * 1000
+        self._running_time = 0
+
+        #----sum ord char for char
 
         # alarms setup
         self.alarms = {}
@@ -591,10 +597,17 @@ class MainEngine:
         career_scene.selector_button_left_text = "<"
         career_scene.selector_button_right_text = ">"
 
-        career_level_window_size = (career_background_frame_size[0] - 200, career_background_frame_size[1] - 300)
+        career_level_decoration_window_size = (300, career_background_frame_size[1] - 300)
+        career_level_window_size = (career_background_frame_size[0] - 600, career_level_decoration_window_size[1])
+        
+        career_level_decoration_window_pos = (
+            career_background_frame_pos[0] + 100,
+            career_background_frame_pos[1] + (career_background_frame_size[1] - career_level_decoration_window_size[1]) / 2 + 100
+        )
+
         career_level_window_pos = (
-            career_background_frame_pos[0] + (career_background_frame_size[0] - career_level_window_size[0]) / 2,
-            career_background_frame_pos[1] + (career_background_frame_size[1] - career_level_window_size[1]) / 2 + 100
+            career_level_decoration_window_pos[0] + career_level_decoration_window_size[0] + 20,
+            career_level_decoration_window_pos[1]
         )
 
         career_scene.career_selector_starting_position = (
@@ -639,11 +652,7 @@ class MainEngine:
 
         career_scene.selector_display_text = self.texts["career_selector_no_career_loaded"] # you should never see this XD
 
-        career_scene.level_scroll_window = ScrollableWindow(
-            appInstance             =self,
-            pos                     =career_level_window_pos,
-            size                    =career_level_window_size,
-            scrollbar               =Scrollbar(
+        career_level_scrollbar = Scrollbar(
                                             appInstance         =self,
                                             pos                 =(career_level_window_pos[0] + career_level_window_size[0] + 20, career_level_window_pos[1]),
                                             size                =(30, career_level_window_size[1]),
@@ -651,7 +660,22 @@ class MainEngine:
                                             backgroundColor     =roket_dark_orange,
                                             floaterHeight       =60,
                                             floaterSprite       =self.sprite_handler.load_sprite("scrollbar_floater", "engine/game/assets/img/menu/scrollbar_floater.png", (30, 60), "c", False)
-                                        ),
+                                        )
+
+        career_scene.level_decoration_scroll_window = ScrollableWindow(
+            appInstance             =self,
+            pos                     =career_level_decoration_window_pos,
+            size                    =career_level_decoration_window_size,
+            scrollbar               =career_level_scrollbar,
+            backgroundColor         =roket_light_blue,
+            scrollSpeedMultiplier   =50
+        )
+
+        career_scene.level_scroll_window = ScrollableWindow(
+            appInstance             =self,
+            pos                     =career_level_window_pos,
+            size                    =career_level_window_size,
+            scrollbar               =career_level_scrollbar,
             backgroundColor         =roket_light_blue,
             scrollSpeedMultiplier   =50
         )
@@ -674,7 +698,9 @@ class MainEngine:
 
         career_scene.level_buttons = {}
         career_scene.level_scroll_window.set_content(self.sprites["scaling_tester"]) # self.sprites["scaling_tester"]
+        career_scene.level_decoration_scroll_window.set_content(self.sprites["scaling_tester"]) # self.sprites["scaling_tester"]
         career_scene.button_render_surface = None
+        career_scene.decoration_render_surface = None
 
         self.cycle_career(True)
         self.cycle_career(False) # shenanigans really; used to get it to the second career and then to the first
@@ -1473,8 +1499,14 @@ class MainEngine:
             career_scene.button_render_surface = pg.Surface((career_scene.level_scroll_window.rect.width, total_content_height))
             career_scene.button_render_surface.fill(roket_light_blue)
             career_scene.level_scroll_window.set_content(career_scene.button_render_surface)
+
+            career_scene.decoration_render_surface = pg.Surface((career_scene.level_decoration_scroll_window.rect.width, total_content_height))
+            career_scene.decoration_render_surface.fill(roket_light_blue)
+            career_scene.level_decoration_scroll_window.set_content(career_scene.decoration_render_surface)
+
         else:
             career_scene.level_scroll_window.set_content(self.sprite_handler.real_scale_sprite(self.sprites["scaling_tester"], self.sprites["scaling_tester"].size))
+            career_scene.level_decoration_scroll_window.set_content(self.sprite_handler.real_scale_sprite(self.sprites["scaling_tester"], self.sprites["scaling_tester"].size))
 
     def regenerate_career_panel(self):
         career = self.scene_handler.getScene("career")
@@ -1699,6 +1731,7 @@ class MainEngine:
         career = self.scene_handler.getScene("career")
 
         # update level window
+        career.level_decoration_scroll_window.update()
         career.level_scroll_window.update()
 
         # update all buttons
@@ -1745,18 +1778,132 @@ class MainEngine:
         # draw level buttons
         if len(career.level_buttons.keys()) > 0:
             _level_render_data = []
+            _decoration_render_data = []
+
+            _last_name:str = None
 
             for level_button_name, level_button in career.level_buttons.items():
                 _level_render_data.extend(level_button.render())
 
+                # draw level decoration
+
+                max_x_decoration_offset = 10
+                max_y_decoration_offset = 5
+                decoration_margin = 70
+                connecting_line_offset = 40
+                connection_line_width = 10
+
+                decoration_rotation_speed = 10
+                decoration_halo_rotation_speed = 30
+
+                last_pos = None
+                this_pos = None
+
+                thingie_last = None
+                thingie_this = ((sum([ord(char) for char in level_button_name + level_button.text]) / (math.pi)) % 1)
+
+                # rotate decoration
+                sprite = None
+                sprite_halo = None
+
+                match self.modloader.get_levels().get(level_button_name).importance: # we do this because the level button doesnt contain a reference to the level
+                    case 1:
+                        sprite = self.sprites["level_decoration_small"]
+
+                    case 2:
+                        sprite = self.sprites["level_decoration_medium"]
+                        sprite_halo = self.sprites["level_decoration_halo_medium"]
+
+                    case 3:
+                        sprite = self.sprites["level_decoration_large"]
+                        sprite_halo = self.sprites["level_decoration_halo_large"]
+
+                sprite = self.career_decoration_cached_rotate(sprite=sprite, rotationDegrees=int((self._running_time / 1000 + thingie_this) * decoration_rotation_speed) % 360)
+                if sprite_halo is not None:
+                    sprite_halo = self.career_decoration_cached_rotate(sprite=sprite_halo, rotationDegrees=int((self._running_time / 1000 + thingie_this) * decoration_halo_rotation_speed) % 360)
+
+                #print(self.career_decoration_cached_rotate.cache_info())
+
+                # last pos
+                if _last_name is not None:
+
+                    last_button:LevelButton = career.level_buttons.get(_last_name)
+
+                    thingie_last = ((sum([ord(char) for char in _last_name + last_button.text]) / (math.pi)) % 1)
+
+                    last_pos =  (
+                            self.to_scale_x(max_x_decoration_offset + decoration_margin) + thingie_last * self.to_scale_x(career.level_decoration_scroll_window.rect.width - 2 * (max_x_decoration_offset + decoration_margin)) + self.to_scale_x(((math.cos(self._running_time / 1000 + (thingie_last ** 2) * math.pi ** 2) + 1) / 2) * max_x_decoration_offset),
+                            last_button.rect.centery + self.to_scale_x(((math.sin(self._running_time / 1000 + (thingie_last ** 2) * math.pi ** 2) + 1) / 2) * max_y_decoration_offset)
+                        )
+
+                    #last_pos_render = (
+                    #    last_pos[0] - (sprite.height / 2), # have to eventually account for the rotated sprite instead of the original
+                    #    last_pos[1] - (sprite.height / 2)
+                    #)
+
+                # this pos
+                this_pos =  (
+                    self.to_scale_x(max_x_decoration_offset + decoration_margin) + thingie_this * self.to_scale_x(career.level_decoration_scroll_window.rect.width - 2 * (max_x_decoration_offset + decoration_margin)) + self.to_scale_x(((math.cos(self._running_time / 1000 + (thingie_this ** 2) * math.pi ** 2) + 1) / 2) * max_x_decoration_offset),
+                    level_button.rect.centery + self.to_scale_x(((math.sin(self._running_time / 1000 + (thingie_this ** 2) * math.pi ** 2) + 1) / 2) * max_y_decoration_offset)
+                )
+
+                this_pos_render = (
+                    this_pos[0] - (sprite.height / 2), # over here too XD
+                    this_pos[1] - (sprite.height / 2)
+                )
+
+                if sprite_halo is not None:
+                    this_halo_pos_render = (
+                        this_pos[0] - (sprite_halo.height / 2), # over here too XD
+                        this_pos[1] - (sprite_halo.height / 2)
+                    )
+
+                _decoration_render_data.append(self.draw("sprite", 1, {"sprite":sprite, "rect":(this_pos_render, (0, 0))}, external=True))
+
+                if sprite_halo is not None:
+                    _decoration_render_data.append(self.draw("sprite", 1, {"sprite":sprite_halo, "rect":(this_halo_pos_render, (0, 0))}, external=True))
+
+                # connecting lines
+                if _last_name is not None:
+
+                    importance = self.modloader.get_levels().get(level_button_name).importance
+
+                    # gap before every important level
+                    if importance != 3:
+
+                        _end_angle = math.atan2(last_pos[1] - this_pos[1], last_pos[0] - this_pos[0])
+                        _start_angle = math.atan2(this_pos[1] - last_pos[1], this_pos[0] - last_pos[0])
+
+                        start_pos = (
+                            last_pos[0] + math.cos(_start_angle) * self.to_scale_x(connecting_line_offset),
+                            last_pos[1] + math.sin(_start_angle) * self.to_scale_y(connecting_line_offset)
+                        )
+
+                        end_pos = (
+                            this_pos[0] + math.cos(_end_angle) * self.to_scale_x(connecting_line_offset),
+                            this_pos[1] + math.sin(_end_angle) * self.to_scale_y(connecting_line_offset)
+                        )
+
+                        _decoration_render_data.append(self.draw("line", 1, {"start":start_pos, "end":end_pos, "width":self.to_scale_x(connection_line_width), "color":roket_decoration_yellow}, external=True))
+
+                _last_name = level_button_name
+
+            career.decoration_render_surface.fill(roket_dark_blue) # use the get_at center of the background frame as fill colord
+
             self.renderer.render(_level_render_data, career.button_render_surface)
+            self.renderer.render(_decoration_render_data, career.decoration_render_surface)
 
         # draw level window
         career.level_scroll_window.render()
+        career.level_decoration_scroll_window.render()
 
     # INTERNAL RANDOM AHH HELPERS
 
     ##################
+
+    @lru_cache(maxsize=None) # disables memory use limit ## make sure youre not doing stupid shit :3
+    def career_decoration_cached_rotate(self, sprite:pg.Surface, rotationDegrees:float):
+        return pg.transform.rotate(sprite, rotationDegrees)
 
     def draw_button_text(self, buttonText:str, button, layer:int|None=None):
         drawLayer = layer
@@ -2179,6 +2326,9 @@ class MainEngine:
 
         if self.debug_overlay_enabled:
             self.render_debug_overlay()
+
+        # update running time
+        self._running_time = time() * 1000 - self._start_time
 
         """ self.animations["example_anim"].anim_pos = (self.mouse_info[0][0], self.mouse_info[0][1])
 

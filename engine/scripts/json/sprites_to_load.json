@@ -258,6 +258,31 @@
         "engine/game/assets/img/else/scaling_tester.png",
         [160,1280],
         "ca"
+    ],
+    "level_decoration_large":[
+        "engine/game/assets/img/menu/level_decoration/level_decoration_large.png",
+        [40,40],
+        "ca"
+    ],
+    "level_decoration_halo_large":[
+        "engine/game/assets/img/menu/level_decoration/level_decoration_halo_large.png",
+        [60,60],
+        "ca"
+    ],
+    "level_decoration_medium":[
+        "engine/game/assets/img/menu/level_decoration/level_decoration_medium.png",
+        [30,30],
+        "ca"
+    ],
+    "level_decoration_halo_medium":[
+        "engine/game/assets/img/menu/level_decoration/level_decoration_halo_medium.png",
+        [50,50],
+        "ca"
+    ],
+    "level_decoration_small":[
+        "engine/game/assets/img/menu/level_decoration/level_decoration_small.png",
+        [30,30],
+        "ca"
     ]
 
 }

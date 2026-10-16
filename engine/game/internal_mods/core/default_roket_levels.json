@@ -5,6 +5,7 @@
         {
             "display_name":"Harsh landing",
             "icon":"engine/game/assets/img/menu/level_icons/level_icon_1.png",
+            "importance":3,
             "stages":
             {
                 "1":
@@ -116,6 +117,7 @@
         {
             "display_name":"Debug 1",
             "icon":"engine/game/assets/img/menu/level_icons/level_icon_2.png",
+            "importance":2,
             "stages":
             {
                 "1":
@@ -227,6 +229,7 @@
         {
             "display_name":"Debug 2",
             "icon":"engine/game/assets/img/menu/level_icons/level_icon_3png",
+            "importance":1,
             "stages":
             {
                 "1":
@@ -338,6 +341,7 @@
         {
             "display_name":"DDEbubUFAHFUn 3",
             "icon":"engine/game/assets/img/menu/level_icons/level_icon_4.png",
+            "importance":1,
             "stages":
             {
                 "1":
@@ -449,6 +453,7 @@
         {
             "display_name":"Gradim Briňák",
             "icon":"",
+            "importance":3,
             "stages":
             {
                 "1":
@@ -560,6 +565,7 @@
         {
             "display_name":"Gradim Briňák2",
             "icon":"",
+            "importance":2,
             "stages":
             {
                 "1":
@@ -671,6 +677,7 @@
         {
             "display_name":"Gradim Briňák3",
             "icon":"",
+            "importance":1,
             "stages":
             {
                 "1":
@@ -782,6 +789,7 @@
         {
             "display_name":"Gradim Briňák4",
             "icon":"",
+            "importance":1,
             "stages":
             {
                 "1":

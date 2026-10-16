@@ -378,6 +378,7 @@ class ModLoader:
                     name=level_name,
                     displayName=level["display_name"],
                     icon=level["icon"], # needs to be loaded and scaled actually or use the image frame idk ## using sprite window ('image frame') in level selector
+                    importance=level['importance'],
                     stages=level["stages"],
                     requirements=level["requirements"],
                     allowedShips=level["allowed_ships"],
