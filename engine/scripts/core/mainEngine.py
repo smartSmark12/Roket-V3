@@ -1493,9 +1493,9 @@ class MainEngine:
 
             # recreate render surface
             for level_button_name, level_button in career_scene.level_buttons.items():
-                total_content_height += level_button.rect.height + self.to_scale_y(career_scene.career_level_button_offset)
+                total_content_height += level_button.rect.height + self.to_scale_y(career_scene.career_level_button_offset, round_num=False)
 
-            total_content_height -= self.to_scale_y(career_scene.career_level_button_offset) # account for the last button's offset
+            total_content_height -= self.to_scale_y(career_scene.career_level_button_offset, round_num=False) # account for the last button's offset
 
         if total_content_height > 0:
             career_scene.button_render_surface = pg.Surface((career_scene.level_scroll_window.rect.width, total_content_height))
