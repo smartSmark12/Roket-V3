@@ -1452,6 +1452,8 @@ class MainEngine:
 
         self.regenerate_career_panel()
 
+        self.scene_handler.getScene("career").level_scroll_window.set_scroll_pos(0)
+
     def set_active_career(self, careerName:str):
         if careerName not in self.modloader.get_careers().keys():
             print("absolute garbage")
@@ -1497,7 +1499,7 @@ class MainEngine:
 
         if total_content_height > 0:
             career_scene.button_render_surface = pg.Surface((career_scene.level_scroll_window.rect.width, total_content_height))
-            career_scene.button_render_surface.fill(roket_light_blue)
+            career_scene.button_render_surface.fill(roket_background_light_blue)
             career_scene.level_scroll_window.set_content(career_scene.button_render_surface)
 
             career_scene.decoration_render_surface = pg.Surface((career_scene.level_decoration_scroll_window.rect.width, total_content_height))
@@ -1788,6 +1790,7 @@ class MainEngine:
                 # draw level decoration
 
                 max_x_decoration_offset = 10
+                #max_x_decoration_offset += self.corrected_mouse_info[3][1] * 40
                 max_y_decoration_offset = 5
                 decoration_margin = 70
                 connecting_line_offset = 40
@@ -1832,8 +1835,8 @@ class MainEngine:
                     thingie_last = ((sum([ord(char) for char in _last_name + last_button.text]) / (math.pi)) % 1)
 
                     last_pos =  (
-                            self.to_scale_x(max_x_decoration_offset + decoration_margin) + thingie_last * self.to_scale_x(career.level_decoration_scroll_window.rect.width - 2 * (max_x_decoration_offset + decoration_margin)) + self.to_scale_x(((math.cos(self._running_time / 1000 + (thingie_last ** 2) * math.pi ** 2) + 1) / 2) * max_x_decoration_offset),
-                            last_button.rect.centery + self.to_scale_x(((math.sin(self._running_time / 1000 + (thingie_last ** 2) * math.pi ** 2) + 1) / 2) * max_y_decoration_offset)
+                            self.to_scale_x(max_x_decoration_offset + decoration_margin, round_num=False) + thingie_last * self.to_scale_x(career.level_decoration_scroll_window.rect.width - 2 * (max_x_decoration_offset + decoration_margin), round_num=False) + self.to_scale_x(((math.cos(self._running_time / 1000 + (thingie_last ** 2) * math.pi ** 2) + 1) / 2) * max_x_decoration_offset, round_num=False),
+                            last_button.rect.centery + self.to_scale_y(((math.sin(self._running_time / 1000 + (thingie_last ** 2) * math.pi ** 2) + 1) / 2) * max_y_decoration_offset, round_num=False)
                         )
 
                     #last_pos_render = (
@@ -1843,8 +1846,8 @@ class MainEngine:
 
                 # this pos
                 this_pos =  (
-                    self.to_scale_x(max_x_decoration_offset + decoration_margin) + thingie_this * self.to_scale_x(career.level_decoration_scroll_window.rect.width - 2 * (max_x_decoration_offset + decoration_margin)) + self.to_scale_x(((math.cos(self._running_time / 1000 + (thingie_this ** 2) * math.pi ** 2) + 1) / 2) * max_x_decoration_offset),
-                    level_button.rect.centery + self.to_scale_x(((math.sin(self._running_time / 1000 + (thingie_this ** 2) * math.pi ** 2) + 1) / 2) * max_y_decoration_offset)
+                    self.to_scale_x(max_x_decoration_offset + decoration_margin, round_num=False) + thingie_this * self.to_scale_x(career.level_decoration_scroll_window.rect.width - 2 * (max_x_decoration_offset + decoration_margin), round_num=False) + self.to_scale_x(((math.cos(self._running_time / 1000 + (thingie_this ** 2) * math.pi ** 2) + 1) / 2) * max_x_decoration_offset, round_num=False),
+                    level_button.rect.centery + self.to_scale_y(((math.sin(self._running_time / 1000 + (thingie_this ** 2) * math.pi ** 2) + 1) / 2) * max_y_decoration_offset, round_num=False)
                 )
 
                 this_pos_render = (
@@ -1875,20 +1878,20 @@ class MainEngine:
                         _start_angle = math.atan2(this_pos[1] - last_pos[1], this_pos[0] - last_pos[0])
 
                         start_pos = (
-                            last_pos[0] + math.cos(_start_angle) * self.to_scale_x(connecting_line_offset),
-                            last_pos[1] + math.sin(_start_angle) * self.to_scale_y(connecting_line_offset)
+                            last_pos[0] + math.cos(_start_angle) * self.to_scale_x(connecting_line_offset, round_num=False),
+                            last_pos[1] + math.sin(_start_angle) * self.to_scale_y(connecting_line_offset, round_num=False)
                         )
 
                         end_pos = (
-                            this_pos[0] + math.cos(_end_angle) * self.to_scale_x(connecting_line_offset),
-                            this_pos[1] + math.sin(_end_angle) * self.to_scale_y(connecting_line_offset)
+                            this_pos[0] + math.cos(_end_angle) * self.to_scale_x(connecting_line_offset, round_num=False),
+                            this_pos[1] + math.sin(_end_angle) * self.to_scale_y(connecting_line_offset, round_num=False)
                         )
 
                         _decoration_render_data.append(self.draw("line", 1, {"start":start_pos, "end":end_pos, "width":self.to_scale_x(connection_line_width), "color":roket_decoration_yellow}, external=True))
 
                 _last_name = level_button_name
 
-            career.decoration_render_surface.fill(roket_dark_blue) # use the get_at center of the background frame as fill colord
+            career.decoration_render_surface.fill(roket_dark_blue) #roket_background_light_blue # use the get_at center of the background frame as fill colord
 
             self.renderer.render(_level_render_data, career.button_render_surface)
             self.renderer.render(_decoration_render_data, career.decoration_render_surface)
