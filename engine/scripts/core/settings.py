@@ -68,6 +68,8 @@ TITLE_PLANET_SPAWNING_ANICHANCE = 5 # its more like 1/antichance is the chance, 
 POPUP_WINDOW_SIZE = [640, 400]
 POPUP_WINDOW_TEXT_LENGTH = 32
 
+BUTTON_COLOR_SUBTRACT_COLOR = (30, 30, 30)
+
 # font settings
 BUTTON_FONT_SIZE = 36                 # all font sizes are gamespace; rescaled to fit the active res
 H1_FONT_SIZE = 160

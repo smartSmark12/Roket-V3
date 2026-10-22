@@ -73,6 +73,11 @@ from game.scripts.vuilib_extension.scrollable_window                            
 from game.scripts.vuilib_extension.scrollbar                                        import Scrollbar
 from engine.game.scripts.modloader.localization_related.localizationResource        import LocalizationResource
 
+from game.scripts.scenes.title                                                      import TitleScene
+from game.scripts.scenes.main_menu                                                  import MainMenuScene
+from game.scripts.scenes.ship_modification                                          import ShipModificationScene
+from game.scripts.scenes.career                                                     import CareerScene
+
 """ from game.game import MainGame """
 
 ## example import
@@ -250,7 +255,6 @@ class MainEngine:
         )
 
         # create darker button variants
-        BUTTON_COLOR_SUBTRACT_COLOR = (30, 30, 30)
         for sprite in ["button_template", "button_template_vertical", "button_template_square", "mainmenu_settings_button", "mainmenu_leaderboard_button"]:
             dark_name = sprite+"_dark"
             self.sprites[dark_name] = self.sprites[sprite].copy()
@@ -320,11 +324,11 @@ class MainEngine:
         #self.load_localization()
 
         # add all scenes
-        self.scene_handler.addScene(Scene(self, "title"))               # the main game title
-        self.scene_handler.addScene(Scene(self, "main_menu"))           # main menu - root point
-        self.scene_handler.addScene(Scene(self, "ship_modification"))   # upgrades, types, modification
+        self.scene_handler.addScene(TitleScene(self))               # the main game title
+        self.scene_handler.addScene(MainMenuScene(self))           # main menu - root point
+        self.scene_handler.addScene(ShipModificationScene(self))   # upgrades, types, modification
         self.scene_handler.addScene(Scene(self, "game"))                # actual game scene
-        self.scene_handler.addScene(Scene(self, "career"))              # career overview and level select
+        self.scene_handler.addScene(CareerScene(self))              # career overview and level select
         self.scene_handler.addScene(Scene(self, "infinite_setup"))      # select music and level for endless mode
         self.scene_handler.addScene(Scene(self, "achievements"))        # achievement and game stats overview
         self.scene_handler.addScene(Scene(self, "settings"))            # resolution, language, etc. settings
@@ -353,354 +357,8 @@ class MainEngine:
         ship_mod_scene.render       = self.ship_modification_render
         career_scene.render         = self.career_render
 
-        # override scene shis
-
-        title_button_width = 280
-        title_button_height = 128
-
-        title_square_button_size = 128
-        title_side_button_x_distance = 250
-        title_button_y_offset = 160 # not sure why this cant be the same as button x dist ::
-
-        main_menu_button_start_y = 750 # all values autoconverted by to_scale_x/y
-        main_menu_button_width = title_button_width
-        main_menu_button_height = title_button_height
-        main_menu_button_y_offset = title_button_y_offset
-
-        main_menu_background_frame_width = 1600
-        main_menu_background_frame_height = 600
-        main_menu_background_frame_x = (WIDTH - main_menu_background_frame_width) / 2
-        main_menu_background_frame_y = 100
-
-        main_menu_background_frame_width_part = main_menu_background_frame_width / 10
-        main_menu_background_frame_margin = 20
-
-        main_menu_ship_frame_width = main_menu_background_frame_width_part * 5 - 2 * main_menu_background_frame_margin
-        main_menu_mode_frame_width = main_menu_background_frame_width_part * 3 - 2 * main_menu_background_frame_margin
-        main_menu_news_frame_width = main_menu_background_frame_width_part * 2 - 2 * main_menu_background_frame_margin
-
-        main_menu_ship_frame_x = main_menu_background_frame_x + main_menu_background_frame_margin
-        main_menu_mode_frame_x = main_menu_ship_frame_x + main_menu_ship_frame_width + 2 * main_menu_background_frame_margin
-        main_menu_news_frame_x = main_menu_mode_frame_x + main_menu_mode_frame_width + 2 * main_menu_background_frame_margin
-
-        ## TITLE
-
-        title_scene.main_text = self.texts["title_title"]
-        title_scene.version_text = "v" + GAME_VERSION + " - " + GAME_VERSION_HINT
-        title_scene.play_text = self.texts["title_play"] + " " + self.get_keybind_keycode_name_in_square_brackets("ui_forward")
-        title_scene.exit_text = self.texts["title_exit"] + " " + self.get_keybind_keycode_name_in_square_brackets("ui_back")
-        title_scene.buttons = {}
-        title_scene.planets = []
-
-        ## create all title buttons
-        title_scene.buttons["play"] = TextButton(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_button_width) / 2), self.to_scale_y((HEIGHT - title_button_height) / 2 + title_button_y_offset), self.to_scale_x(title_button_width), self.to_scale_y(title_button_height)), 0, None, partial(self.scene_handler.setActiveScene, "main_menu"), None, self, title_scene.play_text)
-        title_scene.buttons["exit"] = TextButton(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_button_width) / 2), self.to_scale_y((HEIGHT - title_button_height) / 2 + 2 * title_button_y_offset), self.to_scale_x(title_button_width), self.to_scale_y(title_button_height)), 0, None, partial(self.exit_game), None, self, title_scene.exit_text)
-        
-        title_scene.buttons["settings"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_settings_button"], "hover":self.sprites["mainmenu_settings_button_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_square_button_size) / 2 - title_side_button_x_distance), self.to_scale_y((HEIGHT - title_square_button_size) / 2 + title_button_y_offset), self.to_scale_x(title_square_button_size), self.to_scale_y(title_square_button_size)), 0, None, partial(self.show_info_popup, "options pressed"), None, self)
-        title_scene.buttons["achievements"] = button(flatpane("sprite", {"main":self.sprites["mainmenu_leaderboard_button"], "hover":self.sprites["mainmenu_leaderboard_button_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - title_square_button_size) / 2 + title_side_button_x_distance), self.to_scale_y((HEIGHT - title_square_button_size) / 2 + title_button_y_offset), self.to_scale_x(title_square_button_size), self.to_scale_y(title_square_button_size)), 0, None, partial(self.show_warning_popup, "achievements pressed"), None, self)
-
-
-        ## MAIN MENU
-        main_menu_scene.launch_text = self.texts["main_menu_launch"] + " " + self.get_keybind_keycode_name_in_square_brackets("ui_forward")
-        main_menu_scene.return_text = self.texts["main_menu_return"] + " " + self.get_keybind_keycode_name_in_square_brackets("ui_back")
-        main_menu_scene.background_frame = UIFrameBuilder.get_ui_frame(self.to_scale_x(main_menu_background_frame_width), self.to_scale_y(main_menu_background_frame_height), self.sprites)
-        main_menu_scene.background_frame_pos = (main_menu_background_frame_x, main_menu_background_frame_y)
-        main_menu_scene.ship_frame = UIFrameBuilder.get_ui_frame(self.to_scale_x(main_menu_ship_frame_width), self.to_scale_y(main_menu_background_frame_height), self.sprites)
-        main_menu_scene.ship_frame_pos = (main_menu_ship_frame_x, main_menu_background_frame_y)
-        main_menu_scene.mode_frame = UIFrameBuilder.get_ui_frame(self.to_scale_x(main_menu_mode_frame_width), self.to_scale_y(main_menu_background_frame_height), self.sprites)
-        main_menu_scene.mode_frame_pos = (main_menu_mode_frame_x, main_menu_background_frame_y)
-        main_menu_scene.news_frame = UIFrameBuilder.get_ui_frame(self.to_scale_x(main_menu_news_frame_width), self.to_scale_y(main_menu_background_frame_height), self.sprites)
-        main_menu_scene.news_frame_pos = (main_menu_news_frame_x, main_menu_background_frame_y)
-        main_menu_scene.buttons = {}
-
-        main_menu_scene.buttons["launch"] = TextButton(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - main_menu_button_width) / 2), self.to_scale_y(main_menu_button_start_y), self.to_scale_x(main_menu_button_width), self.to_scale_y(main_menu_button_height)), 0, None, partial(self.launch_from_main_menu), None, self, main_menu_scene.launch_text)
-        main_menu_scene.buttons["return"] = TextButton(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale_x((WIDTH - main_menu_button_width) / 2), self.to_scale_y(main_menu_button_start_y + main_menu_button_y_offset), self.to_scale_x(main_menu_button_width), self.to_scale_y(main_menu_button_height)), 0, None, partial(self.scene_handler.setActiveScene, "title"), None, self, main_menu_scene.return_text)
-
-
-        ### ship frame
-        ship_window_size_mult = 0.4
-        ship_window_size = (main_menu_ship_frame_width * ship_window_size_mult, main_menu_ship_frame_width * ship_window_size_mult)
-        ship_window_pos = (main_menu_ship_frame_x + (main_menu_ship_frame_width - ship_window_size[0]) / 2, main_menu_background_frame_y + (main_menu_background_frame_height - ship_window_size[1]) / 2 - 50) # ja uz asi nedavam matiku pls proc 4 a ne 2
-        main_menu_scene.ship_window = SpriteWindow(self, self.get_active_ship().sprites.get_sprite(0), ship_window_pos, ship_window_size, self.LAYER_UI_TOP)
-
-        ship_switch_size = (128, 280)
-        ship_switch_left_button_pos = (main_menu_ship_frame_x + 30, main_menu_background_frame_y + (main_menu_background_frame_height - ship_switch_size[1]) / 2)
-        ship_switch_right_button_pos = (main_menu_ship_frame_x - 30 + main_menu_ship_frame_width - ship_switch_size[0], main_menu_background_frame_y + (main_menu_background_frame_height - ship_switch_size[1]) / 2)
-
-        ship_mod_button_size = (main_menu_button_width, main_menu_button_height)
-        ship_mod_button_pos = (main_menu_ship_frame_x + (main_menu_ship_frame_width - ship_mod_button_size[0]) / 2, main_menu_background_frame_y + 420)
-
-        main_menu_scene.buttons["ship_switch_left"] = TextButton(flatpane("sprite", {"main":self.sprites["button_template_vertical"], "hover":self.sprites["button_template_vertical_dark"]}, sprite="main"), pg.Rect(self.to_scale(ship_switch_left_button_pos), self.to_scale(ship_switch_size)), 0, None, partial(self.cycle_main_menu_ship, direction=0), None, self, self.texts["main_menu_switch_left"])
-        main_menu_scene.buttons["ship_switch_right"] = TextButton(flatpane("sprite", {"main":self.sprites["button_template_vertical"], "hover":self.sprites["button_template_vertical_dark"]}, sprite="main"), pg.Rect(self.to_scale(ship_switch_right_button_pos), self.to_scale(ship_switch_size)), 0, None, partial(self.cycle_main_menu_ship, direction=1), None, self, self.texts["main_menu_switch_right"])
-        main_menu_scene.buttons["ship_modification"] = TextButton(flatpane("sprite", {"main":self.sprites["button_template"], "hover":self.sprites["button_template_dark"]}, sprite="main"), pg.Rect(self.to_scale(ship_mod_button_pos), self.to_scale(ship_mod_button_size)), 0, None, partial(self.scene_handler.setActiveScene, "ship_modification"), None, self, self.texts["main_menu_ship_modification"])
-
-        main_menu_scene.ship_name_text = self.get_active_ship().get_property("displayName")
-        main_menu_scene.ship_name_text_center = (main_menu_ship_frame_x + main_menu_ship_frame_width / 2, main_menu_background_frame_y + 50)
-
-        """ main_menu_scene.left_switch_text = self.texts["main_menu_switch_left"]
-        main_menu_scene.right_switch_text = self.texts["main_menu_switch_right"]
-        main_menu_scene.mod_button_text = self.texts["main_menu_ship_modification"] """
-
-        ### gamemode frame
-        main_menu_scene.mode_texts = {}
-        main_menu_scene.mode_texts["mode_career"] = self.texts["main_menu_mode_career"]
-        main_menu_scene.mode_texts["mode_infinite"] = self.texts["main_menu_mode_infinite"]
-        main_menu_scene.mode_texts["mode_dummy"] = self.texts["main_menu_mode_dummy"]
-
-        mode_button_size = (360, 146)
-        mode_button_margin = 40
-        mode_button_start_pos = (main_menu_mode_frame_x + mode_button_margin, main_menu_background_frame_y + mode_button_margin)
-        main_menu_scene.buttons["mode_career"] = button(flatpane("sprite", {"main":self.sprites["button_mode_career_baw"], "hover":self.sprites["button_mode_career"]}, sprite="main"), pg.Rect(self.to_scale(mode_button_start_pos), self.to_scale(mode_button_size)), 0, None, partial(self.change_gamemode, "mode_career"), None, self)
-        main_menu_scene.buttons["mode_infinite"] = button(flatpane("sprite", {"main":self.sprites["button_mode_infinite_baw"], "hover":self.sprites["button_mode_infinite"]}, sprite="main"), pg.Rect(self.to_scale((mode_button_start_pos[0], mode_button_start_pos[1] + mode_button_size[1] + mode_button_margin)), self.to_scale(mode_button_size)), 0, None, partial(self.change_gamemode, "mode_infinite"), None, self)
-        main_menu_scene.buttons["mode_dummy"] = button(flatpane("sprite", {"main":self.sprites["button_mode_dummy_baw"], "hover":self.sprites["button_mode_dummy"]}, sprite="main"), pg.Rect(self.to_scale((mode_button_start_pos[0], mode_button_start_pos[1] + 2 * mode_button_size[1] + 2 * mode_button_margin)), self.to_scale(mode_button_size)), 0, None, partial(self.change_gamemode, "mode_dummy"), None, self)
-
-        main_menu_scene.mode_button_names = ["mode_career", "mode_infinite", "mode_dummy"]
-
-        ## SHIP MODIFICATION
-        ship_mod_scene.buttons = {}
-
-        ship_mod_background_frame_size = (1600, 900)
-        ship_mod_background_frame_pos = (
-            (WIDTH - ship_mod_background_frame_size[0]) / 2,
-            (HEIGHT - ship_mod_background_frame_size[1]) / 2
-        )
-
-        ship_mod_return_button_margin = 25
-        ship_mod_return_button_size = 128
-
-        ship_mod_scene.background_frame = UIFrameBuilder.get_ui_frame(
-            self.to_scale_x(ship_mod_background_frame_size[0]),
-            self.to_scale_y(ship_mod_background_frame_size[1]),
-            self.sprites
-        )
-        ship_mod_scene.background_frame_rect = pg.Rect(self.to_scale(ship_mod_background_frame_pos), self.to_scale(ship_mod_background_frame_size))
-
-        ### hangar text
-        ship_mod_scene.hangar_text = "// " + self.texts["ship_hangar_hangar_text"]
-        ship_mod_scene.hangar_text_rect = pg.Rect( # DONT use this rect as a reference - to_scale applied
-            self.to_scale_x(ship_mod_background_frame_pos[0] + ship_mod_return_button_size + ship_mod_return_button_margin + 20),
-            self.to_scale_y(ship_mod_background_frame_pos[1] + 50),
-            0,
-            0
-        )
-
-        ### available mod slot window
-        ship_mod_scene.ship_slot_size = (400, 100)
-        ship_mod_scene.ship_slot_margin = 20
-
-        ship_mod_slot_button_size = 100
-        
-        ### ship mod pedestal
-        ship_mod_scene.pedestal_pos = (730, 400) # this is kinda stupid, no?
-        ship_mod_scene.pedestal_size = (400, 400)
-
-        # eh idk just resize the fking button
-        self.sprites["button_template_square_smaller"] = self.sprite_handler.real_scale_sprite(self.sprites["button_template_square"], (ship_mod_slot_button_size, ship_mod_slot_button_size))
-        self.sprites["button_template_square_smaller_dark"] = self.sprite_handler.real_scale_sprite(self.sprites["button_template_square_dark"], (ship_mod_slot_button_size, ship_mod_slot_button_size))
-
-        ship_mod_scene.ship_mod_panel_size = (
-            ship_mod_scene.ship_slot_size[0] + 2 * ship_mod_scene.ship_slot_margin,
-            (SLOTS_IN_SHIP_MOD_PAGE + 1) * (ship_mod_scene.ship_slot_size[1] + ship_mod_scene.ship_slot_margin) + ship_mod_scene.ship_slot_margin # the +1 is for the page buttons under
-        )
-        ship_mod_scene.ship_mod_panel_pos = (
-            ship_mod_background_frame_pos[0] + ship_mod_scene.ship_slot_margin,
-            ship_mod_background_frame_pos[1] + 200
-        )
-
-        ship_mod_scene.slot_panel = ShipModPanel()
+        # pre scene setup
         self.regenerate_ship_mod_slot_panel()
-
-        ship_mod_scene.slot_panel_background = UIFrameBuilder.get_ui_frame(
-            self.to_scale_x(ship_mod_scene.ship_mod_panel_size[0]),
-            self.to_scale_y(ship_mod_scene.ship_mod_panel_size[1]),
-            self.sprites,
-            alpha=True
-        )
-
-        ship_mod_scene.slot_panel_rect = pg.Rect(self.to_scale(ship_mod_scene.ship_mod_panel_pos), self.to_scale(ship_mod_scene.ship_mod_panel_size))
-
-        ship_mod_scene.buttons["slot_page_left"] = button(flatpane("sprite", {"main":self.sprites["button_template_square_smaller"], "hover":self.sprites["button_template_square_smaller_dark"]}, sprite="main"), pg.Rect(self.to_scale((ship_mod_scene.ship_mod_panel_pos[0] + ship_mod_scene.ship_slot_margin, ship_mod_scene.ship_mod_panel_pos[1] + SLOTS_IN_SHIP_MOD_PAGE * (ship_mod_scene.ship_slot_size[1] + ship_mod_scene.ship_slot_margin) + ship_mod_scene.ship_slot_margin)), self.to_scale((ship_mod_slot_button_size, ship_mod_slot_button_size))), 0, None, partial(ship_mod_scene.slot_panel.prev_page), None, self)
-        ship_mod_scene.buttons["slot_page_right"] = button(flatpane("sprite", {"main":self.sprites["button_template_square_smaller"], "hover":self.sprites["button_template_square_smaller_dark"]}, sprite="main"), pg.Rect(self.to_scale((ship_mod_scene.ship_mod_panel_pos[0] + ship_mod_scene.ship_slot_size[0] - ship_mod_slot_button_size + ship_mod_scene.ship_slot_margin, ship_mod_scene.ship_mod_panel_pos[1] + SLOTS_IN_SHIP_MOD_PAGE * (ship_mod_scene.ship_slot_size[1] + ship_mod_scene.ship_slot_margin) + ship_mod_scene.ship_slot_margin)), self.to_scale((ship_mod_slot_button_size, ship_mod_slot_button_size))), 0, None, partial(ship_mod_scene.slot_panel.next_page), None, self)
-
-        ship_mod_scene.page_button_left_text = "<" # do you realistically need a translation for this?? The answer is no, shut up.
-        ship_mod_scene.page_button_right_text = ">"
-
-        ### ship window
-        ### module storage window
-        ship_mod_scene.storage_slot_size = (100, 100)
-        ship_mod_scene.storage_slot_margin = 20
-
-        ship_mod_scene.storage_panel_size = (
-            (ship_mod_scene.storage_slot_size[0] + ship_mod_scene.storage_slot_margin) * SLOTS_IN_SHIP_MOD_STORAGE_PAGE[0] + ship_mod_scene.storage_slot_margin,
-            (SLOTS_IN_SHIP_MOD_STORAGE_PAGE[1] + 1) * (ship_mod_scene.storage_slot_size[1] + ship_mod_scene.storage_slot_margin) + ship_mod_scene.storage_slot_margin # the +1 is for the page buttons under
-        )
-
-        ship_mod_scene.storage_panel_pos = (
-            ship_mod_background_frame_pos[0] + ship_mod_background_frame_size[0] - (ship_mod_scene.storage_panel_size[0] + ship_mod_scene.ship_slot_margin),
-            ship_mod_background_frame_pos[1] + ship_mod_scene.ship_slot_margin
-        )
-
-        ship_mod_scene.storage_panel = ShipModPanel()
-        #self.regenerate_ship_mod_slot_panel()
-
-        ship_mod_scene.storage_panel_background = UIFrameBuilder.get_ui_frame(
-            self.to_scale_x(ship_mod_scene.storage_panel_size[0]),
-            self.to_scale_y(ship_mod_scene.storage_panel_size[1]),
-            self.sprites,
-            alpha=True
-        )
-
-        ship_mod_scene.storage_panel_rect = pg.Rect(self.to_scale(ship_mod_scene.storage_panel_pos), self.to_scale(ship_mod_scene.storage_panel_size))
-
-        ship_mod_scene.active_ship_module = None
-
-        ### ship mod buttons
-        ship_mod_scene.return_button_text = "<" # yes, this is hardcoded. judge me.
-
-        ship_mod_scene.buttons["return"] = button(flatpane("sprite", {"main":self.sprites["button_template_square"], "hover":self.sprites["button_template_square_dark"]}, sprite="main"), pg.Rect(self.to_scale((ship_mod_background_frame_pos[0] + ship_mod_return_button_margin, ship_mod_background_frame_pos[1] + ship_mod_return_button_margin)), self.to_scale((ship_mod_return_button_size, ship_mod_return_button_size))), 0, None, partial(self.scene_handler.setActiveScene, "main_menu"), None, self)
-
-        ### ship mod pedestal
-        ship_mod_scene.pedestal = ShipModInteractivePedestal(
-            self,
-            self.get_active_ship(),
-            ship_mod_scene.pedestal_pos,
-            ship_mod_scene.pedestal_size
-        )
-
-        ## CAREER
-        career_scene.buttons = {}
-
-        career_background_frame_size = (1600, 900)
-        career_background_frame_pos = (
-            (WIDTH - career_background_frame_size[0]) / 2,
-            (HEIGHT - career_background_frame_size[1]) / 2
-        )
-
-        career_return_button_margin = 25
-        career_return_button_size = 128
-
-        career_scene.background_frame = UIFrameBuilder.get_ui_frame(
-            self.to_scale_x(career_background_frame_size[0]),
-            self.to_scale_y(career_background_frame_size[1]),
-            self.sprites
-        )
-        career_scene.background_frame_rect = pg.Rect(self.to_scale(career_background_frame_pos), self.to_scale(career_background_frame_size))
-
-        career_scene.return_button_text = "<" # also hardcoded xd
-        career_scene.buttons["return"] = button(flatpane("sprite", {"main":self.sprites["button_template_square"], "hover":self.sprites["button_template_square_dark"]}, sprite="main"), pg.Rect(self.to_scale((career_background_frame_pos[0] + career_return_button_margin, career_background_frame_pos[1] + career_return_button_margin)), self.to_scale((career_return_button_size, career_return_button_size))), 0, None, partial(self.scene_handler.setActiveScene, "main_menu"), None, self)
-
-        ### career choice
-        career_selector_element_margin  = 25
-        career_selector_element_height  = 128 # also the button size
-        career_selector_display_width   = 700
-
-        career_scene.selector_button_left_text = "<"
-        career_scene.selector_button_right_text = ">"
-
-        career_level_decoration_window_size = (300, career_background_frame_size[1] - 300)
-        career_level_window_size = (career_background_frame_size[0] - 600, career_level_decoration_window_size[1])
-        
-        career_level_decoration_window_pos = (
-            career_background_frame_pos[0] + 100,
-            career_background_frame_pos[1] + (career_background_frame_size[1] - career_level_decoration_window_size[1]) / 2 + 100
-        )
-
-        career_level_window_pos = (
-            career_level_decoration_window_pos[0] + career_level_decoration_window_size[0] + 20,
-            career_level_decoration_window_pos[1]
-        )
-
-        career_scene.career_selector_starting_position = (
-            career_background_frame_pos[0] + career_selector_element_margin + career_scene.buttons["return"].rect.right,
-            career_background_frame_pos[1] + career_selector_element_margin
-        )
-
-        career_scene.career_level_button_width = career_level_window_size[0]
-        career_scene.career_level_button_height = 100
-        career_scene.career_level_button_offset = 10
-
-        career_scene.buttons["career_selector_left"] = button(
-                flatpane("sprite", {"main":self.sprites["button_template_square"], "hover":self.sprites["button_template_square_dark"]}, sprite="main"),
-                pg.Rect(self.to_scale((career_scene.career_selector_starting_position[0], career_scene.career_selector_starting_position[1])), self.to_scale((career_return_button_size, career_return_button_size))),
-                0,
-                None,
-                partial(self.cycle_career, False),
-                None,
-                self
-            )
-
-        career_scene.buttons["career_selector_right"] = button(
-                flatpane("sprite", {"main":self.sprites["button_template_square"], "hover":self.sprites["button_template_square_dark"]}, sprite="main"),
-                pg.Rect(self.to_scale((career_scene.career_selector_starting_position[0] + career_selector_display_width + career_selector_element_height + 2 * career_selector_element_margin, career_scene.career_selector_starting_position[1])), self.to_scale((career_return_button_size, career_return_button_size))),
-                0,
-                None,
-                partial(self.cycle_career, True),
-                None,
-                self
-            )
-
-        career_scene.selector_display = UIFrameBuilder.get_ui_frame(
-                self.to_scale_x(career_selector_display_width),
-                self.to_scale_y(career_selector_element_height),
-                self.sprites
-            )
-
-        career_scene.selector_display_rect = pg.Rect(
-            self.to_scale((career_scene.career_selector_starting_position[0] + career_selector_element_height + career_selector_element_margin, career_scene.career_selector_starting_position[1])),
-            self.to_scale((career_selector_display_width, career_selector_element_height))
-        )
-
-        career_scene.selector_display_text = self.texts["career_selector_no_career_loaded"] # you should never see this XD
-
-        career_level_scrollbar = Scrollbar(
-                                            appInstance         =self,
-                                            pos                 =(career_level_window_pos[0] + career_level_window_size[0] + 20, career_level_window_pos[1]),
-                                            size                =(30, career_level_window_size[1]),
-                                            windowHeight        =career_level_window_size[1],
-                                            backgroundColor     =roket_dark_orange,
-                                            floaterHeight       =60,
-                                            floaterSprite       =self.sprite_handler.load_sprite("scrollbar_floater", "engine/game/assets/img/menu/scrollbar_floater.png", (30, 60), "c", False)
-                                        )
-
-        career_scene.level_decoration_scroll_window = ScrollableWindow(
-            appInstance             =self,
-            pos                     =career_level_decoration_window_pos,
-            size                    =career_level_decoration_window_size,
-            scrollbar               =career_level_scrollbar,
-            backgroundColor         =roket_light_blue,
-            scrollSpeedMultiplier   =50
-        )
-
-        career_scene.level_scroll_window = ScrollableWindow(
-            appInstance             =self,
-            pos                     =career_level_window_pos,
-            size                    =career_level_window_size,
-            scrollbar               =career_level_scrollbar,
-            backgroundColor         =roket_light_blue,
-            scrollSpeedMultiplier   =50
-        )
-
-        level_button_frame = UIFrameBuilder.get_ui_frame(
-            career_scene.career_level_button_width,
-            career_scene.career_level_button_height,
-            self.sprites,
-            background_sprite="ui_builder_background_light",
-            alpha=True
-        )
-
-        self.sprites["level_button_frame"] = self.sprite_handler.real_scale_sprite(level_button_frame, level_button_frame.size)
-
-        # create darker button variants
-        for sprite in ["level_button_frame"]:
-            dark_name = sprite+"_dark"
-            self.sprites[dark_name] = self.sprites[sprite].copy()
-            pg.Surface.fill(self.sprites[dark_name], BUTTON_COLOR_SUBTRACT_COLOR, special_flags=pg.BLEND_SUB)
-
-        career_scene.level_buttons = {}
-        career_scene.level_scroll_window.set_content(self.sprites["scaling_tester"]) # self.sprites["scaling_tester"]
-        career_scene.level_decoration_scroll_window.set_content(self.sprites["scaling_tester"]) # self.sprites["scaling_tester"]
-        career_scene.button_render_surface = None
-        career_scene.decoration_render_surface = None
 
         self.cycle_career(True)
         self.cycle_career(False) # shenanigans really; used to get it to the second career and then to the first
