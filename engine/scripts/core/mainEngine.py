@@ -187,8 +187,6 @@ class MainEngine:
         # scene handler setup
         self.scene_handler = SceneHandler(self)
 
-        """ self.create_examples() """
-
         self.to_scale_x = self.sprite_handler.to_scalex
         self.to_scale_y = self.sprite_handler.to_scaley
         self.to_scale = self.sprite_handler.to_scale
@@ -1273,16 +1271,8 @@ class MainEngine:
 
     def main_menu_render(self):
         main_menu = self.scene_handler.getScene("main_menu")
-        
-        # draw button texts
-        """ self.draw_button_text(main_menu.launch_text, main_menu.buttons["launch"])
-        self.draw_button_text(main_menu.return_text, main_menu.buttons["return"])
-        self.draw_button_text(main_menu.left_switch_text, main_menu.buttons["ship_switch_left"])
-        self.draw_button_text(main_menu.right_switch_text, main_menu.buttons["ship_switch_right"])
-        self.draw_button_text(main_menu.mod_button_text, main_menu.buttons["ship_modification"]) """
 
         # draw background frame
-        #self.draw("sprite", self.LAYER_UI_BOTTOM, {"sprite":main_menu.background_frame, "rect":(self.to_scale_x(main_menu.background_frame_pos[0]), self.to_scale_y(main_menu.background_frame_pos[1]), 0, 0)})
         self.draw("sprite", self.LAYER_UI_BOTTOM, {"sprite":main_menu.ship_frame, "rect":(self.to_scale_x(main_menu.ship_frame_pos[0]), self.to_scale_y(main_menu.ship_frame_pos[1]), 0, 0)})
         self.draw("sprite", self.LAYER_UI_BOTTOM, {"sprite":main_menu.mode_frame, "rect":(self.to_scale_x(main_menu.mode_frame_pos[0]), self.to_scale_y(main_menu.mode_frame_pos[1]), 0, 0)})
         self.draw("sprite", self.LAYER_UI_BOTTOM, {"sprite":main_menu.news_frame, "rect":(self.to_scale_x(main_menu.news_frame_pos[0]), self.to_scale_y(main_menu.news_frame_pos[1]), 0, 0)})
@@ -1292,8 +1282,6 @@ class MainEngine:
 
         # draw ship name text
         self.draw("text", self.LAYER_UI_TOP, {"text":main_menu.ship_name_text, "font":self.button_font, "center":self.to_scale(main_menu.ship_name_text_center), "no_bg":True, "rect":pg.Rect(0,0,0,0), "color":black}) # idk maybe white
-
-        """ main_menu.ship_button_left.render() """
 
         # draw buttons
         for button in main_menu.buttons:
