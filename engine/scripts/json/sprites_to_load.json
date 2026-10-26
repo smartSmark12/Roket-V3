@@ -39,6 +39,11 @@
         [384, 202],
         "c"
     ],
+    "icon":[
+        "engine/game/assets/img/else/icon.png",
+        [128, 128],
+        "ca"
+    ],
     "asteroid_default1":[
         "engine/game/assets/img/asteroids/asteroid1.png",
         [100,100],

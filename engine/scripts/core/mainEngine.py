@@ -206,6 +206,10 @@ class MainEngine:
 
     # write your game on_init here
     def game_on_init(self):
+
+        # set window icon
+        pg.display.set_icon(self.sprites["icon"])
+
         # set render layers
         self.LAYER_UI_BOTTOM = 7
         self.LAYER_UI_TOP_BOTTOM = self.LAYER_UI_TOP + 1
@@ -362,6 +366,8 @@ class MainEngine:
         self.cycle_career(False) # shenanigans really; used to get it to the second career and then to the first
 
         #self.show_choice_yes_no_popup("Are you sure whatever you're doing is worth it? This is a very long dummy text that is utterly useless for anything else :33")
+
+        #self.show_info_popup("Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, Absolute garbage, ")
 
     # VIRTUAL DISPLAY PREP
 
@@ -1434,7 +1440,6 @@ class MainEngine:
                 _level_render_data.extend(level_button.render())
 
                 # draw level decoration
-
                 max_x_decoration_offset = 10
                 #max_x_decoration_offset += self.corrected_mouse_info[3][1] * 40
                 max_y_decoration_offset = 5
