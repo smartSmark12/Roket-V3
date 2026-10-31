@@ -23,6 +23,7 @@ DEFAULT_SHADER_PATH:str = "./engine/shaders/default" # adds '.vert' & '.frag' au
 
 DEFAULT_SPRITE_PATH:str = "./engine/scripts/sprites_to_load.py"
 DEFAULT_SPRITE_JSON_PATH:str = "./engine/scripts/json/sprites_to_load.json"
+DEFAULT_MUSIC_JSON_PATH:str = "./engine/scripts/json/music_to_load.json"
 DEFAULT_ANIMATION_PATH:str = "./engine/scripts/animations_to_create.py"
 
 # scene settings

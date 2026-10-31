@@ -73,6 +73,7 @@ from game.scripts.vuilib_extension.scrollable_window                            
 from game.scripts.vuilib_extension.scrollbar                                        import Scrollbar
 from engine.game.scripts.modloader.localization_related.localizationResource        import LocalizationResource
 from game.scripts.menu_star                                                         import MenuStar
+from game.scripts.sound_manager                                                     import SoundManager
 
 from game.scripts.scenes.title                                                      import TitleScene
 from game.scripts.scenes.main_menu                                                  import MainMenuScene
@@ -211,6 +212,10 @@ class MainEngine:
         # set window icon
         pg.display.set_icon(self.sprites["icon"])
 
+        # initialize sound manager
+        self.sound_manager = SoundManager(self)
+        self.sound_manager.load_music_from_file(DEFAULT_MUSIC_JSON_PATH)
+
         # set render layers
         self.LAYER_TITLE_STARS = 3
         self.LAYER_UI_BOTTOM = 7
@@ -221,8 +226,6 @@ class MainEngine:
 
         self._start_time = time() * 1000
         self._running_time = 0
-
-        #----sum ord char for char
 
         # alarms setup
         self.alarms = {}
@@ -381,9 +384,13 @@ class MainEngine:
                 self.spawn_title_planets()
             self.update_title_planets()
 
-            self.dt += 1/200
+            self.dt += 1/TITLE_STAR_WARMUP_CYCLES
 
         self.dt = 0 # reset deltatime after warmup
+
+        # temp play menu music
+        self.sound_manager.list_all_loaded_music()
+        self.sound_manager.play_music("core_temp", repeat=True)
 
         #self.show_choice_yes_no_popup("Are you sure whatever you're doing is worth it? This is a very long dummy text that is utterly useless for anything else :33")
 
