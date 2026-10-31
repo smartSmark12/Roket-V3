@@ -1,15 +1,16 @@
 import pygame as pg
 
-from game.scripts.scenes.intermediate_scene         import IntermediateScene
-from game.scripts.scenes.global_scene_params        import GlobalSceneParams as gs
+from game.scripts.scenes.intermediate_scene                             import IntermediateScene
+from game.scripts.scenes.global_scene_params                            import GlobalSceneParams as gs
 
-from scripts.core.settings                          import GAME_VERSION, GAME_VERSION_HINT, WIDTH, HEIGHT
-from vuilib.vui_flatpane                            import flatpane
-from vuilib.vui_button                              import button
-from game.scripts.vuilib_extension.text_button      import TextButton
-from functools                                      import partial
-from game.scripts.ui_frame_builder                  import UIFrameBuilder
-from game.scripts.sprite_window                     import SpriteWindow
+from scripts.core.settings                                              import GAME_VERSION, GAME_VERSION_HINT, WIDTH, HEIGHT
+from vuilib.vui_flatpane                                                import flatpane
+from vuilib.vui_button                                                  import button
+from game.scripts.vuilib_extension.text_button                          import TextButton
+from functools                                                          import partial
+from game.scripts.ui_frame_builder                                      import UIFrameBuilder
+from game.scripts.sprite_window                                         import SpriteWindow
+from game.scripts.ship_modification_related.ship_modification_pedestal  import ShipModInteractivePedestal
 
 class MainMenuScene(IntermediateScene):
     def __init__(self, appInstance):
@@ -61,8 +62,14 @@ class MainMenuScene(IntermediateScene):
             self.app,
             self.return_text
         )
-        
-        self.ship_window = SpriteWindow(self.app, self.app.get_active_ship().sprites.get_sprite(0), gs.ship_window_pos, gs.ship_window_size, self.app.LAYER_UI_TOP)
+
+        self.ship_window = ShipModInteractivePedestal(
+            self.app,
+            self.app.get_active_ship(),
+            gs.ship_window_pos,
+            gs.ship_window_size
+        )
+        #self.ship_window = SpriteWindow(self.app, self.app.get_active_ship().sprites.get_sprite(0), gs.ship_window_pos, gs.ship_window_size, self.app.LAYER_UI_TOP)
 
         self.buttons["ship_switch_left"] = TextButton(
             flatpane(

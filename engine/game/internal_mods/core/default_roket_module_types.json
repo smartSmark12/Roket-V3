@@ -1,9 +1,8 @@
 {
-    "module_types":
-    {
-        "EngineModuleType":null,
-        "HullModuleType":null,
-        "AbilityModuleType":null,
-        "WeaponModuleType":null
+    "module_types": {
+        "EngineModuleType": null,
+        "HullModuleType": null,
+        "AbilityModuleType": null,
+        "WeaponModuleType": null
     }
 }

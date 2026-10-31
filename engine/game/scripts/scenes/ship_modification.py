@@ -151,5 +151,6 @@ class ShipModificationScene(IntermediateScene):
             self.app,
             self.app.get_active_ship(),
             self.pedestal_pos,
-            self.pedestal_size
+            self.pedestal_size,
+            slotEditingModeEnabled=True
         )

@@ -1,99 +1,176 @@
 {
-    "ships":
-    {
-        "legacy":
-        {
-            "display_name":"Legacy",
-            "base_lives":1,
-            "size":[100,100],
-            "collider_size":[100,100],
-            "collider_offset":[0,50],
-            "sprite_source":"internal",
-            "animation_sprites":
-            [
+    "ships": {
+        "legacy": {
+            "display_name": "Legacy",
+            "base_lives": 1,
+            "size": [
+                400,
+                400
+            ],
+            "collider_size": [
+                400,
+                400
+            ],
+            "collider_offset": [
+                0,
+                50
+            ],
+            "sprite_source": "internal",
+            "animation_sprites": [
                 "img/ships/Legacy/ship1_anim1.png",
                 "img/ships/Legacy/ship1_anim2.png",
                 "img/ships/Legacy/ship1_anim3.png"
             ],
-            "module_slots":
-            {
-                "1":{
-                    "name":"Front weapon",
-                    "position":[0,-0.9],
-                    "allowed_module_types":["WeaponModuleType"]
+            "module_slots": {
+                "1": {
+                    "name": "Front weapon",
+                    "position": [
+                        0,
+                        -0.9
+                    ],
+                    "allowed_module_types": [
+                        "WeaponModuleType"
+                    ]
                 },
-                "2":{
-                    "name":"Core hull",
-                    "position":[0,0.1],
-                    "allowed_module_types":["HullModuleType"]
+                "2": {
+                    "name": "Core hull",
+                    "position": [
+                        0,
+                        0.1
+                    ],
+                    "allowed_module_types": [
+                        "HullModuleType"
+                    ]
                 },
-                "3":{
-                    "name":"Main engine",
-                    "position":[0,0.6],
-                    "allowed_module_types":["EngineModuleType"]
+                "3": {
+                    "name": "Main engine",
+                    "position": [
+                        0,
+                        0.6
+                    ],
+                    "allowed_module_types": [
+                        "EngineModuleType"
+                    ]
                 },
-                "4":{
-                    "name":"Extra special fucker",
-                    "position":[0,-0.2],
-                    "allowed_module_types":["WeaponModuleType", "EngineModuleType", "HullModuleType", "AbilityModuleType"]
+                "4": {
+                    "name": "Extra special fucker",
+                    "position": [
+                        0,
+                        -0.2
+                    ],
+                    "allowed_module_types": [
+                        "WeaponModuleType",
+                        "EngineModuleType",
+                        "HullModuleType",
+                        "AbilityModuleType"
+                    ]
                 }
             }
         },
-        "runner":
-        {
-            "display_name":"Runner",
-            "base_lives":1,
-            "size":[100,100],
-            "collider_size":[100,100],
-            "collider_offset":[0,50],
-            "sprite_source":"internal",
-            "animation_sprites":
-            [
+        "runner": {
+            "display_name": "Runner",
+            "base_lives": 1,
+            "size": [
+                400,
+                400
+            ],
+            "collider_size": [
+                400,
+                400
+            ],
+            "collider_offset": [
+                0,
+                50
+            ],
+            "sprite_source": "internal",
+            "animation_sprites": [
                 "img/ships/Runner/Runner_anim1.png",
                 "img/ships/Runner/Runner_anim2.png",
                 "img/ships/Runner/Runner_anim3.png"
             ],
-            "module_slots":
-            {
-                "1":{
-                    "name":"Main weapon",
-                    "position":[0,0.1],
-                    "allowed_module_types":["WeaponModuleType"]
+            "module_slots": {
+                "1": {
+                    "name": "Main weapon",
+                    "position": [
+                        0,
+                        0.1
+                    ],
+                    "allowed_module_types": [
+                        "WeaponModuleType"
+                    ]
                 },
-                "2":{
-                    "name":"Fusion core",
-                    "position":[0,0.2],
-                    "allowed_module_types":["HullModuleType"]
+                "2": {
+                    "name": "Fusion core",
+                    "position": [
+                        0,
+                        0.2
+                    ],
+                    "allowed_module_types": [
+                        "HullModuleType"
+                    ]
                 },
-                "3":{
-                    "name":"Twin engine",
-                    "position":[0,0.7],
-                    "allowed_module_types":["EngineModuleType"]
+                "3": {
+                    "name": "Twin engine",
+                    "position": [
+                        0,
+                        0.7
+                    ],
+                    "allowed_module_types": [
+                        "EngineModuleType"
+                    ]
                 },
-                "4":{
-                    "name":"Universal slot",
-                    "position":[0,0.1],
-                    "allowed_module_types":["WeaponModuleType", "EngineModuleType", "HullModuleType", "AbilityModuleType"]
+                "4": {
+                    "name": "Universal slot",
+                    "position": [
+                        0,
+                        0.1
+                    ],
+                    "allowed_module_types": [
+                        "WeaponModuleType",
+                        "EngineModuleType",
+                        "HullModuleType",
+                        "AbilityModuleType"
+                    ]
                 },
-                "5":{
-                    "name":"Duplicate slot first",
-                    "position":[0.1,0.3],
-                    "allowed_module_types":["EngineModuleType"]
+                "5": {
+                    "name": "Duplicate slot first",
+                    "position": [
+                        0.1,
+                        0.3
+                    ],
+                    "allowed_module_types": [
+                        "EngineModuleType"
+                    ]
                 },
-                "6":{
-                    "name":"Duplicate slot",
-                    "position":[0.2,0.3],
-                    "allowed_module_types":["EngineModuleType"]
+                "6": {
+                    "name": "Duplicate slot",
+                    "position": [
+                        0.2,
+                        0.3
+                    ],
+                    "allowed_module_types": [
+                        "EngineModuleType"
+                    ]
                 },
-                "7":{
-                    "name":"Duplicate slot",
-                    "position":[0.3,0.3],
-                    "allowed_module_types":["EngineModuleType"]
+                "7": {
+                    "name": "Duplicate slot",
+                    "position": [
+                        0.3,
+                        0.3
+                    ],
+                    "allowed_module_types": [
+                        "EngineModuleType"
+                    ]
                 },
-                "8":{
-                    "name":"Duplicate slot last",
-                    "position":[0.4,0.3],
-                    "allowed_module_types":["EngineModuleType"]
+                "8": {
+                    "name": "Duplicate slot last",
+                    "position": [
+                        0.4,
+                        0.3
+                    ],
+                    "allowed_module_types": [
+                        "EngineModuleType"
+                    ]
                 }
             }
         }

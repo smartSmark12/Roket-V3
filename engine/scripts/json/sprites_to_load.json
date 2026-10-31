@@ -59,6 +59,21 @@
         [100,100],
         "ca"
     ],
+    "star1":[
+        "engine/game/assets/img/stars/star1.png",
+        [100,100],
+        "ca"
+    ],
+    "star2":[
+        "engine/game/assets/img/stars/star2.png",
+        [100,100],
+        "ca"
+    ],
+    "star3":[
+        "engine/game/assets/img/stars/star3.png",
+        [100,100],
+        "ca"
+    ],
     "hit_screen_overlay":[
         "engine/game/assets/img/else/asteroid_hit_screen_overlay.png",
         [1920,1080],

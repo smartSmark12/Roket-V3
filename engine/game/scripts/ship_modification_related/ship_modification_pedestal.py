@@ -1,13 +1,15 @@
 from game.scripts.modloader.roket_body_related.roket_body       import RoketBody
 from game.scripts.sprite_window                                 import SpriteWindow
 from scripts.colors                                             import red
+from scripts.core.settings                                      import MODULE_DEFAULT_SIZE
 
 class ShipModInteractivePedestal:
-    def __init__(self, appInstance, ship:RoketBody, position:tuple[float|int], size:tuple[float|int]):
+    def __init__(self, appInstance, ship:RoketBody, position:tuple[float|int], size:tuple[float|int], slotEditingModeEnabled:bool=False):
         self.app = appInstance
         self.ship = ship
         self.pos = position
         self.size = size
+        self.slot_editing_mode = slotEditingModeEnabled
         
         self.hovered_slot = None # a module panel slot; not the ship slot
 
@@ -41,18 +43,21 @@ class ShipModInteractivePedestal:
     def _render_slots(self):
         for slot_id, slot in self.ship.get_module_slots().items():
             # draw slot background
-            self.app.draw(
-                "sprite",
-                self.app.LAYER_UI_TOP_TOP,
-                {
-                    "sprite":self.app.sprites["pedestal_ship_slot"],
-                    "rect":((slot.get_pos()[0] / 2) * self.app.to_scale_x(self.size[0]) + self.slot_offset[0], (slot.get_pos()[1] / 2) * self.app.to_scale_y(self.size[1]) + self.slot_offset[1], 0, 0)
-                }
-            )
+            if self.slot_editing_mode and not slot.has_module():
+                self.app.draw(
+                    "sprite",
+                    self.app.LAYER_UI_TOP_TOP,
+                    {
+                        "sprite":self.app.sprites["pedestal_ship_slot"],
+                        "rect":((slot.get_pos()[0] / 2) * self.app.to_scale_x(self.size[0]) + self.slot_offset[0], (slot.get_pos()[1] / 2) * self.app.to_scale_y(self.size[1]) + self.slot_offset[1], 0, 0)
+                    }
+                )
 
             # draw slot module
             if slot.has_module():
                 sprite = slot.get_module().get_sprites().get_active_sprite()
+                sprite_size = MODULE_DEFAULT_SIZE[0] * slot.get_module().sizeModifier * self.window.ratio
+                sprite = self.app.sprite_handler.cached_real_scale_sprite(sprite, (sprite_size, sprite_size))
 
                 self.app.draw(
                     "sprite",
@@ -76,7 +81,7 @@ class ShipModInteractivePedestal:
 
         self._render_slots()
         
-        if self.hovered_slot is not None:
+        if self.hovered_slot is not None and self.slot_editing_mode:
             self._render_connection_line()
         
         self.window.render()

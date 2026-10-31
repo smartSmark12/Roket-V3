@@ -72,6 +72,7 @@ from game.scripts.vuilib_extension.level_button                                 
 from game.scripts.vuilib_extension.scrollable_window                                import ScrollableWindow
 from game.scripts.vuilib_extension.scrollbar                                        import Scrollbar
 from engine.game.scripts.modloader.localization_related.localizationResource        import LocalizationResource
+from game.scripts.menu_star                                                         import MenuStar
 
 from game.scripts.scenes.title                                                      import TitleScene
 from game.scripts.scenes.main_menu                                                  import MainMenuScene
@@ -85,7 +86,7 @@ from scripts.tileScripts.baseBiomeWeights import baseBiomeWeights
 
 import psutil
 
-from functools      import lru_cache
+from functools      import lru_cache, cache
 from functools      import partial
 from copy           import deepcopy
 from time           import time
@@ -211,6 +212,7 @@ class MainEngine:
         pg.display.set_icon(self.sprites["icon"])
 
         # set render layers
+        self.LAYER_TITLE_STARS = 3
         self.LAYER_UI_BOTTOM = 7
         self.LAYER_UI_TOP_BOTTOM = self.LAYER_UI_TOP + 1
         self.LAYER_UI_TOP_TOP = self.LAYER_UI_TOP_BOTTOM + 1
@@ -226,6 +228,7 @@ class MainEngine:
         self.alarms = {}
 
         self.title_planet_alarm = self.add_alarm("planet_spawn", TITLE_PLANET_SPAWNING_PERIOD, self.spawn_title_planets, True)
+        self.title_star_alarm = self.add_alarm("star_spawn", TITLE_STAR_SPAWNING_PERIOD, self.spawn_title_star, True)
 
         # assign empty corrected mouse info
         self.corrected_mouse_info = None
@@ -364,6 +367,23 @@ class MainEngine:
 
         self.cycle_career(True)
         self.cycle_career(False) # shenanigans really; used to get it to the second career and then to the first
+
+        self.menu_stars:list[MenuStar] = []
+        self.menu_comets:list[MenuStar] = [] # coments stawn together with stars
+        self.menu_planets = []
+
+        # star pre-run warmup
+        for i in range(TITLE_STAR_WARMUP_CYCLES):
+            self.spawn_title_star()
+            self.update_title_stars()
+
+            if i % TITLE_PLANET_SPAWNING_PERIOD == 1:
+                self.spawn_title_planets()
+            self.update_title_planets()
+
+            self.dt += 1/200
+
+        self.dt = 0 # reset deltatime after warmup
 
         #self.show_choice_yes_no_popup("Are you sure whatever you're doing is worth it? This is a very long dummy text that is utterly useless for anything else :33")
 
@@ -1080,7 +1100,7 @@ class MainEngine:
             print(f"{shipName} set as active ship")
 
             # udpate ship window
-            self.scene_handler.getScene("main_menu").ship_window.set_sprite(self.sprites.get(f"{shipName}_anim_0"))
+            self.scene_handler.getScene("main_menu").ship_window.set_ship(self.get_active_ship())
             self.scene_handler.getScene("main_menu").ship_name_text = self.get_active_ship().get_property("displayName")
 
     def get_active_ship(self) -> RoketBody:
@@ -1216,17 +1236,10 @@ class MainEngine:
             self.reset_keybinds()
 
         # planet movement
-        for planet in title.planets:
-            self.animations[planet].anim_pos = (
-                                                self.animations[planet].anim_pos[0] - self.to_scale_x(self.planet_movement_speed[0])*self.dt,
-                                                self.animations[planet].anim_pos[1] - self.to_scale_y(self.planet_movement_speed[1])*self.dt
-                                                )
-            
-            if self.animations[planet].anim_pos[0] < -200:
-                self.animation_handler.remove_animation(planet)
-                title.planets[title.planets.index(planet)] = None
+        self.update_title_planets()
 
-        title.planets = [i for i in title.planets if i is not None]
+        # star movement
+        self.update_title_stars()
 
     def title_render(self):
         title = self.scene_handler.getScene("title")
@@ -1245,8 +1258,10 @@ class MainEngine:
             title.buttons[button].render()
 
         # planet render
-        for planet in title.planets:
-            self.animations_to_render.append(planet)
+        self.render_title_planets()
+
+        # star render
+        self.render_title_stars()
 
 
         # debug
@@ -1275,6 +1290,12 @@ class MainEngine:
         if self.get_keybind_just_pressed("ui_back"):
             main_menu.buttons["return"].on_click()
 
+        # planet movement
+        self.update_title_planets()
+    
+        # star movement
+        self.update_title_stars()
+
     def main_menu_render(self):
         main_menu = self.scene_handler.getScene("main_menu")
 
@@ -1302,6 +1323,12 @@ class MainEngine:
 
         # draw version info
         self.render_version_info()
+
+        # planet render
+        self.render_title_planets()
+
+        # star render
+        self.render_title_stars()
 
     def ship_modification_update(self):
         ship_mod = self.scene_handler.getScene("ship_modification")
@@ -1333,6 +1360,13 @@ class MainEngine:
                     print("selected", slot.title, "from storage")
 
                     self.get_active_ship().get_module(ship_mod.active_ship_module.get_slot_id()).add_module(slot.get_module(), force=True)
+
+
+        # planet movement
+        self.update_title_planets()
+
+        # star movement
+        self.update_title_stars()
 
     def ship_modification_render(self):
         ship_mod = self.scene_handler.getScene("ship_modification")
@@ -1381,6 +1415,12 @@ class MainEngine:
         # draw ship pedestal
         ship_mod.pedestal.render()
 
+        # planet render
+        self.render_title_planets()
+
+        # star render
+        self.render_title_stars()
+
     def career_update(self):
         career = self.scene_handler.getScene("career")
 
@@ -1407,6 +1447,12 @@ class MainEngine:
             for level_button_name, level_button in career.level_buttons.items():
                 level_button.activation_detection(scroll_corrected_mouse_info)
                 level_button.update_hold_time(scroll_corrected_mouse_info)
+
+        # planet movement
+        self.update_title_planets()
+
+        # star movement
+        self.update_title_stars()
 
     def career_render(self):
         career = self.scene_handler.getScene("career")
@@ -1551,6 +1597,12 @@ class MainEngine:
         career.level_scroll_window.render()
         career.level_decoration_scroll_window.render()
 
+        # planet render
+        self.render_title_planets()
+
+        # star render
+        self.render_title_stars()
+
     # INTERNAL RANDOM AHH HELPERS
 
     ##################
@@ -1587,16 +1639,105 @@ class MainEngine:
                 y_pos = random.randint(int(HEIGHT/2), HEIGHT)
 
             self.animation_handler.add_animation(planet_name_prefix + str(animation_number), ["title_planet_0_0","title_planet_0_1","title_planet_0_2"], 2, self.LAYER_TITLE_PLANETS, (self.to_scale_x(x_pos), self.to_scale_y(y_pos)))
-            self.scene_handler.getScene("title").planets.append(planet_name_prefix + str(animation_number))
+            self.menu_planets.append(planet_name_prefix + str(animation_number))
 
-    def in_bounds(self, pos): # this thing is lowkey crazy :(( ## its worldspace, NOT SCREENSPACE
+    def spawn_title_star(self):
+        # star spawning
+        star_index = random.randint(1, 3)
+
+        x_pos = 100
+        y_pos = 100
+
+        while self.in_bounds((x_pos, y_pos), margin=50):
+            x_pos = random.randint(0, WIDTH + 200)
+            y_pos = random.randint(0, HEIGHT + 200)
+
+        self.menu_stars.append(
+            MenuStar(
+                self,
+                (x_pos, y_pos),
+                (-TITLE_STAR_SPEED[0] * (1/(2*star_index)), -TITLE_STAR_SPEED[1] * (1/(2*star_index))),
+                TITLE_STAR_SIZE/star_index,
+                random.random(),
+                random.randrange(TITLE_STAR_ROT_SPEED_MIN_MAX[0], TITLE_STAR_ROT_SPEED_MIN_MAX[1]),
+                "star" + str(star_index)
+            )
+        )
+
+        # comet spawning
+        if random.randint(0, TITLE_COMET_SPAWNING_ANTICHANCE) == 0:
+            x_pos = 100
+            y_pos = 100
+
+            while self.in_bounds((x_pos, y_pos), margin=50):
+                x_pos = random.randint(-200, WIDTH)
+                y_pos = random.randint(-200, HEIGHT)
+
+            self.menu_comets.append(
+                MenuStar(
+                    self,
+                    (x_pos, y_pos),
+                    (TITLE_STAR_SPEED[0] * 10, TITLE_STAR_SPEED[1] * 10),
+                    TITLE_STAR_SIZE,
+                    0,
+                    0,
+                    "comet"
+                )
+            )
+
+    def in_bounds(self, pos, margin=0): # this thing is lowkey crazy :(( ## its worldspace, NOT SCREENSPACE
         x = pos[0]
         y = pos[1]
 
-        if x > 0 and y > 0 and x < WIDTH and y < HEIGHT:
+        if x > 0 - margin and y > 0 - margin and x < WIDTH + margin and y < HEIGHT + margin:
             return True
         else:
             return False
+
+    def update_title_planets(self):
+        for planet in self.menu_planets:
+            self.animations[planet].anim_pos = (
+                                                self.animations[planet].anim_pos[0] - self.to_scale_x(self.planet_movement_speed[0])*self.dt,
+                                                self.animations[planet].anim_pos[1] - self.to_scale_y(self.planet_movement_speed[1])*self.dt
+                                                )
+            
+            if self.animations[planet].anim_pos[0] < -200:
+                self.animation_handler.remove_animation(planet)
+                self.menu_planets[self.menu_planets.index(planet)] = None
+
+        self.menu_planets = [i for i in self.menu_planets if i is not None]
+
+    def render_title_planets(self):
+        for planet in self.menu_planets:
+            self.animations_to_render.append(planet)
+
+    def update_title_stars(self):
+        for star_index in range(len(self.menu_stars)):
+            star = self.menu_stars[star_index]
+
+            star.update()
+
+            if star.pos[0] < -200:
+                self.menu_stars[star_index] = None
+
+        self.menu_stars = [i for i in self.menu_stars if i is not None]
+
+        for comet_index in range(len(self.menu_comets)):
+            comet = self.menu_comets[comet_index]
+
+            comet.update()
+
+            if comet.pos[0] > WIDTH +200:
+                self.menu_comets[comet_index] = None
+
+        self.menu_comets = [i for i in self.menu_comets if i is not None]
+
+    def render_title_stars(self):
+        for star in self.menu_stars:
+            star.render()
+
+        for comet in self.menu_comets:
+            comet.render()
 
     def update_alarms(self):
         for alarm in self.alarms:
@@ -1962,10 +2103,12 @@ class MainEngine:
 
     def do_logic(self): # all non-engine related logic should go here (unless you use scenes ofc)
         # pause planet spawning alarm if title not active
-        if self.scene_handler.getActiveSceneName() != "title":
+        if self.scene_handler.getActiveSceneName() not in ["title", "main_menu", "ship_modification", "career", "infinite_setup", "achievements", "settings"] or self.get_popup_active():
             self.pause_alarm(self.title_planet_alarm)
+            self.pause_alarm(self.title_star_alarm)
         else:
             self.unpause_alarm(self.title_planet_alarm)
+            self.unpause_alarm(self.title_star_alarm)
 
         # handle debug overlay
         # debug overlay handling

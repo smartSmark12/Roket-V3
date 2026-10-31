@@ -11,14 +11,23 @@ class SpriteWindow:
         self.layer = renderLayer
         self.external = external
 
+        self.ratio = 0
+
         if rescaleSprite:
             self._rescale_sprite(realScale=not self.external)
+
+        self._recalculate_ratio()
+
+    def _recalculate_ratio(self):
+        self.ratio = self.sprite.width / self.sourceSprite.width
 
     def _rescale_sprite(self, realScale=True):
         if realScale:
             self.sprite = pg.transform.scale(self.sourceSprite, (self.app.to_scale_x(self.width), self.app.to_scale_y(self.height)))
         else:
             self.sprite = pg.transform.scale(self.sourceSprite, (self.width, self.height))
+
+        self._recalculate_ratio()
 
     def set_sprite(self, sprite:pg.Surface, rescaleSprite:bool=True):
         self.sourceSprite = sprite

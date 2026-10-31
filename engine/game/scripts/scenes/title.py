@@ -19,6 +19,7 @@ class TitleScene(IntermediateScene):
         self.exit_text = self.app.texts["title_exit"] + " " + self.app.get_keybind_keycode_name_in_square_brackets("ui_back")
         self.buttons = {}
         self.planets = []
+        self.stars = []
 
         ## create all title buttons
         self.buttons["play"] = TextButton(

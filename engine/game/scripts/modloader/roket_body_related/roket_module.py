@@ -2,7 +2,7 @@ from engine.game.scripts.modloader.roket_body_related.roket_module_type import R
 from vuilib.vui_flatpane import flatpane
 
 class RoketModule:
-    def __init__(self, name:str, displayName:str, moduleType:str, moduleLevel:int, maxModuleLevel:int, moduleModifiers:dict[str,any], moduleSprites:flatpane):
+    def __init__(self, name:str, displayName:str, moduleType:str, moduleLevel:int, maxModuleLevel:int, moduleModifiers:dict[str,any], moduleSprites:flatpane, size_modifier:float):
         self.name = name
         self.displayName = displayName
         self.modType = moduleType
@@ -10,6 +10,7 @@ class RoketModule:
         self.modMaxLevel = maxModuleLevel
         self.modModifiers = moduleModifiers # check out the roket_mods.md!
         self.modSprites = moduleSprites
+        self.sizeModifier = size_modifier
 
         self.triggers = {
             "on_activation":None,

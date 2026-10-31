@@ -1,7 +1,7 @@
 import pygame as pg
 import os
 import csv
-from functools import lru_cache
+from functools import lru_cache, cache
 
 from scripts.core.settings import DEFAULT_SPRITE_PATH, DEFAULT_SPRITE_JSON_PATH, WIDTH, HEIGHT, MAX_CACHED_SIZE, EXTENDED_DEBUG_ENABLED
 from scripts.json_loader import JsonLoader
@@ -111,9 +111,17 @@ class SpriteHandlerJSON:
 
     def rescale_sprite(self, spriteToRescale:pg.Surface, size:tuple|list) -> pg.Surface:
         return pg.transform.scale(spriteToRescale, (size[0], size[1]))
+
+    @cache
+    def cached_rescale_sprite(self, spriteToRescale:pg.Surface, size:tuple|list) -> pg.Surface:
+        return pg.transform.scale(spriteToRescale, (size[0], size[1]))
     
     def real_scale_sprite(self, spriteToRescale:pg.Surface, size:tuple|list=None) -> pg.Surface:
         return self.rescale_sprite(spriteToRescale, (self.to_scalex(size[0] if size is not None else spriteToRescale.width), self.to_scaley(size[1] if size is not None else spriteToRescale.height)))
+
+    @cache
+    def cached_real_scale_sprite(self, spriteToRescale:pg.Surface, size:tuple|list=None) -> pg.Surface:
+        return self.cached_rescale_sprite(spriteToRescale, (self.to_scalex(size[0] if size is not None else spriteToRescale.width), self.to_scaley(size[1] if size is not None else spriteToRescale.height)))
     
     def real_scale_sprites(self, spritesToRescale:dict[str, pg.Surface], sizes:dict[str, [int, int]]): # type: ignore
         rescaled_sprites = {}
@@ -156,7 +164,7 @@ class SpriteHandlerJSON:
         else:
             return (self.unscale_x(point[0], False), self.unscale_y(point[1], False))
         
-    @lru_cache(maxsize=MAX_CACHED_SIZE)
+    @cache
     def cached_rotate(self, sprite:pg.Surface, degrees:int|float):
         return pg.transform.rotate(sprite, degrees)
     

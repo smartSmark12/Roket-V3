@@ -257,10 +257,16 @@ class ModLoader:
 
                 sprite_path = sprite_path_prefix + loaded_sprite_path
 
+                # size
+                sprite_size = (
+                    MODULE_DEFAULT_SIZE[0] * module["size"],
+                    MODULE_DEFAULT_SIZE[1] * module["size"]
+                )
+
                 # generate sprite name
                 sprite_name = f"{module_name}_module"
 
-                sprite = self.app.sprite_handler.load_sprite(sprite_name, sprite_path, (100,100), "ca")
+                sprite = self.app.sprite_handler.load_sprite(sprite_name, sprite_path, sprite_size, "ca")
 
                 module_sprite = flatpane("sprite", {"main":sprite}, sprite="main")
 
@@ -271,7 +277,8 @@ class ModLoader:
                                                                 1,
                                                                 1,
                                                                 module["modifiers"],
-                                                                module_sprite
+                                                                module_sprite,
+                                                                module["size"]
                                                             )
             
         # debug
