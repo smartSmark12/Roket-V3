@@ -5,7 +5,7 @@ class Level:
         self.app = appInstance
         self.name = name
         self.displayName = displayName
-        self.icon = icon if icon is not "" else self.app.sprites["level_icon_default"] # fallback if no icon is specified
+        self.icon = icon if icon != "" else self.app.sprites["level_icon_default"] # fallback if no icon is specified
         self.importance = importance
         self.stages = stages
         self.requirements = requirements

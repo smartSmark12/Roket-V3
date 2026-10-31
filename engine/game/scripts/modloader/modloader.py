@@ -371,7 +371,7 @@ class ModLoader:
         print("--------\nLoaded environments:\n")
         
         for environment_name, environment in self.mod_environments.items():
-            print(f"{environment_name}, with {len(environment.objectEvents["random"]) + len(environment.objectEvents["forced"])} events")
+            print(f"{environment_name}, with {len(environment.objectEvents['random']) + len(environment.objectEvents['forced'])} events")
 
         print("") # sep
 
