@@ -814,11 +814,11 @@ class MainEngine:
             total_content_height -= self.to_scale_y(career_scene.career_level_button_offset, round_num=False) # account for the last button's offset
 
         if total_content_height > 0:
-            career_scene.button_render_surface = pg.Surface((career_scene.level_scroll_window.rect.width, total_content_height))
+            career_scene.button_render_surface = pg.Surface((self.to_scale_x(career_scene.level_scroll_window.rect.width), total_content_height)) # total_content_height is already to_scaled
             career_scene.button_render_surface.fill(roket_background_light_blue)
             career_scene.level_scroll_window.set_content(career_scene.button_render_surface)
 
-            career_scene.decoration_render_surface = pg.Surface((career_scene.level_decoration_scroll_window.rect.width, total_content_height))
+            career_scene.decoration_render_surface = pg.Surface((self.to_scale_x(career_scene.level_decoration_scroll_window.rect.width), total_content_height))
             career_scene.decoration_render_surface.fill(roket_light_blue)
             career_scene.level_decoration_scroll_window.set_content(career_scene.decoration_render_surface)
 
