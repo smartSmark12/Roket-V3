@@ -8,3 +8,4 @@ dist/
 output/
 *.spec
 *.exe
+.build_tools/

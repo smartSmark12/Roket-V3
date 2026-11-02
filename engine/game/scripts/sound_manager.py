@@ -146,9 +146,10 @@ class SoundManager:
 
     def play_music(self, musicName:str, repeat:bool=False, offset:float=0, fadeInMS:int=0):
         if musicName in self.music.keys():
-            #file = open(self.music.get(musicName), "r")
-            #file.close()
-            pg.mixer.music.load(self.music.get(musicName))
+            try:
+                pg.mixer.music.load(self.music.get(musicName))
+            except:
+                print(f"{__name__}: couldn't fetch music file to play (does the file exist and does it follow the right format? [pure OGG Vorbis; no thumbnail etc.])")
             try:
                 pg.mixer.music.play(loops=-1 if repeat else 0, start=offset, fade_ms=fadeInMS)
 

@@ -159,6 +159,11 @@
         [128,128],
         "ca"   
     ],
+    "mainmenu_shuffle_button":[
+        "engine/game/assets/img/menu/mainmenu_shuffle_button.png",
+        [128,128],
+        "ca"   
+    ],
     "selector_background":[
         "engine/game/assets/img/menu/selector_background.png",
         [840,360],

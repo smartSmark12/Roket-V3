@@ -12,3 +12,4 @@ class ModDefinitions:
     MOD_FEATURE_LEVEL               = "levels"
     MOD_FEATURE_CAREER              = "careers"
     MOD_FEATURE_LOCALIZATION        = "localization"
+    MOD_FEATURE_MENU_MUSIC          = "menu_music"

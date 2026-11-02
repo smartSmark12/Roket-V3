@@ -263,7 +263,7 @@ class MainEngine:
         )
 
         # create darker button variants
-        for sprite in ["button_template", "button_template_vertical", "button_template_square", "mainmenu_settings_button", "mainmenu_leaderboard_button"]:
+        for sprite in ["button_template", "button_template_vertical", "button_template_square", "mainmenu_settings_button", "mainmenu_leaderboard_button", "mainmenu_shuffle_button"]:
             dark_name = sprite+"_dark"
             self.sprites[dark_name] = self.sprites[sprite].copy()
             pg.Surface.fill(self.sprites[dark_name], BUTTON_COLOR_SUBTRACT_COLOR, special_flags=pg.BLEND_SUB)
@@ -390,7 +390,7 @@ class MainEngine:
 
         # temp play menu music
         self.sound_manager.list_all_loaded_music()
-        self.sound_manager.play_music("core_temp", repeat=True)
+        self.sound_manager.play_music("core_title", repeat=True)
 
         #self.show_choice_yes_no_popup("Are you sure whatever you're doing is worth it? This is a very long dummy text that is utterly useless for anything else :33")
 
@@ -686,6 +686,15 @@ class MainEngine:
             case "mode_dummy":
                 print("dummy launch!")
 
+    def shuffle_main_menu_music(self):
+        choice = self.sound_manager.get_active_or_last_music_name()
+
+        while choice == self.sound_manager.get_active_or_last_music_name():
+            choice = random.choice(list(self.modloader.get_menu_music().keys()))
+
+        print(f"\nplaying menu music: {choice}")
+        self.sound_manager.play_music(choice)
+
     def set_ship_mod_module_active(self, slot:ShipModInteractiveSlotSlot):
         ship_mod_scene = self.scene_handler.getScene("ship_modification")
 
@@ -814,11 +823,11 @@ class MainEngine:
             total_content_height -= self.to_scale_y(career_scene.career_level_button_offset, round_num=False) # account for the last button's offset
 
         if total_content_height > 0:
-            career_scene.button_render_surface = pg.Surface((career_scene.level_scroll_window.rect.width, total_content_height))
+            career_scene.button_render_surface = pg.Surface((self.to_scale_x(career_scene.level_scroll_window.rect.width), total_content_height)) # total_content_height is already to_scaled
             career_scene.button_render_surface.fill(roket_background_light_blue)
             career_scene.level_scroll_window.set_content(career_scene.button_render_surface)
 
-            career_scene.decoration_render_surface = pg.Surface((career_scene.level_decoration_scroll_window.rect.width, total_content_height))
+            career_scene.decoration_render_surface = pg.Surface((self.to_scale_x(career_scene.level_decoration_scroll_window.rect.width), total_content_height))
             career_scene.decoration_render_surface.fill(roket_light_blue)
             career_scene.level_decoration_scroll_window.set_content(career_scene.decoration_render_surface)
 
@@ -1736,7 +1745,7 @@ class MainEngine:
         self.print_log() # print and clear log of current cycle
 
     def do_logic(self): # all non-engine related logic should go here (unless you use scenes ofc)
-        # pause planet spawning alarm if title not active
+        # pause planet and star spawning alarm if not in any main menu
         if self.scene_handler.getActiveSceneName() not in ["title", "main_menu", "ship_modification", "career", "infinite_setup", "achievements", "settings"] or self.get_popup_active():
             self.pause_alarm(self.title_planet_alarm)
             self.pause_alarm(self.title_star_alarm)
