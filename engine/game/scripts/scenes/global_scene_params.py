@@ -8,6 +8,7 @@ class GlobalSceneParams:
     title_square_button_size = 128
     title_side_button_x_distance = 250
     title_button_y_offset = 160 # not sure why this cant be the same as button x dist ::
+    title_shuffle_button_margin = 80
 
 
     # MAIN MENU

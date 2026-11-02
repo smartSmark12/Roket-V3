@@ -14,6 +14,7 @@
         "environments": "default_roket_environments.json",
         "careers": "default_roket_careers.json",
         "levels": "default_roket_levels.json",
+        "menu_music": "default_menu_music.json",
         "localization": [
             "en.json",
             "cz.json"

@@ -1,0 +1,34 @@
+{
+    "menu_music": {
+        "core_menu_title": {
+            "display_name": "Menu music",
+            "author": "TBA",
+            "path": "engine/game/assets/music/V3/ogg/mainmenu_music.ogg"
+        },
+        "core_menu_save_the_queen": {
+            "display_name": "Save the Queen",
+            "author": "Scandroid",
+            "path": "engine/game/assets/music/V3/ogg/level/Save_the_Queen.ogg"
+        },
+        "core_menu_regressor": {
+            "display_name": "Regressor",
+            "author": "TBA",
+            "path": "engine/game/assets/music/V3/ogg/level/Regressor.ogg"
+        },
+        "core_menu_bully_ballad": {
+            "display_name": "9:22 Bully Ballad",
+            "author": "TBA",
+            "path": "engine/game/assets/music/V3/ogg/level/9_22_Bully_Ballad.ogg"
+        },
+        "core_menu_below_the_asteroids": {
+            "display_name": "Below the Asteroids",
+            "author": "Cosmonawt",
+            "path": "engine/game/assets/music/V3/ogg/level/Below_the_Asteroids.ogg"
+        },
+        "core_menu_challenger": {
+            "display_name": "Challenger",
+            "author": "Creo",
+            "path": "engine/game/assets/music/V3/ogg/level/Challenger.ogg"
+        }
+    }
+}

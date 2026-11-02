@@ -33,6 +33,7 @@ class ModLoader:
         self.mod_levels         :dict[str,Level]            = {}
         self.mod_environments   :dict[str,Environment]      = {}
         self.mod_localizations  :list[LocalizationResource] = [] # !list
+        self.mod_menu_music     :dict[str,str]              = {}
 
     def get_roket_bodies(self):
         return self.mod_bodies
@@ -57,6 +58,9 @@ class ModLoader:
 
     def get_localizations(self):
         return self.mod_localizations
+
+    def get_menu_music(self):
+        return self.mod_menu_music
 
     def reload_mods(self):
         pass
@@ -110,6 +114,9 @@ class ModLoader:
                 
                 case md.MOD_FEATURE_LOCALIZATION:
                     self._load_localization_resource(featurePath)
+
+                case md.MOD_FEATURE_MENU_MUSIC:
+                    self._load_menu_music(featurePath)
                     
                     
         # debug too
@@ -488,6 +495,26 @@ class ModLoader:
 
         # debug
         print(f"{__name__}: applied localization: {localization_res.get_code()} ({localization_res.get_name()})")
+
+    # menu music
+    def _load_menu_music(self, source:list):
+        for single_source in source:
+            data = JsonLoader.load_from_file(single_source)
+            for music_name in data[md.MOD_FEATURE_MENU_MUSIC]:
+                music = data[md.MOD_FEATURE_MENU_MUSIC][music_name]
+
+                self.mod_menu_music[music_name] = music["path"]
+                self.app.sound_manager.load_music(music_name, music["path"])
+
+        # debug
+        print("--------\nLoaded menu music:\n")
+
+        for music_name, music in self.mod_menu_music.items():
+            print(f"{music_name}")
+
+        print("") # sep
+
+                
 
     # VALIDATION
 

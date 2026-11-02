@@ -80,4 +80,18 @@ class TitleScene(IntermediateScene):
             self.app
         )
 
+        self.buttons["music_shuffle"] = button(
+            flatpane(
+                "sprite",
+                {"main":self.sprites["mainmenu_shuffle_button"], "hover":self.sprites["mainmenu_shuffle_button_dark"]},
+                sprite="main"
+            ),
+            pg.Rect(self.to_scale_x((WIDTH - gs.title_square_button_size - gs.title_shuffle_button_margin)), self.to_scale_y((HEIGHT - gs.title_square_button_size - gs.title_shuffle_button_margin)), self.to_scale_x(gs.title_square_button_size), self.to_scale_y(gs.title_square_button_size)),
+            0,
+            None,
+            partial(self.app.shuffle_main_menu_music),
+            None,
+            self.app
+        )
+
         
