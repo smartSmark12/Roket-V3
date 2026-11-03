@@ -35,22 +35,15 @@ class AnimationHandler:
                 temp_frames = {}
 
                 for item in range(len(line)):
-                    if item not in [0, 1, 2, 3]:
+                    if item not in [0, 1]:
                         try:
-                            temp_frames[int(item)-4] = self.app.sprites[line[item]]
+                            temp_frames[int(item)-2] = self.app.sprites[line[item]]
                         except:
                             errors_assign += 1
                             print(f"can't assign frame {item} of {line[0]}")
 
-                try:
-                    position = line[3].split(":")
-                    position = (int(position[0]), int(position[1]))
-                except:
-                    errors_position += 1
-                    print(f"couldn't read animation position of {line[0]}")
-
                 """ try: """
-                self.app.animations[line[0]] = AnimatedTexture(convert_to_flatpane(temp_frames), float(line[1]), int(line[2]), position, self.app) # need to remake this probably :>
+                self.app.animations[line[0]] = AnimatedTexture(temp_frames, float(line[1])) # need to remake this probably :>
                 """ except:
                     errors_creation += 1
                     print(f"couldn't create animation {line[0]}") # need proper log """
@@ -59,7 +52,7 @@ class AnimationHandler:
 
         self.app.return_to_runtime_logger(f"{__name__}:animation_loader")
 
-    def add_animation(self, animationName:str, frames:list[str], animationLengthInSec:int|float, animationLayer:int, animationPosition:tuple):
+    def add_animation(self, animationName:str, frames:list[str], animationLengthInSec:int|float):
         if animationName not in self.app.animations:
             # get frames from names
             temp_frames = {}
@@ -68,7 +61,7 @@ class AnimationHandler:
                 temp_frames[frame] = self.app.sprites[frames[frame]]
 
             # create the animation
-            self.app.animations[animationName] = AnimatedTexture(convert_to_flatpane(temp_frames), animationLengthInSec, animationLayer, animationPosition, self.app)
+            self.app.animations[animationName] = AnimatedTexture(temp_frames, animationLengthInSec)
 
         else:
             print(f"{__name__}: an animation is already assigned to name {animationName}")
@@ -80,14 +73,12 @@ class AnimationHandler:
         else:
             print(f"{__name__}: couldn't find animation {animationName} to remove")
 
-    def render_animations(self):
+    def update_animations(self):
         for anim in self.app.animations:
             if anim in self.app.animations_to_render:
                 anim_reference = self.app.animations[anim]
 
                 anim_reference.update_active_frame(self.app.dt)
-                position = self.app.animations[anim].get_animation_position()
-                self.app.to_render.append(RenderItem("sprite", anim_reference.get_render_layer(), {"rect":(position[0], position[1], WIDTH, HEIGHT),"sprite":anim_reference.get_current_frame().sprite}))
 
         self.app.animations_to_render.clear() # now this was a memory leak and a half ::
 

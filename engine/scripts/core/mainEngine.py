@@ -48,20 +48,20 @@ from game.scripts.ui_frame_builder                                              
 from game.scripts.sprite_window                                                     import SpriteWindow
 from scripts.core.settings                                                          import GAME_NAME, DEFAULT_SCENE_NAME
 from game.scripts.modloader.modloader                                               import ModLoader
-from engine.game.scripts.modloader.roket_body_related.roket_body                    import RoketBody
-from engine.game.scripts.modloader.roket_body_related.roket_module                  import RoketModule # load modules from json file configs
-from engine.game.scripts.modloader.roket_body_related.roket_module_slot             import RoketModuleSlot
-from engine.game.scripts.modloader.roket_spawnable_related.spawnable_object         import SpawnableObject
-from engine.game.scripts.modloader.roket_spawnable_related.spawnable_prefab         import SpawnablePrefab
-from engine.game.scripts.modloader.environment_related.environment                  import Environment
-from engine.game.scripts.modloader.roket_spawnable_related.spawnable_navigator      import Navigator
+from game.scripts.modloader.roket_body_related.roket_body                           import RoketBody
+from game.scripts.modloader.roket_body_related.roket_module                         import RoketModule # load modules from json file configs
+from game.scripts.modloader.roket_body_related.roket_module_slot                    import RoketModuleSlot
+from game.scripts.modloader.roket_spawnable_related.spawnable_object                import SpawnableObject
+from game.scripts.modloader.roket_spawnable_related.spawnable_prefab                import SpawnablePrefab
+from game.scripts.modloader.environment_related.environment                         import Environment
+from game.scripts.modloader.roket_spawnable_related.spawnable_navigator             import Navigator
 from game.scripts.gamestate.gamestate_object                                        import GameState
 from game.scripts.modloader.career_related.career                                   import Career
-from engine.game.scripts.modloader.level_related.level                              import Level
+from game.scripts.modloader.level_related.level                                     import Level
 from game.scripts.ship_modification_related.ship_modification_panel                 import ShipModPanel
 from game.scripts.ship_modification_related.ship_modification_page                  import ShipModPage
-from engine.game.scripts.ship_modification_related.ship_modification_slot_slot      import ShipModInteractiveSlotSlot
-from engine.game.scripts.ship_modification_related.ship_modification_slot_storage   import ShipModInteractiveSlotStorage
+from game.scripts.ship_modification_related.ship_modification_slot_slot             import ShipModInteractiveSlotSlot
+from game.scripts.ship_modification_related.ship_modification_slot_storage          import ShipModInteractiveSlotStorage
 from game.scripts.ship_modification_related.ship_modification_pedestal              import ShipModInteractivePedestal
 from game.scripts.popup_windows.popup                                               import PopupWindow
 from game.scripts.popup_windows.popup_info                                          import PopupWindowInfo
@@ -71,8 +71,9 @@ from game.scripts.vuilib_extension.text_button                                  
 from game.scripts.vuilib_extension.level_button                                     import LevelButton
 from game.scripts.vuilib_extension.scrollable_window                                import ScrollableWindow
 from game.scripts.vuilib_extension.scrollbar                                        import Scrollbar
-from engine.game.scripts.modloader.localization_related.localizationResource        import LocalizationResource
-from game.scripts.menu_star                                                         import MenuStar
+from game.scripts.modloader.localization_related.localizationResource               import LocalizationResource
+from game.scripts.menu_star.menu_star                                               import MenuStar
+from game.scripts.menu_star.animated_menu_star                                      import AnimatedMenuStar
 from game.scripts.sound_manager                                                     import SoundManager
 
 from game.scripts.scenes.title                                                      import TitleScene
@@ -373,7 +374,7 @@ class MainEngine:
 
         self.menu_stars:list[MenuStar] = []
         self.menu_comets:list[MenuStar] = [] # coments stawn together with stars
-        self.menu_planets = []
+        self.menu_planets:list[AnimatedMenuStar] = []
 
         # star pre-run warmup
         for i in range(TITLE_STAR_WARMUP_CYCLES):
@@ -1266,13 +1267,13 @@ class MainEngine:
     
     def spawn_title_planets(self):
 
-        if random.randint(0, TITLE_PLANET_SPAWNING_ANICHANCE) == 0:
+        if random.randint(0, TITLE_PLANET_SPAWNING_ANTICHANCE) == 0:
+
+            animation_index = random.randint(0, TITLE_PLANET_TYPES - 1)
 
             planet_name_prefix = "title_planet_"
-            animation_number = 0
 
-            while planet_name_prefix + str(animation_number) in self.animations:
-                animation_number += 1
+            animation_name = planet_name_prefix + str(animation_index)
             
             x_pos = 100
             y_pos = 100
@@ -1281,8 +1282,17 @@ class MainEngine:
                 x_pos = random.randint(int(WIDTH/2), WIDTH)
                 y_pos = random.randint(int(HEIGHT/2), HEIGHT)
 
-            self.animation_handler.add_animation(planet_name_prefix + str(animation_number), ["title_planet_0_0","title_planet_0_1","title_planet_0_2"], 2, self.LAYER_TITLE_PLANETS, (self.to_scale_x(x_pos), self.to_scale_y(y_pos)))
-            self.menu_planets.append(planet_name_prefix + str(animation_number))
+            self.menu_planets.append(
+                AnimatedMenuStar(
+                    self,
+                    (x_pos, y_pos),
+                    (-TITLE_PLANET_SPEED[0], -TITLE_PLANET_SPEED[1]),
+                    random.randrange(TITLE_PLANET_SIZE_MIN_MAX[0], TITLE_PLANET_SIZE_MIN_MAX[1], step=5),
+                    random.randrange(-TITLE_PLANET_ROT_MIN_MAX_DEGREES, TITLE_PLANET_ROT_MIN_MAX_DEGREES),
+                    random.randrange(TITLE_PLANET_ROT_SPEED_MIN_MAX[0], TITLE_PLANET_ROT_SPEED_MIN_MAX[1]),
+                    animation_name
+                )
+            )
 
     def spawn_title_star(self):
         # star spawning
@@ -1338,23 +1348,30 @@ class MainEngine:
             return False
 
     def update_title_planets(self):
-        for planet in self.menu_planets:
-            self.animations[planet].anim_pos = (
-                                                self.animations[planet].anim_pos[0] - self.to_scale_x(self.planet_movement_speed[0])*self.dt,
-                                                self.animations[planet].anim_pos[1] - self.to_scale_y(self.planet_movement_speed[1])*self.dt
-                                                )
+
+        # update animation frames
+        for planet_type_index in range(0, TITLE_PLANET_TYPES):
+            planet_name_prefix = "title_planet_"
+            animation_name = planet_name_prefix + str(planet_type_index)
+
+            self.animations[animation_name].update_active_frame(self.dt)
+
+        for planet_index in range(len(self.menu_planets)):
+            planet:AnimatedMenuStar = self.menu_planets[planet_index]
+
+            planet.update()
             
-            if self.animations[planet].anim_pos[0] < -200:
-                self.animation_handler.remove_animation(planet)
-                self.menu_planets[self.menu_planets.index(planet)] = None
+            if planet.pos[0] < -200:
+                self.menu_planets[planet_index] = None
 
         self.menu_planets = [i for i in self.menu_planets if i is not None]
 
     def render_title_planets(self):
         for planet in self.menu_planets:
-            self.animations_to_render.append(planet)
+            planet.render()
 
     def update_title_stars(self):
+        # update stars
         for star_index in range(len(self.menu_stars)):
             star = self.menu_stars[star_index]
 
@@ -1365,6 +1382,7 @@ class MainEngine:
 
         self.menu_stars = [i for i in self.menu_stars if i is not None]
 
+        # update comets
         for comet_index in range(len(self.menu_comets)):
             comet = self.menu_comets[comet_index]
 
@@ -1376,9 +1394,11 @@ class MainEngine:
         self.menu_comets = [i for i in self.menu_comets if i is not None]
 
     def render_title_stars(self):
+        # render stars
         for star in self.menu_stars:
             star.render()
 
+        # render comets
         for comet in self.menu_comets:
             comet.render()
 
@@ -1782,7 +1802,6 @@ class MainEngine:
         while self.is_running:
             self.handle_events()
             self.update()
-            self.animation_handler.render_animations()
             self.render()
         pg.quit()
         sys.exit()
