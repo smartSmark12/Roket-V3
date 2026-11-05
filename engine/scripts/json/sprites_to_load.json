@@ -199,6 +199,31 @@
         [200,200],
         "ca"
     ],
+    "title_planet_2_0":[
+        "engine/game/assets/img/planets/TitlePlanet2_0.png",
+        [200,200],
+        "ca"
+    ],
+    "title_planet_2_1":[
+        "engine/game/assets/img/planets/TitlePlanet2_1.png",
+        [200,200],
+        "ca"
+    ],
+    "title_planet_2_2":[
+        "engine/game/assets/img/planets/TitlePlanet2_2.png",
+        [200,200],
+        "ca"
+    ],
+    "title_planet_2_3":[
+        "engine/game/assets/img/planets/TitlePlanet2_3.png",
+        [200,200],
+        "ca"
+    ],
+    "title_planet_2_4":[
+        "engine/game/assets/img/planets/TitlePlanet2_4.png",
+        [200,200],
+        "ca"
+    ],
     "ui_builder_left":[
         "engine/game/assets/img/ui_builder/left.png",
         [15,210],

@@ -14,16 +14,21 @@ class AnimatedMenuStar(MenuStar): # you see, it inherits, but only in spirit. It
         self.animatedSpriteName             = animatedTextureName
         self.animatedSprite:AnimatedTexture = self.app.animations[self.animatedSpriteName]
 
+        self._update_sprite()
+
+    def _update_sprite(self):
+        self.sprite = self.app.sprite_handler.cached_real_scale_sprite(
+            self.animatedSprite.sprite,
+            (self.size, self.size)
+        )
+
     def update(self):
         self.pos = (
             self.pos[0] + self.speed[0] * self.app.dt,
             self.pos[1] + self.speed[1] * self.app.dt
         )
 
-        self.sprite = self.app.sprite_handler.cached_real_scale_sprite(
-            self.animatedSprite.sprite,
-            (self.size, self.size)
-        )
+        self._update_sprite()
 
         self.rotation += self.rotationSpeed * self.app.dt
 

@@ -378,10 +378,11 @@ class MainEngine:
 
         # star pre-run warmup
         for i in range(TITLE_STAR_WARMUP_CYCLES):
-            self.spawn_title_star()
+            if i % TITLE_STAR_SPAWNING_PERIOD == 0:
+                self.spawn_title_star()
             self.update_title_stars()
 
-            if i % TITLE_PLANET_SPAWNING_PERIOD == 1:
+            if i % TITLE_PLANET_SPAWNING_PERIOD == 0:
                 self.spawn_title_planets()
             self.update_title_planets()
 
@@ -694,7 +695,7 @@ class MainEngine:
             choice = random.choice(list(self.modloader.get_menu_music().keys()))
 
         print(f"\nplaying menu music: {choice}")
-        self.sound_manager.play_music(choice)
+        self.sound_manager.play_music(choice, repeat=True) # could make this a setting later to allow for either automatic shuffling to the next song or repeating
 
     def set_ship_mod_module_active(self, slot:ShipModInteractiveSlotSlot):
         ship_mod_scene = self.scene_handler.getScene("ship_modification")
@@ -1278,9 +1279,9 @@ class MainEngine:
             x_pos = 100
             y_pos = 100
 
-            while self.in_bounds((x_pos, y_pos)):
-                x_pos = random.randint(int(WIDTH/2), WIDTH)
-                y_pos = random.randint(int(HEIGHT/2), HEIGHT)
+            while self.in_bounds((x_pos, y_pos), margin=50):
+                x_pos = random.randint(0, WIDTH + 200)
+                y_pos = random.randint(0, HEIGHT + 200)
 
             self.menu_planets.append(
                 AnimatedMenuStar(
