@@ -236,6 +236,7 @@ class MainEngine:
 
         # assign empty corrected mouse info
         self.corrected_mouse_info = None
+        self.mouse_busy = False
 
         # debug overlay
         self.default_debug_overlay_enabled = True
@@ -886,6 +887,10 @@ class MainEngine:
         # star movement
         self.update_title_stars()
 
+        # temp
+        title.slider.update()
+        self.sound_manager.set_music_volume(title.slider.get_slider_pos())
+
     def title_render(self):
         title = self.scene_handler.getScene("title")
 
@@ -908,6 +913,8 @@ class MainEngine:
         # star render
         self.render_title_stars()
 
+        # temp
+        title.slider.render() 
 
         # debug
         #self.draw("sprite", 7, {"sprite":UIFrameBuilder.get_ui_frame(400, 300, self.sprites), "rect":(100, 100, 0, 0)})
@@ -1402,6 +1409,12 @@ class MainEngine:
         # render comets
         for comet in self.menu_comets:
             comet.render()
+
+    def set_mouse_busy(self, state:bool):
+        if self.mouse_busy and state:
+            print(f"{__name__}: warning: mouse was already busy!")
+
+        self.mouse_busy = state
 
     def update_alarms(self):
         for alarm in self.alarms:

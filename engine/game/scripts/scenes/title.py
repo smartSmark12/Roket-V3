@@ -4,9 +4,11 @@ from game.scripts.scenes.intermediate_scene         import IntermediateScene
 from game.scripts.scenes.global_scene_params        import GlobalSceneParams as gs
 
 from scripts.core.settings                          import GAME_VERSION, GAME_VERSION_HINT, WIDTH, HEIGHT
+from scripts.colors                                 import *
 from vuilib.vui_flatpane                            import flatpane
 from vuilib.vui_button                              import button
 from game.scripts.vuilib_extension.text_button      import TextButton
+from game.scripts.vuilib_extension.slider           import Slider
 from functools                                      import partial
 
 class TitleScene(IntermediateScene):
@@ -92,6 +94,16 @@ class TitleScene(IntermediateScene):
             partial(self.app.shuffle_main_menu_music),
             None,
             self.app
+        )
+
+        # temp
+        self.slider = Slider(
+            self.app,
+            (200, HEIGHT - 200),
+            (400, 20),
+            40,
+            self.sprites["lajf"],
+            roket_orange
         )
 
         

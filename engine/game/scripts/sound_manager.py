@@ -40,7 +40,7 @@ class SoundManager:
     def set_sound_volume(self, soundName:str, volume:float=1.0):
         if soundName in self.sounds:
             if volume <= 1.0 and volume >= 0.0:
-                self.sounds.get(soundName).set_volume(value=volume)
+                self.sounds.get(soundName).set_volume(volume)
             else:
                 print(f"{__name__}: can only accept volumes between 0-1, volume {volume} not accepted")
 
@@ -137,7 +137,7 @@ class SoundManager:
 
     def set_music_volume(self, volume:float=1.0):
         if volume <= 1.0 and volume >= 0.0:
-            pg.mixer.music.set_volume(volume=volume)
+            pg.mixer.music.set_volume(volume)
         else:
             print(f"{__name__}: can only accept volumes between 0-1, volume {volume} not accepted")
 
