@@ -139,13 +139,13 @@
 *Ships unlocked from the start*
 
 #### Shuttle
-<img src="../img/ships/Legacy/ship1_anim1.png" alt="temp legacy" width="100"/>
+<img src="../img/ships/Shuttle/shuttle_anim2.png" alt="Shuttle" width="100" style="image-rendering: pixelated; border-radius: 0px !important;"/>
 
 ### Dyrriani
 *Pirate inspired / war ships*
 
 #### Fragment
-<img src="../img/else/lajf_buff.png" alt="fragment" width="100"/>
+<img src="../img/else/lajf_buff.png" alt="fragment" width="100" style="image-rendering: pixelated; border-radius: 0px !important;"/>
 
 - highly modular
 - almost fully dependent on modules
@@ -155,12 +155,12 @@
 *Modular, industrial, advanced ships*
 
 #### Freighter - working name
-<img src="../img/else/lajf_buff.png" alt="temp" width="100"/>
+<img src="../img/else/lajf_buff.png" alt="temp" width="100" style="image-rendering: pixelated; border-radius: 0px !important;"/>
 
 - heavy modular freighter-like ship
 
 #### Ghost - working name
-<img src="../img/ships/Runner/Runner_anim1.png" alt="temp runner" width="100"/>
+<img src="../img/ships/Runner/Runner_anim1.png" alt="temp runner" width="100" style="image-rendering: pixelated; border-radius: 0px !important;"/>
 
 - fast, cloaking ship (similar to Runner)
 - only a few modules, strong engine and cloaking module, weak weapons
@@ -169,12 +169,12 @@
 *Powerful specialized endgame ships*
 
 #### Second Sol
-<img src="../img/else/lajf_buff.png" alt="second sol" width="100"/>
+<img src="../img/else/lajf_buff.png" alt="second sol" width="100" style="image-rendering: pixelated; border-radius: 0px !important;"/>
 
 - one single powerful core laser
 
 #### Monolith - working name
-<img src="../img/else/lajf_buff.png" alt="temp" width="100"/>
+<img src="../img/else/lajf_buff.png" alt="temp" width="100" style="image-rendering: pixelated; border-radius: 0px !important;"/>
 
 - Tonk-like heavy armored slow ship with a powerful core
 - can call reinforcements?? (drones?)

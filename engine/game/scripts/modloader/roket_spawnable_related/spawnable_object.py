@@ -25,6 +25,9 @@ class SpawnableObject:
 
         self.pos = self.navigator.get_start_pos()
 
+    def move(self):
+        self.navigator.move()
+
     def trigger(self, triggerName:str):
         if triggerName in self.actions:
             if self.actions[triggerName] is not None:

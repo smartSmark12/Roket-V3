@@ -2,7 +2,7 @@ import pygame as pg
 from game.scripts.helper import Helper
 
 class Slider:
-    def __init__(self, appInstance, pos:tuple, size:tuple, floaterSize:float|int, floaterSprite:pg.Surface, backgroundColor:tuple, startingPos:float=0, renderLayer:int=None):
+    def __init__(self, appInstance, pos:tuple, size:tuple, floaterSize:float|int, floaterSprite:pg.Surface, backgroundColor:tuple, rounded:bool=False, fillColor:tuple=None, startingPos:float=0, renderLayer:int=None):
         self.app = appInstance
         self.pos = pos
         self.size = size
@@ -10,11 +10,16 @@ class Slider:
         self._resolve_orientation()
 
         self.backgroundColor = backgroundColor
+        self.fillColor = fillColor
 
         self.floaterSize = floaterSize
-        self.floaterSprite = self.app.sprite_handler.real_scale_sprite(floaterSprite, (floaterSize, floaterSize))
+        self.floaterSprite:pg.Surface = self.app.sprite_handler.real_scale_sprite(floaterSprite, (floaterSize, floaterSize))
+
+        self.floaterRect = self.floaterSprite.get_rect()
 
         self.renderLayer = renderLayer if renderLayer is not None else self.app.LAYER_UI_TOP_BOTTOM
+
+        self.rounded = rounded
 
         self.sliderPos = 0
         self.set_slider_pos(startingPos)
@@ -42,6 +47,8 @@ class Slider:
     def set_slider_pos(self, newPos:float):
         self.sliderPos = Helper.clamp(newPos, 0, 1)
 
+        self.floaterRect.center = (self.pos[0] + self.sliderPos * self.size[0], self.pos[1] + self.size[1] / 2) if not self.orientation else (self.pos[0] + self.size[0] / 2, self.pos[1] + self.sliderPos * self.size[1])
+
     def get_slider_pos(self):
         return self.sliderPos
 
@@ -52,16 +59,16 @@ class Slider:
         mouse_changed = self.app.corrected_mouse_info[2]
 
         # check for hold start
-        if self.rect.collidepoint(mouse_pos): # hovered
-            if mouse_down and mouse_changed: # started holding
+        if self.rect.collidepoint(mouse_pos) or self.floaterRect.collidepoint(mouse_pos): # hovered
+            if mouse_down and mouse_changed and not self.app.get_mouse_busy(): # started holding
                 self.held = True
-                self.app.set_mouse_busy(True)
+                self.app.set_mouse_busy()
 
         # check for hold end and update pos
         if self.held:
             if not mouse_down:
                 self.held = False
-                self.app.set_mouse_busy(False)
+                self.app.release_mouse_busy()
 
             self.set_slider_pos(self._mouse_to_slider_pos(mouse_pos))
 
@@ -75,9 +82,24 @@ class Slider:
                     self.app.to_scale(self.pos),
                     self.app.to_scale(self.size)
                 ),
+                "radius":int((min(self.app.to_scale_x(self.size[0]), self.app.to_scale_y(self.size[1])) / 2) if self.rounded else 0),
                 "color":self.backgroundColor
             }
         )
+
+        if self.fillColor is not None:
+            self.app.draw(
+                "rect",
+                self.renderLayer,
+                {
+                    "rect":(
+                        self.app.to_scale(self.pos),
+                        self.app.to_scale((self.size[0] * self.get_slider_pos(), self.size[1])) if not self.orientation else self.app.to_scale((self.size[0], self.size[1] * self.get_slider_pos()))
+                    ),
+                    "radius":int((min(self.app.to_scale_x(self.size[0]), self.app.to_scale_y(self.size[1])) / 2) if self.rounded else 0),
+                    "color":self.fillColor
+                }
+            )
 
         # draw floater
         self.app.draw(

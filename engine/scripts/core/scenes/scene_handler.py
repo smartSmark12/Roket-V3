@@ -14,7 +14,7 @@ class SceneHandler:
         else:
             print(f"{__name__}: Scene {sceneToAdd.name} already in scenes")
 
-    def getScene(self, sceneName:str):
+    def getScene(self, sceneName:str) -> Scene | None:
         if sceneName in self.scenes:
             return self.scenes[sceneName]
         else:

@@ -84,10 +84,13 @@ class ScrollableWindow:
     def _get_scroll_offset(self): # <pixels-y> scroll offset for interaction ## dont forget to check if the click is within the scrollable window itself as to not click on invisible objects!
         return (self.content_height - self.size[1]) * self.get_scroll_pos()
 
-    def get_scroll_corrected_pos(self, pos:tuple[float|float]):
+    def get_scroll_corrected_pos(self, pos:tuple[float,float]):
         corrected = (pos[0] - self.render_rect.x, pos[1] - self.render_rect.y + self.app.to_scale_y(self._get_scroll_offset()))
 
         return corrected
+
+    def get_inside_window(self, pos:tuple[float,float]):
+        return self.render_rect.collidepoint(pos)
 
     def get_surface(self, update:bool=True):
         if update:

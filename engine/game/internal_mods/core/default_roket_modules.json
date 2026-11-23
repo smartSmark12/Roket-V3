@@ -48,6 +48,35 @@
             "size":0.3,
             "modifiers": {},
             "actions": {}
+        },
+        "shuttle_missile_launcher": {
+            "display_name": "Small missile launcher",
+            "module_type": "WeaponModuleType",
+            "sprite_source": "internal",
+            "sprite": "img/modules/weapons/shuttle_missile_launcher.png",
+            "size":0.6,
+            "modifiers": {},
+            "actions": {}
+        },
+        "shuttle_minigun": {
+            "display_name": "Small rotary cannon",
+            "module_type": "WeaponModuleType",
+            "sprite_source": "internal",
+            "sprite": "img/modules/weapons/shuttle_minigun.png",
+            "size":0.6,
+            "modifiers": {},
+            "actions": {}
+        },
+        "shuttle_shield": {
+            "display_name": "Powered hull",
+            "module_type": "HullModuleType",
+            "sprite_source": "internal",
+            "sprite": "img/modules/hull/shuttle_shield.png",
+            "size":1,
+            "modifiers": {
+                "hull_strength_mod": 1
+            },
+            "actions": {}
         }
     }
 }

@@ -47,6 +47,19 @@ class button:
             
             return False
 
+    def set_hovered(self, status:bool=True):
+        self.hover = status
+
+        if self.hover:
+            self.on_hover()
+
+        else:
+            self.passive_update()
+
+    def set_clicked(self, status:bool=True):
+        if status:
+            self.on_click()
+
     def is_hovered(self, mousePos:tuple):
         return self.rect.collidepoint(mousePos)
     

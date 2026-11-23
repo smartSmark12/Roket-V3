@@ -19,6 +19,9 @@ from game.scripts.modloader.career_related.career                       import C
 from game.scripts.modloader.level_related.level                         import Level
 from game.scripts.modloader.environment_related.environment             import Environment
 from game.scripts.modloader.localization_related.localizationResource   import LocalizationResource
+from game.scripts.event_related.action_event                            import ActionEvent
+from game.scripts.event_related.environment_action_event                import EnvActionEvent
+from game.scripts.event_related.action_event_type                       import ActionEventType
 
 class ModLoader:
     def __init__(self, appInstance):
@@ -32,6 +35,7 @@ class ModLoader:
         self.mod_careers        :dict[str,Career]           = {}
         self.mod_levels         :dict[str,Level]            = {}
         self.mod_environments   :dict[str,Environment]      = {}
+        self.mod_env_objects    :dict[str,SpawnablePrefab]  = {}
         self.mod_localizations  :list[LocalizationResource] = [] # !list
         self.mod_menu_music     :dict[str,str]              = {}
 
@@ -55,6 +59,9 @@ class ModLoader:
 
     def get_environments(self):
         return self.mod_environments
+
+    def get_env_objects(self):
+        return self.mod_env_objects
 
     def get_localizations(self):
         return self.mod_localizations
@@ -101,7 +108,7 @@ class ModLoader:
                     self._load_spawnables(featurePath)
                     
                 case md.MOD_FEATURE_ENV_OBJECT:
-                    pass
+                    self._load_env_objects(featurePath)
                 
                 case md.MOD_FEATURE_ENV:
                     self._load_environments(featurePath)
@@ -366,10 +373,49 @@ class ModLoader:
         for single_source in source:
             data = JsonLoader.load_from_file(single_source)
             for environment_name, environment in data[md.MOD_FEATURE_ENV].items():
+                # generate actionevents from data
+
+                randomActionEvents = {}
+                forcedActionEvents = {}
+
+                # random
+                for event_index in range(len(environment["environment_object_events"]["random"])):
+                    try:
+                        event = environment["environment_object_events"]["random"][event_index]
+                        randomActionEvents[event_index] = EnvActionEvent(
+                            appInstance     =self.app,
+                            actionCondition =event["antichance"],
+                            actionPeriod    =event["period"],
+                            actionType      =ActionEventType.ACTION_ENV_SPAWN,
+                            actionParams    ={
+                                "spawnable":event["spawnable"]
+                            }
+                        )
+                    except:
+                        print(f"{__name__}: couldn't load random environment spawnable")
+
+                # forced
+                for event_index in range(len(environment["environment_object_events"]["forced"])):
+                    try:
+                        event = environment["environment_object_events"]["forced"][event_index]
+                        forcedActionEvents[event_index] = ActionEvent(
+                            appInstance     =self.app,
+                            actionCondition =event["antichance"],
+                            actionType      =ActionEventType.ACTION_ENV_SPAWN,
+                            actionParams    ={
+                                "spawnable":event["spawnable"]
+                            }
+                        )
+                    except:
+                        print(f"{__name__}: couldn't load forced environment spawnable")
+
+
+                # stitch env
                 env = Environment(
                     appInstance=self.app,
                     backgroundColor=environment["background_color"],
-                    objectEvents=environment["environment_object_events"]
+                    randomObjectEvents=randomActionEvents,
+                    forcedObjectEvents=forcedActionEvents
                 )
 
                 self.mod_environments[environment_name] = env
@@ -378,9 +424,75 @@ class ModLoader:
         print("--------\nLoaded environments:\n")
         
         for environment_name, environment in self.mod_environments.items():
-            print(f"{environment_name}, with {len(environment.objectEvents['random']) + len(environment.objectEvents['forced'])} events")
+            print(f"{environment_name}, with {len(environment.randomObjectEvents) + len(environment.forcedObjectEvents)} event(s)")
 
         print("") # sep
+
+    def _load_env_objects(self, source:list):
+        
+        for single_source in source:
+            data = JsonLoader.load_from_file(single_source)
+            for spawnable_name, spawnable in data[md.MOD_FEATURE_ENV_OBJECT].items():
+
+                # prepare sprites
+                loaded_sprite_paths = spawnable["animation_sprites"]
+
+                # prepare prefix
+                sprite_path_prefix = None
+
+                if spawnable["sprite_source"] == "internal":
+                    sprite_path_prefix = INTERNAL_SPRITE_PATH
+                elif spawnable["sprite_source"] == "external":
+                    sprite_path_prefix = EXTERNAL_SPRITE_PATH
+                else:
+                    sprite_path_prefix = "" # when using fully custom paths
+
+                # output sprite dict
+                sprite_dict = {}
+
+                # load sprites
+                for sprite_index in range(len(loaded_sprite_paths)):
+                    sprite_path = sprite_path_prefix + loaded_sprite_paths[sprite_index]
+
+                    # generate sprite name
+                    sprite_name = f"{spawnable_name}_anim_{sprite_index}"
+
+                    sprite_dict[sprite_index] = self.app.sprite_handler.load_sprite(sprite_name, sprite_path, (100,100), "ca")
+
+
+                # create final flatpane
+                spawnable_sprite = flatpane("sprite", sprite_dict, sprite=0)
+
+                # collider
+                collision_rect = pg.Rect( # unused by env spawnables
+                    0,
+                    0,
+                    100,
+                    100
+                )
+
+                navigator = Navigator(self, "straight")
+
+                # spawnable
+                self.mod_env_objects[spawnable_name] = SpawnablePrefab( # the spawnable prefab is used ## yeah its late 
+                    appInstance     =self.app,
+                    name            =spawnable_name,
+                    displayName     =spawnable_name,    # unused
+                    collider        =collision_rect,    # unused
+                    sprites         =spawnable_sprite,
+                    navigator       =navigator,         # always straight
+                    actions         ={},                # no actions
+                    moveSpeed       =spawnable["speed"]
+                )
+
+        # debug
+        print("--------\nLoaded environment objects:\n")
+
+        for spawnable_name, spawnable in self.mod_env_objects.items():
+            print(f"{spawnable.spawnableDisplayName} ({spawnable.spawnableName})")
+
+        print("")
+    
 
     def _load_levels(self, source:list):
         

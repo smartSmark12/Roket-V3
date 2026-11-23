@@ -1,0 +1,8 @@
+class ActionEventType:
+
+    ACTION_SPAWN = 0
+    ACTION_EXPLODE = 1
+    ACTION_HEAL = 2
+    ACTION_DAMAGE = 3
+
+    ACTION_ENV_SPAWN = 10

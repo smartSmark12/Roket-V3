@@ -80,6 +80,8 @@ from game.scripts.scenes.title                                                  
 from game.scripts.scenes.main_menu                                                  import MainMenuScene
 from game.scripts.scenes.ship_modification                                          import ShipModificationScene
 from game.scripts.scenes.career                                                     import CareerScene
+from game.scripts.scenes.game                                                       import GameScene
+from game.scripts.scenes.settings                                                   import SettingsScene
 
 """ from game.game import MainGame """
 
@@ -190,13 +192,13 @@ class MainEngine:
         # scene handler setup
         self.scene_handler = SceneHandler(self)
 
-        self.to_scale_x = self.sprite_handler.to_scalex
-        self.to_scale_y = self.sprite_handler.to_scaley
-        self.to_scale = self.sprite_handler.to_scale
+        self.to_scale_x     = self.sprite_handler.to_scalex
+        self.to_scale_y     = self.sprite_handler.to_scaley
+        self.to_scale       = self.sprite_handler.to_scale
 
-        self.unscale_x = self.sprite_handler.unscale_x
-        self.unscale_y = self.sprite_handler.unscale_y
-        self.unscale = self.sprite_handler.unscale
+        self.unscale_x      = self.sprite_handler.unscale_x
+        self.unscale_y      = self.sprite_handler.unscale_y
+        self.unscale        = self.sprite_handler.unscale
 
         # logger setup
         self.create_runtime_logger()
@@ -295,7 +297,7 @@ class MainEngine:
         self.selected_mode = "mode_career"
 
         # active ship
-        self.active_ship_name = "legacy" # will be replaced by loading a save perhaps?
+        self.active_ship_name = "shuttle" # will be replaced by loading a save perhaps?
 
         # active career
         self.active_career_name = None
@@ -337,11 +339,11 @@ class MainEngine:
         self.scene_handler.addScene(TitleScene(self))               # the main game title
         self.scene_handler.addScene(MainMenuScene(self))           # main menu - root point
         self.scene_handler.addScene(ShipModificationScene(self))   # upgrades, types, modification
-        self.scene_handler.addScene(Scene(self, "game"))                # actual game scene
+        self.scene_handler.addScene(GameScene(self))                # actual game scene
         self.scene_handler.addScene(CareerScene(self))              # career overview and level select
         self.scene_handler.addScene(Scene(self, "infinite_setup"))      # select music and level for endless mode
         self.scene_handler.addScene(Scene(self, "achievements"))        # achievement and game stats overview
-        self.scene_handler.addScene(Scene(self, "settings"))            # resolution, language, etc. settings
+        self.scene_handler.addScene(SettingsScene(self))            # resolution, language, etc. settings
 
         # set main scene
         self.scene_handler.setActiveScene("title")
@@ -359,12 +361,16 @@ class MainEngine:
         title_scene.update          = self.title_update
         main_menu_scene.update      = self.main_menu_update
         ship_mod_scene.update       = self.ship_modification_update
+        game_scene.update           = self.game_update
+        settings_scene.update       = self.settings_update
         career_scene.update         = self.career_update
 
         # override scene renders
         title_scene.render          = self.title_render
         main_menu_scene.render      = self.main_menu_render
         ship_mod_scene.render       = self.ship_modification_render
+        game_scene.render           = self.game_render
+        settings_scene.render       = self.settings_render
         career_scene.render         = self.career_render
 
         # pre scene setup
@@ -390,6 +396,8 @@ class MainEngine:
             self.dt += 1/TITLE_STAR_WARMUP_CYCLES
 
         self.dt = 0 # reset deltatime after warmup
+        
+        self.gamestate = None
 
         # temp play menu music
         self.sound_manager.list_all_loaded_music()
@@ -544,8 +552,42 @@ class MainEngine:
 
     ##################
 
-    def create_gamestate(self):
-        self.gamestate = GameState() # idk anymore XD
+    # game
+
+    def start_game(self, selectedLevelName:str):
+        """ ... """
+
+        self.create_gamestate(
+            self.get_active_ship(),
+            self.modloader.get_levels().get(selectedLevelName)
+        )
+
+        self.scene_handler.setActiveScene("game")
+
+    def create_gamestate(self, ship:RoketBody, level:Level):
+        if self.gamestate is not None:
+            print("Warning! A gamestate already exists! It will get overwritten")
+
+        self.gamestate = GameState(
+            app     =self,
+            body    =ship,
+            level   =level
+        ) # idk anymore XD
+
+        # this is a bit cursed but it works, so...
+        print(f"""
+Created a new gamestate:
+Ship: {ship.get_property("displayName")} ({ship.name})
+Level: {level.displayName} ({level.name})
+made up of {len(level.stages)} stages
+        """)
+
+    def clear_gamestate(self):
+        print("Gamestate has been reset to None")
+        self.gamestate = None 
+
+    def get_gamestate(self):
+        return self.gamestate
 
     def regenerate_ship_mod_slot_panel(self):
         slot_panel:ShipModPanel = self.scene_handler.getScene("ship_modification").slot_panel
@@ -810,7 +852,7 @@ class MainEngine:
                         pg.Rect(self.to_scale((0, (career_scene.career_level_button_height + career_scene.career_level_button_offset) * index)), self.to_scale((career_scene.career_level_button_width, career_scene.career_level_button_height))),
                         0,
                         None,
-                        partial(print, level_name),
+                        partial(self.start_game, level_name),
                         None,
                         self,
                         level.displayName,
@@ -983,7 +1025,7 @@ class MainEngine:
         self.render_title_stars()
 
     def ship_modification_update(self):
-        ship_mod = self.scene_handler.getScene("ship_modification")
+        ship_mod:ShipModificationScene = self.scene_handler.getScene("ship_modification")
 
         # update all buttons
         for button_index in ship_mod.buttons:
@@ -1013,6 +1055,9 @@ class MainEngine:
 
                     self.get_active_ship().get_module(ship_mod.active_ship_module.get_slot_id()).add_module(slot.get_module(), force=True)
 
+
+        if self.get_keybind_just_pressed("ui_back"):
+            ship_mod.buttons["return"].on_click()
 
         # planet movement
         self.update_title_planets()
@@ -1073,8 +1118,76 @@ class MainEngine:
         # star render
         self.render_title_stars()
 
+    def game_update(self):
+        game:GameScene = self.scene_handler.getScene("game")
+
+        # update all buttons
+        for button_index in game.buttons:
+            button = game.buttons[button_index]
+            button.activation_detection(self.corrected_mouse_info)
+            button.update_hold_time(self.corrected_mouse_info)
+
+        self.get_gamestate().update()
+
+        game.time_display = self.get_gamestate().get_game_time()
+
+    def game_render(self):
+        game:GameScene = self.scene_handler.getScene("game")
+
+        # render all buttons
+        for button in game.buttons:
+            game.buttons[button].render()
+
+        self.draw("text", self.LAYER_UI_BOTTOM, {"text":str(game.time_display)})
+
+    def settings_update(self):
+        settings:SettingsScene = self.scene_handler.getScene("settings")
+
+        # update all buttons
+        for button_index in settings.buttons:
+            button = settings.buttons[button_index]
+            button.activation_detection(self.corrected_mouse_info)
+            button.update_hold_time(self.corrected_mouse_info)
+
+        # planet movement
+        self.update_title_planets()
+
+        # star movement
+        self.update_title_stars()
+
+    def settings_render(self):
+        settings:SettingsScene = self.scene_handler.getScene("settings")
+
+        # draw buttons
+        for button in settings.buttons:
+            settings.buttons[button].render()
+
+        # planet render
+        self.render_title_planets()
+
+        # star render
+        self.render_title_stars()
+
+    def achievements_update(self):
+
+
+        # planet movement
+        self.update_title_planets()
+
+        # star movement
+        self.update_title_stars()
+
+    def achievements_render(self):
+
+
+        # planet render
+        self.render_title_planets()
+
+        # star render
+        self.render_title_stars()
+
     def career_update(self):
-        career = self.scene_handler.getScene("career")
+        career:CareerScene = self.scene_handler.getScene("career")
 
         # update level window
         career.level_decoration_scroll_window.update()
@@ -1096,9 +1209,19 @@ class MainEngine:
                 self.corrected_mouse_info[3] # unchanged
             )
 
+            in_window = career.level_scroll_window.get_inside_window(self.corrected_mouse_info[0]) # has to be non scroll corrected logically
+
             for level_button_name, level_button in career.level_buttons.items():
-                level_button.activation_detection(scroll_corrected_mouse_info)
-                level_button.update_hold_time(scroll_corrected_mouse_info)
+                if in_window:
+                    level_button.activation_detection(scroll_corrected_mouse_info)
+                    level_button.update_hold_time(scroll_corrected_mouse_info)
+
+                else:
+                    level_button.set_hovered(False)
+
+        if self.get_keybind_just_pressed("ui_back"):
+            career.buttons["return"].on_click()
+
 
         # planet movement
         self.update_title_planets()
@@ -1410,11 +1533,17 @@ class MainEngine:
         for comet in self.menu_comets:
             comet.render()
 
-    def set_mouse_busy(self, state:bool):
-        if self.mouse_busy and state:
+    def set_mouse_busy(self):
+        if self.mouse_busy:
             print(f"{__name__}: warning: mouse was already busy!")
 
-        self.mouse_busy = state
+        self.mouse_busy = True
+
+    def release_mouse_busy(self):
+        self.mouse_busy = False
+
+    def get_mouse_busy(self):
+        return self.mouse_busy
 
     def update_alarms(self):
         for alarm in self.alarms:

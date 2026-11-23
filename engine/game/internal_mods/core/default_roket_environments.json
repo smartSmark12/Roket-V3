@@ -1,33 +1,32 @@
 {
-    "environments":
-    {
-        "core_miranda":
-        {
-            "background_color":[255,255,0],
-            "environment_object_events":{
-                "random":
-                [
-
+    "environments": {
+        "core_miranda": {
+            "background_color": [
+                255,
+                255,
+                0
+            ],
+            "environment_object_events": {
+                "random": [
+                    {
+                        "period": 0.4,
+                        "antichance": 1,
+                        "spawnable": "star1"
+                    }
                 ],
-                "forced":
-                [
-
-                ]
+                "forced": []
             }
-        },
-        "core_miranda_test":
-        {
-            "background_color":[255,255,0],
-            "environment_object_events":{
-                "random":
-                [
-
-                ],
-                "forced":
-                [
-
-                ]
-            }
+        }
+    },
+    "core_miranda_test": {
+        "background_color": [
+            255,
+            255,
+            0
+        ],
+        "environment_object_events": {
+            "random": [],
+            "forced": []
         }
     }
 }

@@ -1,0 +1,28 @@
+{
+    "environment_objects": {
+        "star1": {
+            "sprite_source": "internal",
+            "animation_sprites": [
+                "img/stars/star1.png"
+            ],
+            "animation_length": 1,
+            "speed": [
+                0,
+                100
+            ],
+            "size": [
+                100,
+                100
+            ],
+            "size_multiplier_min_max": [
+                1,
+                2
+            ],
+            "rotation_speed": 10,
+            "rotation_speed_multiplier_min_max": [
+                1,
+                4
+            ]
+        }
+    }
+}

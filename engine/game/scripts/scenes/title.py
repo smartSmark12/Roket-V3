@@ -63,7 +63,7 @@ class TitleScene(IntermediateScene):
             pg.Rect(self.to_scale_x((WIDTH - gs.title_square_button_size) / 2 - gs.title_side_button_x_distance), self.to_scale_y((HEIGHT - gs.title_square_button_size) / 2 + gs.title_button_y_offset), self.to_scale_x(gs.title_square_button_size), self.to_scale_y(gs.title_square_button_size)),
             0,
             None,
-            partial(self.app.show_info_popup, "options pressed"),
+            partial(self.scene_handler.setActiveScene, "settings"),
             None,
             self.app
         )
@@ -100,10 +100,13 @@ class TitleScene(IntermediateScene):
         self.slider = Slider(
             self.app,
             (200, HEIGHT - 200),
-            (400, 20),
-            40,
-            self.sprites["lajf"],
-            roket_orange
+            (400, 2*6.7),
+            50,
+            self.sprite_handler.rotate(self.sprites["lajf"], 270),
+            roket_very_dark_orange,
+            rounded=True,
+            fillColor=roket_orange,
+            startingPos=.75
         )
 
         

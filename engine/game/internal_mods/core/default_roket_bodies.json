@@ -1,7 +1,7 @@
 {
     "ships": {
-        "legacy": {
-            "display_name": "Legacy",
+        "shuttle": {
+            "display_name": "Shuttle",
             "base_lives": 1,
             "size": [
                 400,
@@ -17,52 +17,39 @@
             ],
             "sprite_source": "internal",
             "animation_sprites": [
-                "img/ships/Legacy/ship1_anim1.png",
-                "img/ships/Legacy/ship1_anim2.png",
-                "img/ships/Legacy/ship1_anim3.png"
+                "img/ships/Shuttle/shuttle_anim1.png",
+                "img/ships/Shuttle/shuttle_anim2.png",
+                "img/ships/Shuttle/shuttle_anim3.png"
             ],
             "module_slots": {
                 "1": {
-                    "name": "Front weapon",
+                    "name": "Left weapon",
                     "position": [
-                        0,
-                        -0.9
+                        -0.53125,
+                        -0.34375
                     ],
                     "allowed_module_types": [
                         "WeaponModuleType"
                     ]
                 },
                 "2": {
-                    "name": "Core hull",
+                    "name": "Right weapon",
                     "position": [
-                        0,
-                        0.1
+                        0.53125,
+                        -0.34375
                     ],
                     "allowed_module_types": [
-                        "HullModuleType"
+                        "WeaponModuleType"
                     ]
                 },
                 "3": {
-                    "name": "Main engine",
+                    "name": "Core hull",
                     "position": [
                         0,
-                        0.6
+                        -0.1875
                     ],
                     "allowed_module_types": [
-                        "EngineModuleType"
-                    ]
-                },
-                "4": {
-                    "name": "Extra special fucker",
-                    "position": [
-                        0,
-                        -0.2
-                    ],
-                    "allowed_module_types": [
-                        "WeaponModuleType",
-                        "EngineModuleType",
-                        "HullModuleType",
-                        "AbilityModuleType"
+                        "HullModuleType"
                     ]
                 }
             }
